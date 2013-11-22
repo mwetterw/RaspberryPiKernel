@@ -9,11 +9,6 @@ BINDIR = $(BUILDDIR)bin/
 MISCDIR = $(BUILDDIR)misc/
 SRCDIR = src/
 
-EXTDEP = .d
-EXTPRE = .i
-EXTASM = .s
-EXTOBJ = .o
-
 SOURCES_C = $(shell find $(SRCDIR) -iname "*.c")
 SOURCES_ASM = $(shell find $(SRCDIR) -iname "*.s")
 
@@ -45,9 +40,13 @@ PRINTF = $(HIDE)printf
 LINKERSCRIPT = $(TARGETNAME).ld
 MAPFILE = $(MISCDIR)$(TARGETNAME).map
 
+QEMU = qemu-system-arm -kernel $(KERNELELF) -cpu arm1176 -m 512 -M versatilepb -nographic -no-reboot -serial stdio -append "rw earlyprintk loglevel=8 panic=120 keep_bootcon rootwait dma.dmachans=0x7f35 bcm2708_fb.fbwidth=1024 bcm2708_fb.fbheight=768 bcm2708.boardrev=0xf bcm2708.serial=0xcad0eedf smsc95xx.macaddr=B8:27:EB:D0:EE:DF sdhci-bcm2708.emmc_clock_freq=100000000 vc_mem.mem_base=0x1c000000 vc_mem.mem_size=0x20000000  dwc_otg.lpm_enable=0 kgdboc=ttyAMA0,115200 console=ttyS0 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" -S -s
+
+GDB = gdb-multiarch
+
 
 #--------SPECIAL RULES--------#
-.PHONY: all clean mrproper test
+.PHONY: all clean mrproper emu run
 .PRECIOUS: $(PRE) $(ASM) $(OBJ) $(DEP)
 .SECONDEXPANSION:
 
@@ -60,7 +59,7 @@ $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 $(KERNELLIST): $(KERNELELF)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "%-13s <$@>...\n" "Generating"
-	$(CMD_PREFIX)objdump -d $< > $@
+	$(CMD_PREFIX)objdump -D $< > $@
 
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
@@ -90,5 +89,23 @@ $(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -iname '%.c') $(THIS)
 	$(PRINTF) "%-13s <$<>...\n" "Preprocessing"
 	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $<
 
+
+
+#--------PHONY RULES--------#
+emu: $(KERNELIMG)
+	$(HIDE)$(QEMU)
+
+run: $(KERNELIMG)
+	$(PRINTF) "%-13s <qemu>...\n" "Launching"
+	$(HIDE)$(QEMU) > $(MISCDIR)qemu.stdout 2> $(MISCDIR)qemu.stderr & \
+	QEMU_PID=$$!; \
+	printf "%-13s <gdb>...\n" "Launching"; \
+	$(GDB) $(KERNELELF) -x gdb/init.gdb; \
+	printf "%-13s <qemu>...\n" "Killing"; \
+	kill -9 $$QEMU_PID;
+
+
 mrproper:
 	$(RM) $(BUILDDIR)
+
+-include $(DEP)
