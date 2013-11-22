@@ -1,4 +1,4 @@
-THIS := $(lastword MAKEFILE_LIST)
+THIS := $(lastword $(MAKEFILE_LIST))
 
 BUILDDIR = build/
 DEPDIR = $(BUILDDIR)dep/
@@ -74,7 +74,7 @@ $(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
 	$(PRINTF) "%-13s <$<>...\n" "Assembling"
 	$(CMD_PREFIX)as $(ASM_FLAGS) -o $@ $<
 
-$(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -iname '%.s')
+$(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -iname '%.s') $(THIS)
 	$(MKDIR) $(OBJDIR)
 	$(PRINTF) "%-13s <$<>...\n" "Assembling"
 	$(CMD_PREFIX)as $(ASM_FLAGS) -o $@ $<
@@ -84,7 +84,7 @@ $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(PRINTF) "%-13s <$<>...\n" "Compiling"
 	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $<
 
-$(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -iname '%.c')
+$(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -iname '%.c') $(THIS)
 	$(MKDIR) $(PREDIR)
 	$(MKDIR) $(DEPDIR)
 	$(PRINTF) "%-13s <$<>...\n" "Preprocessing"
