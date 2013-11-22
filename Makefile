@@ -6,6 +6,7 @@ PREDIR = $(BUILDDIR)pre/
 ASMDIR = $(BUILDDIR)asm/
 OBJDIR = $(BUILDDIR)obj/
 BINDIR = $(BUILDDIR)bin/
+MISCDIR = $(BUILDDIR)misc/
 SRCDIR = src/
 
 EXTDEP = .d
@@ -27,6 +28,7 @@ DEP = $(addprefix $(DEPDIR), $(notdir $(SOURCES_C:%.c=%.d)))
 TARGETNAME = kernel
 KERNELIMG = $(BINDIR)$(TARGETNAME).img
 KERNELELF = $(BINDIR)$(TARGETNAME).elf
+KERNELLIST = $(MISCDIR)$(TARGETNAME).list
 
 HIDE = @
 CMD_PREFIX = $(HIDE)arm-linux-gnueabi-
@@ -41,7 +43,7 @@ PRINTF = $(HIDE)printf
 
 
 LINKERSCRIPT = $(TARGETNAME).ld
-MAPFILE = $(TARGETNAME).map
+MAPFILE = $(MISCDIR)$(TARGETNAME).map
 
 
 #--------SPECIAL RULES--------#
@@ -50,15 +52,22 @@ MAPFILE = $(TARGETNAME).map
 .SECONDEXPANSION:
 
 #--------RULES--------#
-$(KERNELIMG): $(KERNELELF)
+$(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 	$(MKDIR) $(BINDIR)
 	$(PRINTF) "%-13s <$@>...\n" "Generating"
 	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG)
 
+$(KERNELLIST): $(KERNELELF)
+	$(MKDIR) $(MISCDIR)
+	$(PRINTF) "%-13s <$@>...\n" "Generating"
+	$(CMD_PREFIX)objdump -d $< > $@
+
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
+	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "%-13s <$@>...\n" "Linking"
 	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ)
+	$(ECHO)
 
 $(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
 	$(MKDIR) $(OBJDIR)
