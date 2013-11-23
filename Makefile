@@ -9,6 +9,8 @@ BINDIR = $(BUILDDIR)bin/
 MISCDIR = $(BUILDDIR)misc/
 SRCDIR = src/
 
+CLEANDIR = $(DEPDIR) $(PREDIR) $(ASMDIR) $(OBJDIR) $(MISCDIR)
+
 SOURCES_C = $(shell find $(SRCDIR) -iname "*.c")
 SOURCES_ASM = $(shell find $(SRCDIR) -iname "*.s")
 
@@ -104,6 +106,10 @@ run: $(KERNELIMG)
 	printf "%-13s <qemu>...\n" "Killing"; \
 	kill -9 $$QEMU_PID;
 
+all: mrproper $(KERNELIMG)
+
+clean:
+	$(RM) $(CLEANDIR)
 
 mrproper:
 	$(RM) $(BUILDDIR)
