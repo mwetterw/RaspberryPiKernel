@@ -55,6 +55,50 @@ COLOR_GREEN = \033[1;32m
 COLOR_RED = \033[1;31m
 COLOR_WHITE = \033[1;37m
 COLOR_GREY = \033[1;30m
+BGCOLOR_RED = \033[41m
+BGCOLOR_GREEN = \033[42m
+
+COLOR_ERROR = $(BGCOLOR_RED)$(COLOR_WHITE)
+COLOR_SUCCESS = $(BGCOLOR_GREEN)$(COLOR_WHITE)
+COLOR_PRE = $(COLOR_GREY)
+COLOR_CC = $(COLOR_BLUE)
+COLOR_ASM = $(COLOR_PURPLE)
+COLOR_LN = $(COLOR_CYAN)
+COLOR_GEN = $(COLOR_WHITE)
+
+define errorHandler
+	if [ $$? -ne 0 ]; then \
+		$(call printError,$1,$2,$3) \
+		false; \
+	fi;
+endef
+
+define printError
+	echo ""; \
+	echo -n "$(COLOR_ERROR)There are$(COLOR_END) "; \
+	case $3 in \
+	"pre") \
+		echo -n "$(COLOR_PRE)PREPROCESSING$(COLOR_END)"; \
+		;; \
+	"cc") \
+		echo -n "$(COLOR_CC)COMPILING$(COLOR_END)"; \
+		;; \
+	"asm") \
+		echo -n "$(COLOR_ASM)ASSEMBLING$(COLOR_END)"; \
+		;; \
+	"ld") \
+		echo -n "$(COLOR_LN)LINKING$(COLOR_END)"; \
+		;; \
+	"genlist") \
+		echo -n "$(COLOR_GEN)LISTING GENERATION$(COLOR_END)"; \
+		;; \
+	"genimg") \
+		echo -n "$(COLOR_GEN)KERNEL GENERATION$(COLOR_END)"; \
+		;; \
+	esac; \
+	echo " $(COLOR_ERROR)errors.$(COLOR_END)" ;\
+	echo "$(COLOR_ERROR)BUILD FAILED$(COLOR_END)";
+endef
 
 #--------SPECIAL RULES--------#
 .PHONY: all clean mrproper emu run
@@ -65,24 +109,30 @@ COLOR_GREY = \033[1;30m
 $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 	$(MKDIR) $(BINDIR)
 	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
-	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG)
+	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG); \
+	$(call errorHandler,$1,$2,genimg)
+	$(ECHO)
+	$(ECHO) "$(COLOR_SUCCESS)BUILD SUCCESSFUL$(COLOR_END)"
 
 $(KERNELLIST): $(KERNELELF)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
-	$(CMD_PREFIX)objdump -D $< > $@
+	$(PRINTF) "$(COLOR_GEN)%-13s$(COLOR_END) <$@>...\n" "Generating"
+	$(CMD_PREFIX)objdump -D $< > $@; \
+	$(call errorHandler,$1,$2,genlist)
 
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "$(COLOR_CYAN)%-13s$(COLOR_END) <$@>...\n" "Linking"
-	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ)
-	$(ECHO)
+	$(PRINTF) "$(COLOR_LN)%-13s$(COLOR_END) <$@>...\n" "Linking"
+	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ); \
+	$(call errorHandler,$1,$2,ld)
+
 
 define assemble
 	$(MKDIR) $(OBJDIR)
-	$(PRINTF) "$(COLOR_PURPLE)%-13s$(COLOR_END) <$2>...\n" "Assembling"
-	$(CMD_PREFIX)as $(ASM_FLAGS) -o $1 $2
+	$(PRINTF) "$(COLOR_ASM)%-13s$(COLOR_END) <$2>...\n" "Assembling"
+	$(CMD_PREFIX)as $(ASM_FLAGS) -o $1 $2; \
+	$(call errorHandler,$1,$2,asm)
 endef
 
 $(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
@@ -93,14 +143,16 @@ $(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -name '%.s') $(THIS)
 
 $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(MKDIR) $(ASMDIR)
-	$(PRINTF) "$(COLOR_BLUE)%-13s$(COLOR_END) <$<>...\n" "Compiling"
-	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $<
+	$(PRINTF) "$(COLOR_CC)%-13s$(COLOR_END) <$<>...\n" "Compiling"
+	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $<; \
+	$(call errorHandler,$@,$<,cc)
 
 $(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -name '%.c') $(THIS)
 	$(MKDIR) $(PREDIR)
 	$(MKDIR) $(DEPDIR)
-	$(PRINTF) "$(COLOR_GREY)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
-	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $<
+	$(PRINTF) "$(COLOR_PRE)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
+	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $<; \
+	$(call errorHandler,$1,$2,pre)
 
 
 
