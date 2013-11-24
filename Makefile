@@ -53,7 +53,7 @@ include make/colors.inc.mk
 include make/errorHandler.inc.mk
 
 #--------SPECIAL RULES--------#
-.PHONY: all clean mrproper emu run
+.PHONY: all clean mrproper emu run list
 .PRECIOUS: $(PRE) $(ASM) $(OBJ) $(DEP)
 .SECONDEXPANSION:
 
