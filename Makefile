@@ -26,6 +26,7 @@ TARGETNAME = kernel
 KERNELIMG = $(BINDIR)$(TARGETNAME).img
 KERNELELF = $(BINDIR)$(TARGETNAME).elf
 KERNELLIST = $(MISCDIR)$(TARGETNAME).list
+TMPERRORFILE = $(MISCDIR)$(THIS).stderr
 
 HIDE = @
 CMD_PREFIX = $(HIDE)arm-linux-gnueabi-
@@ -67,7 +68,7 @@ COLOR_LN = $(COLOR_CYAN)
 COLOR_GEN = $(COLOR_WHITE)
 
 define errorHandler
-	if [ $$? -ne 0 ]; then \
+	2> $(TMPERRORFILE); if [ $$? -ne 0 ]; then \
 		$(call printError,$1,$2,$3) \
 		false; \
 	fi;
@@ -96,7 +97,9 @@ define printError
 		echo -n "$(COLOR_GEN)KERNEL GENERATION$(COLOR_END)"; \
 		;; \
 	esac; \
-	echo " $(COLOR_ERROR)errors.$(COLOR_END)" ;\
+	echo " $(COLOR_ERROR)errors:$(COLOR_END)"; \
+	cat $(TMPERRORFILE); \
+	echo ""; \
 	echo "$(COLOR_ERROR)BUILD FAILED$(COLOR_END)";
 endef
 
@@ -109,7 +112,7 @@ endef
 $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 	$(MKDIR) $(BINDIR)
 	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
-	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG); \
+	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG) \
 	$(call errorHandler,$1,$2,genimg)
 	$(ECHO)
 	$(ECHO) "$(COLOR_SUCCESS)BUILD SUCCESSFUL$(COLOR_END)"
@@ -117,21 +120,21 @@ $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 $(KERNELLIST): $(KERNELELF)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_GEN)%-13s$(COLOR_END) <$@>...\n" "Generating"
-	$(CMD_PREFIX)objdump -D $< > $@; \
+	$(CMD_PREFIX)objdump -D $< > $@ \
 	$(call errorHandler,$1,$2,genlist)
 
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_LN)%-13s$(COLOR_END) <$@>...\n" "Linking"
-	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ); \
+	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ) \
 	$(call errorHandler,$1,$2,ld)
 
 
 define assemble
 	$(MKDIR) $(OBJDIR)
 	$(PRINTF) "$(COLOR_ASM)%-13s$(COLOR_END) <$2>...\n" "Assembling"
-	$(CMD_PREFIX)as $(ASM_FLAGS) -o $1 $2; \
+	$(CMD_PREFIX)as $(ASM_FLAGS) -o $1 $2 \
 	$(call errorHandler,$1,$2,asm)
 endef
 
@@ -139,19 +142,21 @@ $(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
 	$(call assemble,$@,$<)
 
 $(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -name '%.s') $(THIS)
+	$(MKDIR) $(MISCDIR)
 	$(call assemble,$@,$<)
 
 $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(MKDIR) $(ASMDIR)
 	$(PRINTF) "$(COLOR_CC)%-13s$(COLOR_END) <$<>...\n" "Compiling"
-	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $<; \
+	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $< \
 	$(call errorHandler,$@,$<,cc)
 
 $(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -name '%.c') $(THIS)
 	$(MKDIR) $(PREDIR)
 	$(MKDIR) $(DEPDIR)
+	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_PRE)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
-	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $<; \
+	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $< \
 	$(call errorHandler,$1,$2,pre)
 
 
