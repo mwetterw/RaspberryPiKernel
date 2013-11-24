@@ -70,6 +70,8 @@ define errorHandler
 	2> $(MISCDIR)$(notdir $2).err; if [ $$? -ne 0 ]; then \
 		$(call printError,$1,$2,$3) \
 		false; \
+		else \
+		rm -f $(MISCDIR)$(notdir $2).err; \
 	fi;
 endef
 
