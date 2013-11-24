@@ -9,11 +9,13 @@ OBJDIR = $(BUILDDIR)obj/
 BINDIR = $(BUILDDIR)bin/
 MISCDIR = $(BUILDDIR)misc/
 SRCDIR = src/
+MAKEINCDIR = make/
 CLEANDIR = $(DEPDIR) $(PREDIR) $(ASMDIR) $(OBJDIR) $(MISCDIR)
 
 #--------AUTOMATIC RECURSIVE FILE FINDING--------#
 SOURCES_C = $(shell find $(SRCDIR) -name "*.c")
 SOURCES_ASM = $(shell find $(SRCDIR) -name "*.s")
+THIS += $(wildcard $(MAKEINCDIR)*.mk)
 
 #--------INTERMIDIATE FILES--------#
 PRE = $(addprefix $(PREDIR), $(notdir $(SOURCES_C:%.c=%.i)))
