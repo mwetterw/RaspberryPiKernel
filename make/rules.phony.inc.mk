@@ -1,9 +1,9 @@
 emu: $(KERNELIMG)
-	$(HIDE)$(QEMU)
+	$(HIDE)$(QEMU) $(QEMU_FLAGS)
 
 run: $(KERNELIMG)
 	$(PRINTF) "%-13s <qemu>...\n" "Launching"
-	$(HIDE)$(QEMU) > $(MISCDIR)qemu.stdout 2> $(MISCDIR)qemu.stderr & \
+	$(HIDE)$(QEMU) $(QEMU_FLAGS) > $(MISCDIR)qemu.stdout 2> $(MISCDIR)qemu.stderr & \
 	QEMU_PID=$$!; \
 	printf "%-13s <gdb>...\n" "Launching"; \
 	$(GDB) $(KERNELELF) -x gdb/init.gdb; \
