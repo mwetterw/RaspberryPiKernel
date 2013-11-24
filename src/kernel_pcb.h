@@ -27,6 +27,6 @@ void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
  * @param PCB to add
  * @param Turnstile to add to
  */
-void kernel_pcb_turnstile_add ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
+void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
 
 #endif
