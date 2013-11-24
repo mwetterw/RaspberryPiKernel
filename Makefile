@@ -11,8 +11,8 @@ SRCDIR = src/
 
 CLEANDIR = $(DEPDIR) $(PREDIR) $(ASMDIR) $(OBJDIR) $(MISCDIR)
 
-SOURCES_C = $(shell find $(SRCDIR) -iname "*.c")
-SOURCES_ASM = $(shell find $(SRCDIR) -iname "*.s")
+SOURCES_C = $(shell find $(SRCDIR) -name "*.c")
+SOURCES_ASM = $(shell find $(SRCDIR) -name "*.s")
 
 PRE = $(addprefix $(PREDIR), $(notdir $(SOURCES_C:%.c=%.i)))
 ASM = $(addprefix $(ASMDIR), $(notdir $(SOURCES_C:%.c=%.s)))
@@ -88,7 +88,7 @@ endef
 $(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
 	$(call assemble,$@,$<)
 
-$(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -iname '%.s') $(THIS)
+$(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -name '%.s') $(THIS)
 	$(call assemble,$@,$<)
 
 $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
@@ -96,7 +96,7 @@ $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(PRINTF) "$(COLOR_BLUE)%-13s$(COLOR_END) <$<>...\n" "Compiling"
 	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $<
 
-$(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -iname '%.c') $(THIS)
+$(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -name '%.c') $(THIS)
 	$(MKDIR) $(PREDIR)
 	$(MKDIR) $(DEPDIR)
 	$(PRINTF) "$(COLOR_GREY)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
