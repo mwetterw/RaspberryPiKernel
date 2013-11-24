@@ -1,3 +1,6 @@
+#ifndef _H_KERNEL_PCB
+#define _H_KERNEL_PCB
+
 #include <stdint.h>
 
 typedef struct kernel_pcb_s
@@ -6,3 +9,5 @@ typedef struct kernel_pcb_s
 	uint32_t * mpStack;
 	struct kernel_pcb_s * mpNext;
 } kernel_pcb_t;
+
+#endif
