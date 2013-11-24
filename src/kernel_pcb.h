@@ -2,6 +2,7 @@
 #define _H_KERNEL_PCB
 
 #include <stdint.h>
+#include "kernel_arm.h"
 
 typedef struct kernel_pcb_s
 {
@@ -28,5 +29,8 @@ void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
  * @param Turnstile to add to
  */
 void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
+
+#define kernel_pcb_set_register(pcb, register, value) \
+	( pcb ) -> mpSP [ register ] = ( uint32_t ) ( value )
 
 #endif
