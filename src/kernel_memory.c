@@ -4,7 +4,7 @@
 
 
 static kernel_heap_part_t *
-kernel_private_allocate_memory ( uint32_t size, kernel_heap_part_t * pPrevious );
+kernel_memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious );
 
 static char kernel_memory_heap [ KERNEL_HEAP_SIZE ];
 
@@ -63,7 +63,7 @@ void * kernel_memory_allocate ( uint32_t size )
 			)
 		)
 		{
-			kernel_heap_part_t * new = kernel_private_allocate_memory ( size, current );
+			kernel_heap_part_t * new = kernel_memory_private_allocate ( size, current );
 			return new + 1;
 		}
 
@@ -100,7 +100,7 @@ void kernel_memory_deallocate ( void * address )
 
 // ASSERT
 // pPrevious HAS TO be valid. There is no check
-kernel_heap_part_t * kernel_private_allocate_memory ( uint32_t size, kernel_heap_part_t * pPrevious )
+kernel_heap_part_t * kernel_memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious )
 {
 	kernel_heap_part_t * new = ( kernel_heap_part_t * ) (
 		( ( char * ) pPrevious ) +
