@@ -29,65 +29,23 @@ KERNELLIST = $(MISCDIR)$(TARGETNAME).list
 
 HIDE = @
 CMD_PREFIX = $(HIDE)arm-linux-gnueabi-
+GDB = gdb-multiarch
 
 CC_FLAGS = -Wall -Wextra -Werror -nostdlib -fomit-frame-pointer -mno-apcs-frame -nostartfiles -ffreestanding -g -march=armv6z -marm
 ASM_FLAGS = -g -march=armv6z
+
+QEMU = qemu-system-arm -kernel $(KERNELELF) -cpu arm1176 -m 512 -M versatilepb -nographic -no-reboot -serial stdio -append "rw earlyprintk loglevel=8 panic=120 keep_bootcon rootwait dma.dmachans=0x7f35 bcm2708_fb.fbwidth=1024 bcm2708_fb.fbheight=768 bcm2708.boardrev=0xf bcm2708.serial=0xcad0eedf smsc95xx.macaddr=B8:27:EB:D0:EE:DF sdhci-bcm2708.emmc_clock_freq=100000000 vc_mem.mem_base=0x1c000000 vc_mem.mem_size=0x20000000  dwc_otg.lpm_enable=0 kgdboc=ttyAMA0,115200 console=ttyS0 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" -S -s
 
 MKDIR = $(HIDE)mkdir -p
 ECHO = $(HIDE)echo
 RM = $(HIDE)rm -rf
 PRINTF = $(HIDE)printf
 
-
 LINKERSCRIPT = $(TARGETNAME).ld
 MAPFILE = $(MISCDIR)$(TARGETNAME).map
 
-QEMU = qemu-system-arm -kernel $(KERNELELF) -cpu arm1176 -m 512 -M versatilepb -nographic -no-reboot -serial stdio -append "rw earlyprintk loglevel=8 panic=120 keep_bootcon rootwait dma.dmachans=0x7f35 bcm2708_fb.fbwidth=1024 bcm2708_fb.fbheight=768 bcm2708.boardrev=0xf bcm2708.serial=0xcad0eedf smsc95xx.macaddr=B8:27:EB:D0:EE:DF sdhci-bcm2708.emmc_clock_freq=100000000 vc_mem.mem_base=0x1c000000 vc_mem.mem_size=0x20000000  dwc_otg.lpm_enable=0 kgdboc=ttyAMA0,115200 console=ttyS0 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" -S -s
-
-GDB = gdb-multiarch
-
 include make/colors.mk
-
-define errorHandler
-	2> $(MISCDIR)$(notdir $2).err; \
-		if [ $$? -ne 0 ]; then \
-			echo " $(COLOR_RED)[ KO ]$(COLOR_END)"; \
-			$(call printError,$1,$2,$3) \
-			false; \
-		else \
-			rm -f $(MISCDIR)$(notdir $2).err; \
-			echo " $(COLOR_GREEN)[ OK ]$(COLOR_END)"; \
-		fi;
-endef
-
-define printError
-	echo ""; \
-	echo -n "$(COLOR_ERROR)There are$(COLOR_END) "; \
-	case $3 in \
-	"pre") \
-		echo -n "$(COLOR_PRE)PREPROCESSING$(COLOR_END)"; \
-		;; \
-	"cc") \
-		echo -n "$(COLOR_CC)COMPILING$(COLOR_END)"; \
-		;; \
-	"asm") \
-		echo -n "$(COLOR_ASM)ASSEMBLING$(COLOR_END)"; \
-		;; \
-	"ld") \
-		echo -n "$(COLOR_LN)LINKING$(COLOR_END)"; \
-		;; \
-	"genlist") \
-		echo -n "$(COLOR_GEN)LISTING GENERATION$(COLOR_END)"; \
-		;; \
-	"genimg") \
-		echo -n "$(COLOR_GEN)KERNEL GENERATION$(COLOR_END)"; \
-		;; \
-	esac; \
-	echo " $(COLOR_ERROR)errors:$(COLOR_END)"; \
-	cat $(MISCDIR)$(notdir $2).err; \
-	echo ""; \
-	echo "$(COLOR_ERROR)BUILD FAILED$(COLOR_END)";
-endef
+include make/errorHandler.inc.mk
 
 #--------SPECIAL RULES--------#
 .PHONY: all clean mrproper emu run
