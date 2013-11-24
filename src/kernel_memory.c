@@ -3,7 +3,8 @@
 #include "kernel_config.h"
 
 
-kernel_heap_part_t * kernel_private_allocate_memory ( uint32_t size, kernel_heap_part_t * pPrevious );
+static kernel_heap_part_t *
+kernel_private_allocate_memory ( uint32_t size, kernel_heap_part_t * pPrevious );
 
 static char kernel_memory_heap [ KERNEL_HEAP_SIZE ];
 
