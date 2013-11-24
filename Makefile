@@ -1,4 +1,5 @@
 THIS := $(lastword $(MAKEFILE_LIST))
+MAKEFLAGS += --output-sync=target
 
 #--------DIRECTORIES--------#
 BUILDDIR = build/
