@@ -21,3 +21,4 @@ clean:
 mrproper:
 	$(RM) $(BUILDDIR)
 
+list: $(KERNELLIST)

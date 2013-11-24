@@ -1,4 +1,4 @@
-$(KERNELIMG): $(KERNELELF) $(KERNELLIST)
+$(KERNELIMG): $(KERNELELF)
 	$(MKDIR) $(BINDIR)
 	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) %-30s" "Generating" "<$(notdir $@)>..."
 	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG) \
