@@ -1,3 +1,6 @@
+MAKEFLAGS += --output-sync=none
+.NOTPARALLEL:
+
 emu: $(KERNELIMG)
 	$(HIDE)$(QEMU) $(QEMU_FLAGS)
 
