@@ -46,6 +46,15 @@ QEMU = qemu-system-arm -kernel $(KERNELELF) -cpu arm1176 -m 512 -M versatilepb -
 
 GDB = gdb-multiarch
 
+COLOR_END = \033[0m
+COLOR_CYAN = \033[1;36m
+COLOR_PURPLE = \033[1;35m
+COLOR_BLUE = \033[1;34m
+COLOR_YELLOW = \033[1;33m
+COLOR_GREEN = \033[1;32m
+COLOR_RED = \033[1;31m
+COLOR_WHITE = \033[1;37m
+COLOR_GREY = \033[1;30m
 
 #--------SPECIAL RULES--------#
 .PHONY: all clean mrproper emu run
@@ -55,40 +64,41 @@ GDB = gdb-multiarch
 #--------RULES--------#
 $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 	$(MKDIR) $(BINDIR)
-	$(PRINTF) "%-13s <$@>...\n" "Generating"
+	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
 	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG)
 
 $(KERNELLIST): $(KERNELELF)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "%-13s <$@>...\n" "Generating"
+	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
 	$(CMD_PREFIX)objdump -D $< > $@
 
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "%-13s <$@>...\n" "Linking"
+	$(PRINTF) "$(COLOR_CYAN)%-13s$(COLOR_END) <$@>...\n" "Linking"
 	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ)
 	$(ECHO)
 
 $(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
 	$(MKDIR) $(OBJDIR)
-	$(PRINTF) "%-13s <$<>...\n" "Assembling"
+	$(PRINTF) "$(COLOR_PURPLE)%-13s$(COLOR_END) <$<>...\n" "Assembling"
 	$(CMD_PREFIX)as $(ASM_FLAGS) -o $@ $<
+
 
 $(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -iname '%.s') $(THIS)
 	$(MKDIR) $(OBJDIR)
-	$(PRINTF) "%-13s <$<>...\n" "Assembling"
+	$(PRINTF) "$(COLOR_PURPLE)%-13s$(COLOR_END) <$<>...\n" "Assembling"
 	$(CMD_PREFIX)as $(ASM_FLAGS) -o $@ $<
 
 $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(MKDIR) $(ASMDIR)
-	$(PRINTF) "%-13s <$<>...\n" "Compiling"
+	$(PRINTF) "$(COLOR_BLUE)%-13s$(COLOR_END) <$<>...\n" "Compiling"
 	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $<
 
 $(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -iname '%.c') $(THIS)
 	$(MKDIR) $(PREDIR)
 	$(MKDIR) $(DEPDIR)
-	$(PRINTF) "%-13s <$<>...\n" "Preprocessing"
+	$(PRINTF) "$(COLOR_GREY)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
 	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $<
 
 
