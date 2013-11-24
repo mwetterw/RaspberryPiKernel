@@ -38,8 +38,27 @@ reset:
 	bic r0, #1
 	mcr p15, #0, r0, c1, c0, 0
 
+    ;@ Switch to IRQ Mode
+	;@ IRQ Disabled
+	;@ FIQ Disabled
+    mov r0,#0xD2
+    msr cpsr_c,r0
+    mov sp,#0x8000
 
-	mov sp, #0x8000000
+    ;@ Switch to FIQ Mode
+	;@ IRQ Disabled
+	;@ FIQ Disabled
+    mov r0,#0xD1
+    msr cpsr_c,r0
+    mov sp,#0x4000
+
+    ;@ Switch to SUPERVISOR Mode
+	;@ IRQ Disabled
+	;@ FIQ Disabled
+    mov r0,#0xD3
+    msr cpsr_c,r0
+    mov sp,#0x8000000
+
 	b kernel_main
 
 undefined: b undefined
