@@ -67,12 +67,15 @@ COLOR_LN = $(COLOR_CYAN)
 COLOR_GEN = $(COLOR_WHITE)
 
 define errorHandler
-	2> $(MISCDIR)$(notdir $2).err; if [ $$? -ne 0 ]; then \
-		$(call printError,$1,$2,$3) \
-		false; \
+	2> $(MISCDIR)$(notdir $2).err; \
+		if [ $$? -ne 0 ]; then \
+			echo " $(COLOR_RED)[ KO ]$(COLOR_END)"; \
+			$(call printError,$1,$2,$3) \
+			false; \
 		else \
-		rm -f $(MISCDIR)$(notdir $2).err; \
-	fi;
+			rm -f $(MISCDIR)$(notdir $2).err; \
+			echo " $(COLOR_GREEN)[ OK ]$(COLOR_END)"; \
+		fi;
 endef
 
 define printError
@@ -112,7 +115,7 @@ endef
 #--------RULES--------#
 $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 	$(MKDIR) $(BINDIR)
-	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
+	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) %-30s" "Generating" "<$@>..."
 	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG) \
 	$(call errorHandler,$@,$<,genimg)
 	$(ECHO)
@@ -120,21 +123,22 @@ $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 
 $(KERNELLIST): $(KERNELELF)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "$(COLOR_GEN)%-13s$(COLOR_END) <$@>...\n" "Generating"
+	$(PRINTF) "$(COLOR_GEN)%-13s$(COLOR_END) %-30s" "Generating" "<$@>..."
 	$(CMD_PREFIX)objdump -D $< > $@ \
 	$(call errorHandler,$@,$<,genlist)
 
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "$(COLOR_LN)%-13s$(COLOR_END) <$@>...\n" "Linking"
+	$(PRINTF) "$(COLOR_LN)%-13s$(COLOR_END) %-30s" "Linking" "<$@>..."
 	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ) \
 	$(call errorHandler,$@,$<,ld)
+	$(ECHO)
 
 
 define assemble
 	$(MKDIR) $(OBJDIR)
-	$(PRINTF) "$(COLOR_ASM)%-13s$(COLOR_END) <$2>...\n" "Assembling"
+	$(PRINTF) "$(COLOR_ASM)%-13s$(COLOR_END) %-30s" "Assembling" "<$2>..."
 	$(CMD_PREFIX)as $(ASM_FLAGS) -o $1 $2 \
 	$(call errorHandler,$1,$2,asm)
 endef
@@ -148,7 +152,7 @@ $(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -name '%.s') $(THIS)
 
 $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(MKDIR) $(ASMDIR)
-	$(PRINTF) "$(COLOR_CC)%-13s$(COLOR_END) <$<>...\n" "Compiling"
+	$(PRINTF) "$(COLOR_CC)%-13s$(COLOR_END) %-30s" "Compiling" "<$<>..."
 	$(CMD_PREFIX)gcc -S $(CC_FLAGS) -o $@ $< \
 	$(call errorHandler,$@,$<,cc)
 
@@ -156,7 +160,7 @@ $(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -name '%.c') $(THIS)
 	$(MKDIR) $(PREDIR)
 	$(MKDIR) $(DEPDIR)
 	$(MKDIR) $(MISCDIR)
-	$(PRINTF) "$(COLOR_PRE)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
+	$(PRINTF) "$(COLOR_PRE)%-13s$(COLOR_END) %-30s" "Preprocessing" "<$<>..."
 	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $< \
 	$(call errorHandler,$@,$<,pre)
 
