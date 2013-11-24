@@ -26,7 +26,6 @@ TARGETNAME = kernel
 KERNELIMG = $(BINDIR)$(TARGETNAME).img
 KERNELELF = $(BINDIR)$(TARGETNAME).elf
 KERNELLIST = $(MISCDIR)$(TARGETNAME).list
-TMPERRORFILE = $(MISCDIR)$(THIS).stderr
 
 HIDE = @
 CMD_PREFIX = $(HIDE)arm-linux-gnueabi-
@@ -68,7 +67,7 @@ COLOR_LN = $(COLOR_CYAN)
 COLOR_GEN = $(COLOR_WHITE)
 
 define errorHandler
-	2> $(TMPERRORFILE); if [ $$? -ne 0 ]; then \
+	2> $(MISCDIR)$(notdir $2).err; if [ $$? -ne 0 ]; then \
 		$(call printError,$1,$2,$3) \
 		false; \
 	fi;
@@ -98,7 +97,7 @@ define printError
 		;; \
 	esac; \
 	echo " $(COLOR_ERROR)errors:$(COLOR_END)"; \
-	cat $(TMPERRORFILE); \
+	cat $(MISCDIR)$(notdir $2).err; \
 	echo ""; \
 	echo "$(COLOR_ERROR)BUILD FAILED$(COLOR_END)";
 endef
@@ -113,7 +112,7 @@ $(KERNELIMG): $(KERNELELF) $(KERNELLIST)
 	$(MKDIR) $(BINDIR)
 	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) <$@>...\n" "Generating"
 	$(CMD_PREFIX)objcopy $(KERNELELF) -O binary $(KERNELIMG) \
-	$(call errorHandler,$1,$2,genimg)
+	$(call errorHandler,$@,$<,genimg)
 	$(ECHO)
 	$(ECHO) "$(COLOR_SUCCESS)BUILD SUCCESSFUL$(COLOR_END)"
 
@@ -121,14 +120,14 @@ $(KERNELLIST): $(KERNELELF)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_GEN)%-13s$(COLOR_END) <$@>...\n" "Generating"
 	$(CMD_PREFIX)objdump -D $< > $@ \
-	$(call errorHandler,$1,$2,genlist)
+	$(call errorHandler,$@,$<,genlist)
 
 $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_LN)%-13s$(COLOR_END) <$@>...\n" "Linking"
 	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ) \
-	$(call errorHandler,$1,$2,ld)
+	$(call errorHandler,$@,$<,ld)
 
 
 define assemble
@@ -157,7 +156,7 @@ $(PRE): $(PREDIR)%.i: $$(shell find $(SRCDIR) -name '%.c') $(THIS)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_PRE)%-13s$(COLOR_END) <$<>...\n" "Preprocessing"
 	$(CMD_PREFIX)gcc -E -o $@ -MMD -MT $@ -MF $(addprefix $(DEPDIR), $(notdir $(<:.c=.d))) $< \
-	$(call errorHandler,$1,$2,pre)
+	$(call errorHandler,$@,$<,pre)
 
 
 
