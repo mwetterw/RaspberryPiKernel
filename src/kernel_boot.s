@@ -31,10 +31,8 @@ reset:
     ldmia r0!,{r2,r3,r4,r5,r6,r7,r8,r9}
     stmia r1!,{r2,r3,r4,r5,r6,r7,r8,r9}
 
-mov sp, #0x4000
-
-kalashnikov:
-	b kalashnikov
+    mov sp, #0x8000000
+	b kernel_main
 
 undefined: b undefined
 swi: b swi
