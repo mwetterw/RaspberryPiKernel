@@ -79,16 +79,17 @@ $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ)
 	$(ECHO)
 
-$(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
+define assemble
 	$(MKDIR) $(OBJDIR)
-	$(PRINTF) "$(COLOR_PURPLE)%-13s$(COLOR_END) <$<>...\n" "Assembling"
-	$(CMD_PREFIX)as $(ASM_FLAGS) -o $@ $<
+	$(PRINTF) "$(COLOR_PURPLE)%-13s$(COLOR_END) <$2>...\n" "Assembling"
+	$(CMD_PREFIX)as $(ASM_FLAGS) -o $1 $2
+endef
 
+$(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
+	$(call assemble,$@,$<)
 
 $(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -iname '%.s') $(THIS)
-	$(MKDIR) $(OBJDIR)
-	$(PRINTF) "$(COLOR_PURPLE)%-13s$(COLOR_END) <$<>...\n" "Assembling"
-	$(CMD_PREFIX)as $(ASM_FLAGS) -o $@ $<
+	$(call assemble,$@,$<)
 
 $(ASM): $(ASMDIR)%.s: $(PREDIR)%.i
 	$(MKDIR) $(ASMDIR)
