@@ -21,8 +21,8 @@ THIS += $(wildcard $(MAKEINCDIR)*.mk)
 #--------INTERMIDIATE FILES--------#
 PRE = $(addprefix $(PREDIR), $(notdir $(SOURCES_C:%.c=%.i)))
 ASM = $(addprefix $(ASMDIR), $(notdir $(SOURCES_C:%.c=%.s)))
-OBJC = $(addprefix $(OBJDIR), $(notdir $(ASM:%.s=%.o)))
-OBJASM += $(addprefix $(OBJDIR), $(notdir $(SOURCES_ASM:%.s=%.o)))
+OBJC = $(addprefix $(OBJDIR), $(notdir $(ASM:%.s=%.c.o)))
+OBJASM += $(addprefix $(OBJDIR), $(notdir $(SOURCES_ASM:%.s=%.s.o)))
 OBJ = $(OBJC) $(OBJASM)
 DEP = $(addprefix $(DEPDIR), $(notdir $(SOURCES_C:%.c=%.d)))
 
@@ -33,6 +33,8 @@ KERNELELF = $(BINDIR)$(TARGETNAME).elf
 KERNELLIST = $(MISCDIR)$(TARGETNAME).list
 LINKERSCRIPT = $(TARGETNAME).ld
 MAPFILE = $(MISCDIR)$(TARGETNAME).map
+
+-include make/config.inc.mk
 
 #--------COMMANDS--------#
 HIDE ?= @
@@ -53,7 +55,7 @@ include make/colors.inc.mk
 include make/errorHandler.inc.mk
 
 #--------SPECIAL RULES--------#
-.PHONY: all clean mrproper emu run list
+.PHONY: all clean mrproper emu run list deploy sdcopy umount
 .PRECIOUS: $(PRE) $(ASM) $(OBJ) $(DEP)
 .SECONDEXPANSION:
 

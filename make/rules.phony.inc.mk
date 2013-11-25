@@ -22,3 +22,22 @@ mrproper:
 	$(RM) $(BUILDDIR)
 
 list: $(KERNELLIST)
+
+ifdef SDCARD
+deploy: $(KERNELIMG) sdcopy umount
+	$(ECHO)
+	$(ECHO) "$(COLOR_SUCCESS)DEPLOY SUCCESSFUL$(COLOR_END)"
+
+sdcopy: $(KERNELIMG)
+	$(PRINTF) "$(COLOR_SDCARD)%-13s$(COLOR_END) %-30s" "Deploying" "<$(notdir $<)>..."
+	@cp $< $(SDCARD) \
+	$(call errorHandler,$@,$<,sdcard,$@)
+
+umount:
+	$(PRINTF) "$(COLOR_SDCARD)%-13s$(COLOR_END) %-30s" "Unmounting" "<SDCARD>..."
+	@umount $(SDCARD) \
+	$(call errorHandler,$@,$<,sdcard,$@)
+else
+deploy sdcopy umount:
+	$(error "Please set SDCARD variable!")
+endif
