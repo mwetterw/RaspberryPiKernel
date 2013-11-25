@@ -15,6 +15,7 @@ void kernel_scheduler_init ( )
 	kernel_pcb_idle.mpStack = 0;
 	kernel_pcb_idle.mpSP = ( void * ) 0x2000;
 	kernel_pcb_set_register ( &kernel_pcb_idle, pc, kernel_idle_process );
+	kernel_pcb_inherit_cpsr ( &kernel_pcb_idle );
 
 	kernel_pcb_turnstile_init ( &kernel_turnstile_round_robin );
 
