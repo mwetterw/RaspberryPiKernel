@@ -34,3 +34,6 @@ void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * tur
 	( pcb ) -> mpSP [ register ] = ( uint32_t ) ( value )
 
 #endif
+
+
+void kernel_pcb_inherit_cpsr ( kernel_pcb_t * pcb );
