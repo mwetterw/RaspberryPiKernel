@@ -27,10 +27,10 @@ define assemble
 	$(call errorHandler,$1,$2,asm)
 endef
 
-$(OBJC): $(OBJDIR)%.o: $(ASMDIR)%.s
+$(OBJC): $(OBJDIR)%.c.o: $(ASMDIR)%.s
 	$(call assemble,$@,$<)
 
-$(OBJASM): $(OBJDIR)%.o: $$(shell find $(SRCDIR) -name '%.s') $(THIS)
+$(OBJASM): $(OBJDIR)%.s.o: $$(shell find $(SRCDIR) -name '%.s') $(THIS)
 	$(MKDIR) $(MISCDIR)
 	$(call assemble,$@,$<)
 
