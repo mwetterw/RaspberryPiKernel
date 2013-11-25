@@ -34,6 +34,8 @@ KERNELLIST = $(MISCDIR)$(TARGETNAME).list
 LINKERSCRIPT = $(TARGETNAME).ld
 MAPFILE = $(MISCDIR)$(TARGETNAME).map
 
+-include make/config.inc.mk
+
 #--------COMMANDS--------#
 HIDE ?= @
 CMD_PREFIX ?= $(HIDE)arm-linux-gnueabi-
@@ -53,7 +55,7 @@ include make/colors.inc.mk
 include make/errorHandler.inc.mk
 
 #--------SPECIAL RULES--------#
-.PHONY: all clean mrproper emu run list
+.PHONY: all clean mrproper emu run list deploy sdcopy umount
 .PRECIOUS: $(PRE) $(ASM) $(OBJ) $(DEP)
 .SECONDEXPANSION:
 
