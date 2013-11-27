@@ -1,5 +1,5 @@
 #include "led.h"
-#include "../kernel_hardware.h"
+#include "../kernel/hardware.h"
 
 
 void api_led_on ( )

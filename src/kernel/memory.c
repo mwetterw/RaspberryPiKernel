@@ -1,6 +1,6 @@
-#include "kernel_memory.h"
-#include "kernel_memory_private.h"
-#include "kernel_config.h"
+#include "memory.h"
+#include "memory_private.h"
+#include "config.h"
 
 
 static kernel_heap_part_t *

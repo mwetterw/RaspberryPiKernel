@@ -1,4 +1,4 @@
-#include "kernel_gpio.h"
+#include "gpio.h"
 
 #define GPSET0 kernel_arm_addr ( 0x2020001C )
 #define GPSET1 kernel_arm_addr ( 0x20200020 )

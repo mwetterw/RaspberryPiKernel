@@ -1,5 +1,5 @@
-#include "kernel_hardware.h"
-#include "kernel_gpio.h"
+#include "hardware.h"
+#include "gpio.h"
 
 #define GPIO_LED GPIO16
 

@@ -1,4 +1,4 @@
-#include "kernel_pcb.h"
+#include "pcb.h"
 
 void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile )
 {

@@ -1,6 +1,6 @@
-#include "kernel_memory.h"
-#include "kernel_scheduler.h"
-#include "kernel_hardware.h"
+#include "memory.h"
+#include "scheduler.h"
+#include "hardware.h"
 
 void __attribute__ ( ( noreturn, naked ) ) kernel_main ( )
 {

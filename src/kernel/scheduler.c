@@ -1,5 +1,5 @@
-#include "kernel_scheduler.h"
-#include "kernel_pcb.h"
+#include "scheduler.h"
+#include "pcb.h"
 
 static kernel_pcb_t * kernel_pcb_running;
 static kernel_pcb_turnstile_t kernel_turnstile_round_robin;

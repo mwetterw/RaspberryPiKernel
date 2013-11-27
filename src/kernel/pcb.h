@@ -2,7 +2,7 @@
 #define _H_KERNEL_PCB
 
 #include <stdint.h>
-#include "kernel_arm.h"
+#include "arm.h"
 
 typedef struct kernel_pcb_s
 {

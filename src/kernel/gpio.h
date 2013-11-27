@@ -2,7 +2,7 @@
 #define _H_KERNEL_GPIO
 
 #include <stdint.h>
-#include "kernel_arm.h"
+#include "arm.h"
 
 #define GPIO_FSEL_INPUT 0
 #define GPIO_FSEL_OUTPUT 1
