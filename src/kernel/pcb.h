@@ -30,6 +30,13 @@ void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
  */
 void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
 
+/*
+ * Lets the first PCB become the last,
+ * the second the first, etc.
+ * @param Turnstile to rotate
+ */
+void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
+
 #define kernel_pcb_set_register(pcb, register, value) \
 	( pcb ) -> mpSP [ register ] = ( uint32_t ) ( value )
 
