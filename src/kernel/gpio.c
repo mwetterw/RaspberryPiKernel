@@ -26,11 +26,11 @@ void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel )
 void kernel_gpio_set ( unsigned char gpioPin )
 {
 	uint32_t * gpset = ( gpioPin < 32 ? GPSET0 : GPSET1 );
-	kernel_arm_addr32 ( gpset ) = ( 1 << gpioPin );
+	kernel_arm_addr32 ( gpset ) = ( 1 << ( gpioPin % 32 ) );
 }
 
 void kernel_gpio_clear ( unsigned char gpioPin )
 {
 	uint32_t * gpclr = ( gpioPin < 32 ? GPCLR0 : GPCLR1 );
-	kernel_arm_addr32 ( gpclr ) = ( 1 << gpioPin );
+	kernel_arm_addr32 ( gpclr ) = ( 1 << ( gpioPin % 32 ) );
 }
