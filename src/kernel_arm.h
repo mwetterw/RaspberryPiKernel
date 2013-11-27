@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#define kernel_arm_addr(addr) ( uint32_t * ) ( addr )
+#define kernel_arm_addr32(addr) ( * ( uint32_t * ) ( addr ) )
+#define kernel_arm_array32(addr, i) ( ( ( uint32_t * ) ( addr ) ) [ i ] )
+
 #define r0 0
 #define r1 1
 #define r2 2
