@@ -9,7 +9,7 @@ run: $(KERNELIMG)
 	$(HIDE)$(QEMU) $(QEMU_FLAGS) > $(MISCDIR)qemu.stdout 2> $(MISCDIR)qemu.stderr & \
 	QEMU_PID=$$!; \
 	printf "%-13s <gdb>...\n" "Launching"; \
-	$(GDB) $(KERNELELF) -x gdb/init.gdb; \
+	$(GDB) $(KERNELELF) -x gdb/default.gdb; \
 	printf "%-13s <qemu>...\n" "Killing"; \
 	kill -9 $$QEMU_PID;
 
