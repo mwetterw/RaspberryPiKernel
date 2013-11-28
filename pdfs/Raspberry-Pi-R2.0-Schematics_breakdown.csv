@@ -1,0 +1,878 @@
+"Type","Component","Connection","Pin","PinName","Signal","Sheet","Location","ComponentType","Value","PartNumber","A/B/NF","Module","BoardSide","ConnectionType"
+"component","IC1",,,,,2,"I5","chip","Dual Buffer","NC7WZ17",,"BCM2835 HDMI","front",
+"component","IC2",,,,,1,"H1","chip","CPU & GPU","BCM2835",,"multiple","front",
+"component","IC3",,,,,3,"D1","chip","LAN & USB","LAN9512","B","multiple","front",
+"power",,,,,"+5V0",1,"C4",,,,,"USB Power Input",,
+"power",,,,,"GND",1,"B6",,,,,"USB Power Input",,
+"power",,,,,"PE",1,"A6",,,,,"USB Power Input",,
+"power",,,,,"+5V0",1,"A7",,,,,"USB Power Input",,
+"power",,,,,"+3V3",1,"C7",,,,,"USB Power Input",,
+"power",,,,,"GND",1,"C7",,,,,"USB Power Input",,
+"power",,,,,"+2V5",1,"C8",,,,,"USB Power Input",,
+"power",,,,,"GND",1,"C9",,,,,"USB Power Input",,
+"power",,,,,"+1V8",1,"C9",,,,,"USB Power Input",,
+"power",,,,,"GND",1,"C10",,,,,"USB Power Input",,
+"component","S1",,,,,1,"A5","connector","MICRO USB TYPE B","PD-USB/112",,"USB Power Input","front",
+"component","F3",,,,,1,"B4","fuse","1A1 6V","miniSMD",,"USB Power Input","back",
+"component","R51",,,,,1,"B5","resistor","0R0",,,"USB Power Input","back",
+"component","D17",,,,,1,"B5","diode (voltage suppressor)","5V","SMBJ",,"USB Power Input","back",
+"component","C6",,,,,1,"C5","capacitor (polarized)","220uF",,,"USB Power Input","front",
+"component","C3",,,,,1,"C5","capacitor","100n",,,"USB Power Input","front",
+"component","C2",,,,,1,"C5","capacitor","1n0",,,"USB Power Input","front",
+"component","RG2",,,,,1,"B7","regulator","3v3","NCP1117-3v3",,"USB Power Input","front",
+"component","C12",,,,,1,"A7","capacitor","100n",,,"USB Power Input","front",
+"component","C11",,,,,1,"B7","capacitor (polarized)","47u",,,"USB Power Input","front",
+"component","C8",,,,,1,"C7","capacitor","100n",,,"USB Power Input","front",
+"component","C10",,,,,1,"C7","capacitor","10n",,,"USB Power Input","front",
+"component","RG3",,,,,1,"B8","regulator","2v5","LP2980-2v5",,"USB Power Input","front",
+"component","C15",,,,,1,"B8","capacitor","10u",,,"USB Power Input","front",
+"component","C13",,,,,1,"C8","capacitor","10n",,,"USB Power Input","front",
+"component","RG1",,,,,1,"B9","regulator","1v8","NCP1117-1v8",,"USB Power Input","front",
+"component","C5",,,,,1,"A9","capacitor","100n",,,"USB Power Input","front",
+"component","C9",,,,,1,"B9","capacitor (polarized)","47u",,,"USB Power Input","front",
+"component","C7",,,,,1,"C9","capacitor","10n",,,"USB Power Input","front",
+"signal",,"S1",1,"VBUS","VIN",1,"A4",,,,,"USB Power Input",,"power"
+"signal",,"S1",2,"USB D-","nc",1,"A4",,,,,"USB Power Input",,"nc"
+"signal",,"S1",3,"USB D+","nc",1,"A4",,,,,"USB Power Input",,"nc"
+"signal",,"S1",4,"ID (nc)","nc",1,"A4",,,,,"USB Power Input",,"nc"
+"signal",,"S1",5,"GND","GND",1,"A4",,,,,"USB Power Input",,"ground"
+"signal",,"S1","M1","Shield","PE",1,"A5",,,,,"USB Power Input",,"ground"
+"signal",,"S1","M2","Shield","PE",1,"A5",,,,,"USB Power Input",,"ground"
+"signal",,"S1","M3","Shield","PE",1,"A5",,,,,"USB Power Input",,"ground"
+"signal",,"S1","M4","Shield","PE",1,"A5",,,,,"USB Power Input",,"ground"
+"signal",,"S1","M5","Pad","nc",1,"A5",,,,,"USB Power Input",,"nc"
+"signal",,"S1","M6","Pad","nc",1,"A5",,,,,"USB Power Input",,"nc"
+"signal",,"RG2",2,"Vi","+5V0",1,"B7",,,,,"USB Power Input",,"power"
+"signal",,"RG2",1,"Vo","+3V3",1,"B7",,,,,"USB Power Input",,"power"
+"signal",,"RG2",3,"com","GND",1,"B7",,,,,"USB Power Input",,"ground"
+"signal",,"RG3",1,"VIN","+3V3",1,"B8",,,,,"USB Power Input",,"power"
+"signal",,"RG3",3,"ON","+3V3",1,"B8",,,,,"USB Power Input",,"power"
+"signal",,"RG3",2,"GND","GND",1,"B8",,,,,"USB Power Input",,"ground"
+"signal",,"RG3",5,"OUT","+2V5",1,"B8",,,,,"USB Power Input",,"power"
+"signal",,"RG3",4,"NC","nc",1,"B8",,,,,"USB Power Input",,"nc"
+"signal",,"RG1",1,"Vi","+3V3",1,"B9",,,,,"USB Power Input",,"power"
+"signal",,"RG1",3,"Vo","+1V8",1,"B9",,,,,"USB Power Input",,"power"
+"signal",,"RG1",2,"com","GND",1,"B9",,,,,"USB Power Input",,"ground"
+"testpoint","TP1",,,,"+5V0",1,"C4",,,,,"USB Power Input","front",
+"testpoint","TP2",,,,"GND",1,"B5",,,,,"USB Power Input","front",
+"power",,,,,"+1V8",1,"G1",,,,,"BCM2835 OSC",,
+"power",,,,,"GND",1,"G1",,,,,"BCM2835 OSC",,
+"power",,,,,"GND",1,"G2",,,,,"BCM2835 OSC",,
+"power",,,,,"GND",1,"H2",,,,,"BCM2835 OSC",,
+"power",,,,,"GND",1,"J2",,,,,"BCM2835 OSC",,
+"component","C87",,,,,1,"G1","capacitor","100n",,,"BCM2835 OSC","back",
+"component","C82",,,,,1,"G2","capacitor","1u0",,,"BCM2835 OSC","back",
+"component","C81",,,,,1,"G2","capacitor","100n",,,"BCM2835 OSC","back",
+"component","C83",,,,,1,"H2","capacitor","100n",,,"BCM2835 OSC","back",
+"component","X2",,,,,1,"I1","crystal","19M2",,,"BCM2835 OSC","back",
+"component","C86",,,,,1,"I1","capacitor","27p",,,"BCM2835 OSC","back",
+"component","C74",,,,,1,"I2","capacitor","27p",,,"BCM2835 OSC","back",
+"signal",,"IC2","P9","PLL_1V8","+1V8",1,"H1",,,,,"BCM2835 OSC",,"power"
+"signal",,"IC2","N7","PLL_VDD_OUT","PLL_VDD",1,"H1",,,,,"BCM2835 OSC",,"power"
+"signal",,"IC2","P7","PLL_VDD","PLL_VDD",1,"H2",,,,,"BCM2835 OSC",,"power"
+"signal",,"IC2","N8","XOSC_VDD","PLL_VDD",1,"H2",,,,,"BCM2835 OSC",,"power"
+"signal",,"IC2","U18","AGND1","GND",1,"H2",,,,,"BCM2835 OSC",,"ground"
+"signal",,"IC2","V1","AGND2","GND",1,"H2",,,,,"BCM2835 OSC",,"ground"
+"signal",,"IC2","R8","XTALN","XN",1,"I1",,,,,"BCM2835 OSC",,"data"
+"signal",,"IC2","R9","XTALP","XP",1,"I1",,,,,"BCM2835 OSC",,"data"
+"signal",,"X2",3,,"XN",1,"I1",,,,,"BCM2835 OSC",,"data"
+"signal",,"X2",4,,"GND",1,"I1",,,,,"BCM2835 OSC",,"ground"
+"signal",,"X2",2,,"GND",1,"I2",,,,,"BCM2835 OSC",,"ground"
+"signal",,"X2",1,,"XP",1,"I2",,,,,"BCM2835 OSC",,"data"
+"power",,,,,"+1V8",1,"D3",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"D4",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"D5",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"E5",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"E7",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"H4",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"H4",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"H6",,,,,"BCM2835 PWR1",,
+"power",,,,,"GND",1,"H6",,,,,"BCM2835 PWR1",,
+"component","C54",,,,,1,"D3","capacitor","100n",,,"BCM2835 PWR1","back",
+"component","C94",,,,,1,"D3","capacitor","100n",,,"BCM2835 PWR1","back",
+"component","C60",,,,,1,"E3","capacitor","100n",,,"BCM2835 PWR1","back",
+"component","C91",,,,,1,"D4","capacitor","100n",,,"BCM2835 PWR1","back",
+"component","C57",,,,,1,"E4","capacitor","4u7",,,"BCM2835 PWR1","back",
+"component","R16",,,,,1,"E5","resistor","240R",,,"BCM2835 PWR1","front",
+"component","C55",,,,,1,"G3","capacitor","1u0",,,"BCM2835 PWR1","back",
+"component","C68",,,,,1,"G3","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C78",,,,,1,"H3","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C18",,,,,1,"G4","capacitor","1u0",,,"BCM2835 PWR1","front",
+"component","C90",,,,,1,"G4","capacitor","1u0",,,"BCM2835 PWR1","back",
+"component","C93",,,,,1,"H4","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C76",,,,,1,"H4","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C73",,,,,1,"H4","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C56",,,,,1,"G5","capacitor","1u0",,,"BCM2835 PWR1","back",
+"component","C67",,,,,1,"G5","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C63",,,,,1,"H5","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C85",,,,,1,"H5","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C92",,,,,1,"G6","capacitor","220n",,,"BCM2835 PWR1","back",
+"component","C59",,,,,1,"H6","capacitor","220n",,,"BCM2835 PWR1","back",
+"signal",,"IC2","B15","SDRAM_1V8_1","+1V8",1,"E3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","K1","SDRAM_1V8_2","+1V8",1,"E3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","K17","SDRAM_1V8_3","+1V8",1,"E3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","T3","SDRAM_1V8_4","+1V8",1,"E3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","U17","SDRAM_1V8_5","+1V8",1,"E4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","V18","SDRAM_1V8_6","+1V8",1,"E4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","A16","SLDO_1V8_1","+1V8",1,"E4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","B16","SLDO_1V8_2","+1V8",1,"E4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","H12","ZQ","ZQ",1,"E4",,,,,"BCM2835 PWR1",,"data"
+"signal",,"IC2","A1","GND1","GND",1,"E5",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","A2","GND2","GND",1,"E5",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","A3","GND3","GND",1,"E5",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","A17","GND4","GND",1,"E5",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","A18","GND5","GND",1,"E5",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","B1","GND6","GND",1,"E5",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","B2","GND7","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","B17","GND8","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","B18","GND9","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","C2","GND10","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","E3","GND11","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","E14","GND12","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","F13","GND13","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","F18","GND14","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","H9","GND15","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","H10","GND16","GND",1,"E6",,,,,"BCM2835 PWR1",,"ground"
+"signal",,"IC2","D18","SDC_VDD_OUT","SDC_VDD",1,"G3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","G13","SDC_VDD1","SDC_VDD",1,"G3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","H13","SDC_VDD2","SDC_VDD",1,"G3",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","J5","SDC_VDD3","SDC_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","L12","SDC_VDD4","SDC_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","C18","SDRAM_VDD_OUT","SDRAM_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","C8","SDRAM_VDD1","SDRAM_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","C16","SDRAM_VDD2","SDRAM_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","C17","SDRAM_VDD3","SDRAM_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","G15","SDRAM_VDD4","SDRAM_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","H18","SDRAM_VDD5","SDRAM_VDD",1,"G4",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","J1","SDRAM_VDD6","SDRAM_VDD",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","R3","SDRAM_VDD7","SDRAM_VDD",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","T9","SDRAM_VDD8","SDRAM_VDD",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","T17","SDRAM_VDD9","SDRAM_VDD",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","E18","VDDIO1_OUT","VDD_IO",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","A10","VDDIO1_1","VDD_IO",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","F15","VDDIO1_2","VDD_IO",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","G14","VDDIO1_3","VDD_IO",1,"G5",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","G17","VDDIO1_4","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","G18","VDDIO1_5","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","J14","VDDIO1_6","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","J16","VDDIO1_7","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","K3","VDDIO1_8","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","M16","VDDIO1_9","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","P18","VDDIO1_10","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","T4","VDDIO1_11","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","T12","VDDIO1_12","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"signal",,"IC2","T16","VDDIO1_13","VDD_IO",1,"G6",,,,,"BCM2835 PWR1",,"power"
+"power",,,,,"+3V3",1,"J3",,,,,"BCM2835 PWR2",,
+"power",,,,,"GND",1,"J4",,,,,"BCM2835 PWR2",,
+"power",,,,,"GND",1,"I3",,,,,"BCM2835 PWR2",,
+"power",,,,,"GND",1,"I4",,,,,"BCM2835 PWR2",,
+"power",,,,,"GND",1,"I5",,,,,"BCM2835 PWR2",,
+"power",,,,,"GND",1,"I6",,,,,"BCM2835 PWR2",,
+"component","C89",,,,,1,"J3","capacitor","100n",,,"BCM2835 PWR2","back",
+"signal",,"IC2","H11","GND1","GND",1,"I3",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","H17","GND2","GND",1,"I3",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J2","GND3","GND",1,"I3",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J7","GND4","GND",1,"I3",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J8","GND5","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J9","GND6","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J10","GND7","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J11","GND8","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J12","GND9","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","J13","GND10","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K7","GND11","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K8","GND12","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K9","GND13","GND",1,"I4",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K10","GND14","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K11","GND15","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K12","GND16","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K13","GND17","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","K14","GND18","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L2","GND19","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L7","GND20","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L8","GND21","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L9","GND22","GND",1,"I5",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L10","GND23","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L11","GND24","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L14","GND25","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","M8","GND26","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","M9","GND27","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","M15","GND28","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","N1","GND29","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","N18","GND30","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","P16","GND31","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","T18","GND32","GND",1,"I6",,,,,"BCM2835 PWR2",,"ground"
+"signal",,"IC2","L5","VPP","+3V3",1,"J3",,,,,"BCM2835 PWR2",,"power"
+"signal",,"IC2","T15","NVM_VACC","nc",1,"J4",,,,,"BCM2835 PWR2",,"nc"
+"signal",,"IC2","D1","NVM_VCC","nc",1,"J4",,,,,"BCM2835 PWR2",,"nc"
+"signal",,"IC2","D2","NVM_VCCQ","nc",1,"J4",,,,,"BCM2835 PWR2",,"nc"
+"signal",,"IC2","T7","NVM_VDD","nc",1,"J5",,,,,"BCM2835 PWR2",,"nc"
+"power",,,,,"+5V0",1,"E7",,,,,"BCM2835 SMPS",,
+"power",,,,,"GND",1,"E8",,,,,"BCM2835 SMPS",,
+"power",,,,,"GND",1,"E8",,,,,"BCM2835 SMPS",,
+"power",,,,,"+3V3",1,"E8",,,,,"BCM2835 SMPS",,
+"power",,,,,"GND",1,"E9",,,,,"BCM2835 SMPS",,
+"power",,,,,"GND",1,"E10",,,,,"BCM2835 SMPS",,
+"power",,,,,"GND",1,"H8",,,,,"BCM2835 SMPS",,
+"power",,,,,"GND",1,"G10",,,,,"BCM2835 SMPS",,
+"component","C17",,,,,1,"E7","capacitor","10u",,,"BCM2835 SMPS","front",
+"component","C62",,,,,1,"E8","capacitor","100n",,,"BCM2835 SMPS","back",
+"component","R15",,,,,1,"E9","resistor","100K",,,"BCM2835 SMPS","front",
+"component","L5",,,,,1,"H7","inductor","1U0","LQM2HP_G0",,"BCM2835 SMPS","back",
+"component","C16",,,,,1,"H7","capacitor","10u",,,"BCM2835 SMPS","front",
+"component","C65",,,,,1,"G9","capacitor","220n",,,"BCM2835 SMPS","back",
+"component","C69",,,,,1,"H9","capacitor","220n",,,"BCM2835 SMPS","back",
+"component","C88",,,,,1,"H9","capacitor","220n",,,"BCM2835 SMPS","back",
+"component","C58",,,,,1,"H9","capacitor","220n",,,"BCM2835 SMPS","back",
+"component","C79",,,,,1,"I9","capacitor","220n",,,"BCM2835 SMPS","back",
+"component","C66",,,,,1,"I9","capacitor","220n",,,"BCM2835 SMPS","back",
+"signal",,"IC2","A13","VDD_BAT1","+5V0",1,"F7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","A14","VDD_BAT2","+5V0",1,"F7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","B13","VDD_BAT3","+5V0",1,"F7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","B14","VDD_BAT4","+5V0",1,"F7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","A15","VDDBAT2","+5V0",1,"F8",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","D15","RUN","RUN",1,"F9",,,,,"BCM2835 SMPS",,"data"
+"signal",,"IC2","D16","SR_TEST","GND",1,"F9",,,,,"BCM2835 SMPS",,"ground"
+"signal",,"IC2","U6","AGND1","GND",1,"F10",,,,,"BCM2835 SMPS",,"ground"
+"signal",,"IC2","V17","AGND2","GND",1,"F10",,,,,"BCM2835 SMPS",,"ground"
+"signal",,"IC2","C12","VDD_OUT1","VDD_OUT",1,"G7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","C13","VDD_OUT2","VDD_OUT",1,"G7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","D12","VDD_OUT3","VDD_OUT",1,"G7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","D13","VDD_OUT4","VDD_OUT",1,"G7",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","C15","VD_FB","VDD_CORE",1,"G8",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","A7","VDD_CORE1","VDD_CORE",1,"G8",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","A9","VDD_CORE2","VDD_CORE",1,"G8",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","D3","VDD_CORE3","VDD_CORE",1,"G8",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","E15","VDD_CORE4","VDD_CORE",1,"G8",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","G12","VDD_CORE5","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","H5","VDD_CORE6","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","H15","VDD_CORE7","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","H16","VDD_CORE8","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","K4","VDD_CORE9","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","L13","VDD_CORE10","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","L15","VDD_CORE11","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","N4","VDD_CORE12","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","N10","VDD_CORE13","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","P15","VDD_CORE14","VDD_CORE",1,"G9",,,,,"BCM2835 SMPS",,"power"
+"signal",,"IC2","A11","SMPS_PGND1","GND",1,"G10",,,,,"BCM2835 SMPS",,"ground"
+"signal",,"IC2","A12","SMPS_PGND2","GND",1,"G10",,,,,"BCM2835 SMPS",,"ground"
+"signal",,"IC2","B11","SMPS_PGND3","GND",1,"G10",,,,,"BCM2835 SMPS",,"ground"
+"signal",,"IC2","B12","SMPS_PGND4","GND",1,"G10",,,,,"BCM2835 SMPS",,"ground"
+"power",,,,,"+1V8",2,"B1",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"B2",,,,,"BCM2835 HDMI",,
+"power",,,,,"+3V3",2,"B2",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"B2",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"C2",,,,,"BCM2835 HDMI",,
+"power",,,,,"+5V0",2,"F2",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"D4",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"E4",,,,,"BCM2835 HDMI",,
+"power",,,,,"+5V0_HDMI",2,"F4",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"G5",,,,,"BCM2835 HDMI",,
+"power",,,,,"+3V3",2,"H4",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"H5",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"H5",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"I5",,,,,"BCM2835 HDMI",,
+"power",,,,,"PE",2,"I5",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"I4",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"H2",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"I2",,,,,"BCM2835 HDMI",,
+"power",,,,,"+5V0",2,"I1",,,,,"BCM2835 HDMI",,
+"power",,,,,"GND",2,"J2",,,,,"BCM2835 HDMI",,
+"component","L6",,,,,2,"B1","inductor",,"BLM15AG601",,"BCM2835 HDMI","back",
+"component","L8",,,,,2,"B2","inductor",,"BLM15AG601",,"BCM2835 HDMI","back",
+"component","C80",,,,,2,"B1","capacitor","100n",,,"BCM2835 HDMI","back",
+"component","C71",,,,,2,"B2","capacitor","100n",,,"BCM2835 HDMI","back",
+"component","C61",,,,,2,"D4","capacitor","56p",,,"BCM2835 HDMI","back",
+"component","R17",,,,,2,"E4","resistor","8K2",,,"BCM2835 HDMI","front",
+"component","R13",,,,,2,"E2","resistor","1K8",,,"BCM2835 HDMI","front",
+"component","R14",,,,,2,"F2","resistor","1K8",,,"BCM2835 HDMI","front",
+"component","L1",,,,,2,"F3","inductor",,"BLM18AG121",,"BCM2835 HDMI","front",
+"component","L2",,,,,2,"F3","inductor",,"BLM18AG121",,"BCM2835 HDMI","front",
+"component","D15",,,,,2,"F5","diode (signal)",,"BAV99",,"BCM2835 HDMI","back",
+"component","D16",,,,,2,"G5","diode (signal)",,"BAV99",,"BCM2835 HDMI","back",
+"component","D14",,,,,2,"H5","diode (signal)",,"BAV99",,"BCM2835 HDMI","back",
+"component","R12",,,,,2,"H4","resistor","47K",,,"BCM2835 HDMI","front",
+"component","R11",,,,,2,"H4","resistor","47K",,,"BCM2835 HDMI","front",
+"component","C14",,,,,2,"H5","capacitor","1n0",,,"BCM2835 HDMI","front",
+"component","S3",,,,,2,"J4","connector","HDMI","PD-HDMI/110",,"BCM2835 HDMI","front",
+"component","D2",,,,,2,"H2","diode (protection)",,"Rclamp0524P",,"BCM2835 HDMI","front",
+"component","D3",,,,,2,"I2","diode (protection)",,"Rclamp0524P",,"BCM2835 HDMI","front",
+"component","D1",,,,,2,"I1","diode",,"BAT54",,"BCM2835 HDMI","front",
+"component","C75",,,,,2,"J1","capacitor","100n",,,"BCM2835 HDMI","back",
+"signal",,"IC2","M10","HDMI_1V8","HDMI_1V8",2,"C1",,,,,"BCM2835 HDMI",,"power"
+"signal",,"IC2","P10","HDMI_3V3","HDMI_3V3",2,"C2",,,,,"BCM2835 HDMI",,"power"
+"signal",,"IC2","T14","HDMI_AGND","GND",2,"C2",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"IC2","V7","HDMI_CLK_P","HDMI_CLK_P",2,"D1",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","U7","HDMI_CLK_N","HDMI_CLK_N",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","V8","HDMI_TX0_P","HDMI_TX0_P",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","U8","HDMI_TX0_N","HDMI_TX0_N",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","V9","HDMI_TX1_P","HDMI_TX1_P",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","U9","HDMI_TX1_N","HDMI_TX1_N",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","V10","HDMI_TX2_P","HDMI_TX2_P",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","U10","HDMI_TX2_N","HDMI_TX2_N",2,"D2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","R17","HDMI_SDA","HDMI_SDA_L",2,"D3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","R18","HDMI_SCL","HDMI_SCL_L",2,"D3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","K18","HDMI_EXTRES","HDMI_EXTRES",2,"D3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC2","N9","HDMI_CECDAT","HDMI_CEC_DAT",2,"D3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",1,,"HDMI_TX2_P",2,"J2",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",2,,"GND",2,"J2",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",3,,"HDMI_TX2_N",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",4,,"HDMI_TX1_P",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",5,,"GND",2,"J3",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",6,,"HDMI_TX1_N",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",7,,"HDMI_TX0_P",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",8,,"GND",2,"J3",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",9,,"HDMI_TX0_N",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",10,,"HDMI_CLK_P",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",11,,"GND",2,"J3",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",12,,"HDMI_CLK_N",2,"J3",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",13,,"HDMI_CEC_DAT",2,"J4",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",14,,"nc",2,"J4",,,,,"BCM2835 HDMI",,"nc"
+"signal",,"S3",15,,"HDMI_SCL",2,"J4",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",16,,"HDMI_SDA",2,"J4",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",17,,"GND",2,"J4",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",18,,"+5V0_HDMI",2,"J4",,,,,"BCM2835 HDMI",,"power"
+"signal",,"S3",19,,"HDMI_HPD",2,"J4",,,,,"BCM2835 HDMI",,"data"
+"signal",,"S3",20,,"PE",2,"J5",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",21,,"PE",2,"J5",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",22,,"PE",2,"J5",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"S3",23,,"PE",2,"J5",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"IC1",1,,"HDMI_HPD_F",2,"I5",,,,,"BCM2835 HDMI",,"data"
+"signal",,"IC1",2,,"GND",2,"I5",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"IC1",3,,"GND",2,"H6",,,,,"BCM2835 HDMI",,"ground"
+"signal",,"IC1",4,,"nc",2,"I6",,,,,"BCM2835 HDMI",,"nc"
+"signal",,"IC1",5,,"+3V3",2,"I5",,,,,"BCM2835 HDMI",,"power"
+"signal",,"IC1",6,,"HDMI_HPD_P",2,"I5",,,,,"BCM2835 HDMI",,"data"
+"power",,,,,"+3V3",2,"A3",,,,,"BCM2835 IO1",,
+"power",,,,,"GND",2,"A4",,,,,"BCM2835 IO1",,
+"component","C64",,,,,2,"A4","capacitor","100n",,,"BCM2835 IO1","back",
+"signal",,"IC2","H4","VDDIO2_1","+3V3",2,"B3",,,,,"BCM2835 IO1",,"power"
+"signal",,"IC2","E4","VDDIO2_2","+3V3",2,"B3",,,,,"BCM2835 IO1",,"power"
+"signal",,"IC2","H2","GPIO0","SDA0",2,"B3",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","H6","GPIO1","SCL0",2,"B3",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","J6","GPIO2","SDA1",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","J4","GPIO3","SCL1",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","H1","GPIO4","GPIO_GCLK",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","H3","GPIO5","CAM_CLK",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","G1","GPIO6","LAN_RUN",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","F2","GPIO7","SPI_CE1_N",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","F1","GPIO8","SPI_CE0_N",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","G2","GPIO9","SPI_MISO",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","G3","GPIO10","SPI_MOSI",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","G4","GPIO11","SPI_SCLK",2,"B4",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","H7","GPIO12","nc",2,"B4",,,,,"BCM2835 IO1",,"nc"
+"signal",,"IC2","G5","GPIO13","nc",2,"B5",,,,,"BCM2835 IO1",,"nc"
+"signal",,"IC2","D4","GPIO14","TXD0",2,"B5",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","E2","GPIO15","RXD0",2,"B5",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","C1","GPIO16","STATUS_LED_N",2,"B5",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","E1","GPIO17","GPIO_GEN0",2,"B5",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","B4","GPIO18","GPIO_GEN1",2,"B5",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","G8","GPIO19","nc",2,"B5",,,,,"BCM2835 IO1",,"nc"
+"signal",,"IC2","E5","GPIO20","nc",2,"B5",,,,,"BCM2835 IO1",,"nc"
+"signal",,"IC2","C4","GPIO21","GPIO_GEN2",2,"B5",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","B3","GPIO22","GPIO_GEN3",2,"B6",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","C5","GPIO23","GPIO_GEN4",2,"B6",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","A4","GPIO24","GPIO_GEN5",2,"B6",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","A5","GPIO25","GPIO_GEN6",2,"B6",,,,,"BCM2835 IO1",,"data"
+"signal",,"IC2","D6","GPIO26","nc",2,"B6",,,,,"BCM2835 IO1",,"nc"
+"signal",,"IC2","B5","GPIO27","CAM_GPIO",2,"B6",,,,,"BCM2835 IO1",,"data"
+"power",,,,,"+3V3",2,"A7",,,,,"BCM2835 IO2",,
+"power",,,,,"GND",2,"A7",,,,,"BCM2835 IO2",,
+"power",,,,,"+3V3",2,"A8",,,,,"BCM2835 IO2",,
+"power",,,,,"GND",2,"A9",,,,,"BCM2835 IO2",,
+"power",,,,,"+3V3",2,"C6",,,,,"BCM2835 IO2",,
+"power",,,,,"GND",2,"D8",,,,,"BCM2835 IO2",,
+"power",,,,,"+3V3",2,"C10",,,,,"BCM2835 IO2",,
+"power",,,,,"GND",2,"C10",,,,,"BCM2835 IO2",,
+"power",,,,,"GND",2,"E10",,,,,"BCM2835 IO2",,
+"power",,,,,"PE",2,"E10",,,,,"BCM2835 IO2",,
+"component","L7",,,,,2,"A7","inductor",,"BLM15AG601",,"BCM2835 IO2","back",
+"component","C77",,,,,2,"A7","capacitor","100n",,,"BCM2835 IO2","back",
+"component","C53",,,,,2,"A9","capacitor","100n",,,"BCM2835 IO2","back",
+"component","R8",,,,,2,"C7","resistor","10K",,"B","BCM2835 IO2","front",
+"component","R7",,,,,2,"C7","resistor","10K",,"NF","BCM2835 IO2","front",
+"component","R4",,,,,2,"D7","resistor","10K",,"NF","BCM2835 IO2","front",
+"component","R5",,,,,2,"D7","resistor","10K",,"NF","BCM2835 IO2","front",
+"component","R10",,,,,2,"C7","resistor","10K",,"A","BCM2835 IO2","front",
+"component","R9",,,,,2,"C7","resistor","10K",,,"BCM2835 IO2","front",
+"component","R6",,,,,2,"D7","resistor","10K",,,"BCM2835 IO2","front",
+"component","R3",,,,,2,"D7","resistor","10K",,,"BCM2835 IO2","front",
+"component","C95",,,,,2,"C10","capacitor","4u7",,,"BCM2835 IO2","back",
+"component","C96",,,,,2,"C10","capacitor","100n",,,"BCM2835 IO2","back",
+"component","R48",,,,,2,"D9","resistor","33R",,,"BCM2835 IO2","back",
+"component","R47",,,,,2,"D9","resistor","33R",,,"BCM2835 IO2","back",
+"component","R49",,,,,2,"D9","resistor","33R",,,"BCM2835 IO2","back",
+"component","R50",,,,,2,"D9","resistor","33R",,,"BCM2835 IO2","back",
+"component","R45",,,,,2,"D10","resistor","33R",,,"BCM2835 IO2","back",
+"component","R46",,,,,2,"D10","resistor","33R",,,"BCM2835 IO2","back",
+"component","S8",,,,,2,"E10","connector","SD-CARD",,,"BCM2835 IO2","back",
+"signal",,"IC2","E7","VDDIO3_1","VDD3_L",2,"B7",,,,,"BCM2835 IO2",,"power"
+"signal",,"IC2","E8","VDDIO3_2","VDD3_L",2,"B7",,,,,"BCM2835 IO2",,"power"
+"signal",,"IC2","K5","VDDIO4_1","+3V3",2,"B8",,,,,"BCM2835 IO2",,"power"
+"signal",,"IC2","C3","GPIO28","CONFIG0",2,"B7",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","A6","GPIO29","CONFIG1",2,"B7",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","C6","GPIO30","CONFIG2",2,"B7",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","D5","GPIO31","CONFIG3",2,"B7",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","G7","GPIO32","nc",2,"B7",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","B6","GPIO33","nc",2,"B7",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","D7","GPIO34","nc",2,"B7",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","B7","GPIO35","nc",2,"B7",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","C7","GPIO36","nc",2,"B7",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","E6","GPIO37","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","B8","GPIO38","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","D8","GPIO39","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","B9","GPIO40","PWM0_OUT",2,"B8",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","G6","GPIO41","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","C9","GPIO42","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","J3","GPIO43","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","E9","GPIO44","nc",2,"B8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"IC2","D9","GPIO45","PWM1_OUT",2,"B8",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","M6","GPIO46","HDMI_HPD_P",2,"B8",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","M2","GPIO47","SD_CARD_DET",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","M7","GPIO48","SD_CLK_R",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","N2","GPIO49","SD_CMD_R",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","L1","GPIO50","SD_DATA0_R",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","M3","GPIO51","SD_DATA1_R",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","L3","GPIO52","SD_DATA2_R",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"IC2","L6","GPIO53","SD_DATA3_R",2,"B9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",10,"CD","SD_CARD_DET",2,"E8",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",11,"COM1","GND",2,"E8",,,,,"BCM2835 IO2",,"ground"
+"signal",,"S8",12,"COM2","nc",2,"E8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"S8",13,"WP","nc",2,"E8",,,,,"BCM2835 IO2",,"nc"
+"signal",,"S8",4,"Vdd","+3V3",2,"E9",,,,,"BCM2835 IO2",,"power"
+"signal",,"S8",5,"CLK","SD_CLK",2,"E9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",2,"CMD","SD_CMD",2,"E9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",7,"DAT0","SD_DATA0",2,"E9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",8,"DAT1","SD_DATA1",2,"E9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",9,"DAT2","SD_DATA2",2,"E9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",1,"DAT3/CD","SD_DATA3",2,"E9",,,,,"BCM2835 IO2",,"data"
+"signal",,"S8",3,"Vss1","GND",2,"E9",,,,,"BCM2835 IO2",,"ground"
+"signal",,"S8",6,"Vss2","GND",2,"E9",,,,,"BCM2835 IO2",,"ground"
+"signal",,"S8",14,"MTG1","PE",2,"E9",,,,,"BCM2835 IO2",,"ground"
+"signal",,"S8",15,"MTG2","PE",2,"E10",,,,,"BCM2835 IO2",,"ground"
+"power",,,,,"+3V3",2,"E4",,,,,"GPIO Header",,
+"power",,,,,"+3V3",2,"D5",,,,,"GPIO Header",,
+"power",,,,,"GND",2,"D6",,,,,"GPIO Header",,
+"power",,,,,"GND",2,"E7",,,,,"GPIO Header",,
+"power",,,,,"+5V0",2,"F5",,,,,"GPIO Header",,
+"component","C4",,,,,2,"D6","capacitor","100n",,,"GPIO Header","front",
+"component","R2",,,,,2,"D5","resistor","1K8",,,"GPIO Header","front",
+"component","R1",,,,,2,"E5","resistor","1K8",,,"GPIO Header","front",
+"component","P1",,,,,2,"E7","header","User GPIO","PH-26/004",,"GPIO Header","front",
+"signal",,"P1",1,,"+3V3",2,"E5",,,,,"GPIO Header",,"power"
+"signal",,"P1",3,,"SDA0",2,"E5",,,,,"GPIO Header",,"data"
+"signal",,"P1",5,,"SCL0",2,"E5",,,,,"GPIO Header",,"data"
+"signal",,"P1",7,,"GPIO_GCLK",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",9,,"DNC",2,"E6",,,,,"GPIO Header",,"nc"
+"signal",,"P1",11,,"GPIO_GEN0",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",13,,"GPIO_GEN2",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",15,,"GPIO_GEN3",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",17,,"DNC",2,"E6",,,,,"GPIO Header",,"nc"
+"signal",,"P1",19,,"SPI_MOSI",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",21,,"SPI_MISO",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",23,,"SPI_SCLK",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",25,,"DNC",2,"E6",,,,,"GPIO Header",,"nc"
+"signal",,"P1",2,,"+5V0",2,"E5",,,,,"GPIO Header",,"power"
+"signal",,"P1",4,,"DNC",2,"E5",,,,,"GPIO Header",,"nc"
+"signal",,"P1",6,,"GND",2,"E5",,,,,"GPIO Header",,"ground"
+"signal",,"P1",8,,"TXD0",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",10,,"RXD0",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",12,,"GPIO_GEN1",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",14,,"DNC",2,"E6",,,,,"GPIO Header",,"nc"
+"signal",,"P1",16,,"GPIO_GEN4",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",18,,"GPIO_GEN5",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",20,,"DNC",2,"E6",,,,,"GPIO Header",,"nc"
+"signal",,"P1",22,,"GPIO_GEN6",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",24,,"SPI_CE0_N",2,"E6",,,,,"GPIO Header",,"data"
+"signal",,"P1",26,,"SPI_CE1_N",2,"E6",,,,,"GPIO Header",,"data"
+"power",,,,,"+2V5",2,"G7",,,,,"BCM2835 DAC",,
+"power",,,,,"GND",2,"G7",,,,,"BCM2835 DAC",,
+"power",,,,,"GND",2,"G7",,,,,"BCM2835 DAC",,
+"power",,,,,"+2V5",2,"I7",,,,,"BCM2835 DAC",,
+"power",,,,,"GND",2,"J8",,,,,"BCM2835 DAC",,
+"component","C72",,,,,2,"G7","capacitor","100n",,,"BCM2835 DAC","back",
+"component","R44",,,,,2,"I7","resistor","15R",,,"BCM2835 DAC","back",
+"component","D4",,,,,2,"I8","diode (signal)",,"BAV99",,"BCM2835 DAC","front",
+"component","S4",,,,,2,"J7","connector","PHONO (RCA)","PA-3/018",,"BCM2835 DAC","front",
+"signal",,"IC2","R14","DAC_2V5","+2V5",2,"G7",,,,,"BCM2835 DAC",,"power"
+"signal",,"IC2","U1","DAC_AGND1","GND",2,"G7",,,,,"BCM2835 DAC",,"ground"
+"signal",,"IC2","U2","DAC_AGND2","GND",2,"G7",,,,,"BCM2835 DAC",,"ground"
+"signal",,"IC2","P14","DAC_OUT","VID_DAC",2,"H7",,,,,"BCM2835 DAC",,"data"
+"signal",,"IC2","N15","DAC_TERM","COMPVID",2,"H7",,,,,"BCM2835 DAC",,"data"
+"signal",,"S4",2,,"COMPVID",2,"J7",,,,,"BCM2835 DAC",,"data"
+"signal",,"S4",3,,"nc",2,"J7",,,,,"BCM2835 DAC",,"nc"
+"signal",,"S4",1,,"GND",2,"J7",,,,,"BCM2835 DAC",,"ground"
+"power",,,,,"GND",2,"G9",,,,,"Analogue audio out",,
+"power",,,,,"GND",2,"G10",,,,,"Analogue audio out",,
+"power",,,,,"GND",2,"H10",,,,,"Analogue audio out",,
+"power",,,,,"GND",2,"H9",,,,,"Analogue audio out",,
+"component","R21",,,,,2,"G8","resistor","270R",,,"Analogue audio out","front",
+"component","C20",,,,,2,"G9","capacitor","33n",,,"Analogue audio out","front",
+"component","R20",,,,,2,"G9","resistor","150R",,,"Analogue audio out","front",
+"component","C48",,,,,2,"G8","capacitor","10u",,,"Analogue audio out","back",
+"component","R27",,,,,2,"G9","resistor","270R",,,"Analogue audio out","front",
+"component","C26",,,,,2,"G10","capacitor","33n",,,"Analogue audio out","front",
+"component","R26",,,,,2,"G10","resistor","150R",,,"Analogue audio out","front",
+"component","C34",,,,,2,"G9","capacitor","10u",,,"Analogue audio out","back",
+"component","D12",,,,,2,"H10","diode (signal)",,"BAV99",,"Analogue audio out","back",
+"component","D13",,,,,2,"H10","diode (signal)",,"BAV99",,"Analogue audio out","back",
+"component","S6",,,,,2,"I9","connector","3.5mm audio","PA-5/013",,"Analogue audio out","front",
+"signal",,"S6",1,,"GND",2,"I8",,,,,"Analogue audio out",,"ground"
+"signal",,"S6",5,,"LOUT_R",2,"I8",,,,,"Analogue audio out",,"data"
+"signal",,"S6",4,,"nc",2,"I9",,,,,"Analogue audio out",,"nc"
+"signal",,"S6",3,,"nc",2,"I9",,,,,"Analogue audio out",,"nc"
+"signal",,"S6",2,,"LOUT_L",2,"I9",,,,,"Analogue audio out",,"data"
+"power",,,,,"+3V3",3,"A1",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"A2",,,,,"LAN9512 PSU",,
+"power",,,,,"+1V8",3,"A2",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"A3",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"B3",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"C3",,,,,"LAN9512 PSU",,
+"power",,,,,"+3V3",3,"B3",,,,,"LAN9512 PSU",,
+"power",,,,,"+3V3",3,"C3",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"C4",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"A5",,,,,"LAN9512 PSU",,
+"power",,,,,"+3V3",3,"E1",,,,,"LAN9512 PSU",,
+"power",,,,,"GND",3,"E2",,,,,"LAN9512 PSU",,
+"component","C49",,,,,3,"A1","capacitor","4u7",,"B","LAN9512 PSU","back",
+"component","C42",,,,,3,"B1","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C35",,,,,3,"B1","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C37",,,,,3,"B1","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C44",,,,,3,"C1","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C29",,,,,3,"A2","capacitor","4u7",,"B","LAN9512 PSU","front",
+"component","C36",,,,,3,"A2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C43",,,,,3,"B2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","L3",,,,,3,"B3","inductor",,"BLM18AG601","B","LAN9512 PSU","front",
+"component","C45",,,,,3,"B3","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C27",,,,,3,"B3","capacitor","1u0",,"B","LAN9512 PSU","front",
+"component","R19",,,,,3,"B4","resistor","10K",,"B","LAN9512 PSU","front",
+"component","P3",,,,,3,"A5","header","Ethernet JTAG","PH-7/002","NF","LAN9512 PSU","front",
+"component","L4",,,,,3,"F1","inductor",,"BLM18AG601","B","LAN9512 PSU","front",
+"component","C46",,,,,3,"E2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C50",,,,,3,"E2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C47",,,,,3,"F2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C40",,,,,3,"F2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C39",,,,,3,"G2","capacitor","100n",,"B","LAN9512 PSU","back",
+"component","C38",,,,,3,"G2","capacitor","100n",,"B","LAN9512 PSU","back",
+"signal",,"P3",1,,"SM_NRST",3,"A4",,,,,"LAN9512 PSU",,"data"
+"signal",,"P3",2,,"SM_TDI",3,"A4",,,,,"LAN9512 PSU",,"data"
+"signal",,"P3",3,,"SM_TDO",3,"A4",,,,,"LAN9512 PSU",,"data"
+"signal",,"P3",4,,"SM_TMS",3,"A4",,,,,"LAN9512 PSU",,"data"
+"signal",,"P3",5,,"SM_TCLK",3,"A4",,,,,"LAN9512 PSU",,"data"
+"signal",,"P3",6,,"nc",3,"A4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"P3",7,,"GND",3,"A5",,,,,"LAN9512 PSU",,"ground"
+"signal",,"IC3",19,"VDD_3V3_IO1","+3V3",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",27,"VDD_3V3_IO2","+3V3",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",33,"VDD_3V3_IO3","+3V3",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",39,"VDD_3V3_IO4","+3V3",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",46,"VDD_3V3_IO5","+3V3",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",15,"VDD_1V8_CORE1","+1V8",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",38,"VDD_1V8_CORE2","+1V8",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",48,"VDD_1V8ETH_PLL","ETH_PLL",3,"C2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",62,"VDD_1V8USB_PLL","USB_PLL",3,"C3",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",65,"VSS_GND_TAB","GND",3,"C3",,,,,"LAN9512 PSU",,"ground"
+"signal",,"IC3",13,"TEST1","nc",3,"C3",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",34,"TEST2","GND",3,"C3",,,,,"LAN9512 PSU",,"ground"
+"signal",,"IC3",40,"TEST3","+3V3",3,"C3",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",47,"TEST4","nc",3,"C3",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",12,"N_RESET","LAN_RUN",3,"C4",,,,,"LAN9512 PSU",,"data"
+"signal",,"IC3",28,"N_TRST","SM_NRST",3,"C4",,,,,"LAN9512 PSU",,"data"
+"signal",,"IC3",29,"TMS","SM_TMS",3,"C4",,,,,"LAN9512 PSU",,"data"
+"signal",,"IC3",30,"TDI","SM_TDI",3,"C4",,,,,"LAN9512 PSU",,"data"
+"signal",,"IC3",31,"TDO","SM_TDO",3,"C4",,,,,"LAN9512 PSU",,"data"
+"signal",,"IC3",32,"TCK","SM_TCLK",3,"C4",,,,,"LAN9512 PSU",,"data"
+"signal",,"IC3",5,"VDD_3V3A1","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",10,"VDD_3V3A2","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",49,"VDD_3V3A3","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",51,"VDD_3V3A4","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",54,"VDD_3V3A5","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",57,"VDD_3V3A6","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",64,"VDD_3V3A7","+3V3_AN",3,"E2",,,,,"LAN9512 PSU",,"power"
+"signal",,"IC3",35,"GPIO3","nc",3,"E3",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",36,"GPIO4","nc",3,"E3",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",37,"GPIO5","nc",3,"E3",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",42,"GPIO6","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",43,"GPIO7","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",6,"NC1","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",7,"NC2","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",8,"NC3","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",9,"NC4","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",17,"NC5","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"signal",,"IC3",18,"NC6","nc",3,"E4",,,,,"LAN9512 PSU",,"nc"
+"power",,,,,"+3V3",3,"E4",,,,,"LAN9512 ETH (EEPROM)",,
+"power",,,,,"GND",3,"E6",,,,,"LAN9512 ETH (EEPROM)",,
+"power",,,,,"GND",3,"E7",,,,,"LAN9512 ETH (EEPROM)",,
+"power",,,,,"+3V3",3,"H7",,,,,"LAN9512 ETH (EEPROM)",,
+"power",,,,,"GND",3,"H5",,,,,"LAN9512 ETH (EEPROM)",,
+"power",,,,,"GND",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,
+"power",,,,,"PE",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,
+"component","R40",,,,,3,"E5","resistor","10K",,"B","LAN9512 ETH (EEPROM)","back",
+"component","R41",,,,,3,"E5","resistor","12K4",,"B","LAN9512 ETH (EEPROM)","back",
+"component","C41",,,,,3,"E6","capacitor","33p",,"B","LAN9512 ETH (EEPROM)","back",
+"component","C51",,,,,3,"E6","capacitor","33p",,"B","LAN9512 ETH (EEPROM)","back",
+"component","X1",,,,,3,"E6","crystal","25M0",,"B","LAN9512 ETH (EEPROM)","back",
+"component","R39",,,,,3,"F6","resistor","1M0",,"B","LAN9512 ETH (EEPROM)","back",
+"component","R22",,,,,3,"G5","resistor","49R9",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R24",,,,,3,"G5","resistor","49R9",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R23",,,,,3,"G5","resistor","49R9",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R28",,,,,3,"H5","resistor","49R9",,"B","LAN9512 ETH (EEPROM)","front",
+"component","C28",,,,,3,"H5","capacitor","100n",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R25",,,,,3,"I5","resistor","10R",,"B","LAN9512 ETH (EEPROM)","front",
+"component","C25",,,,,3,"H6","capacitor","15p",,"B","LAN9512 ETH (EEPROM)","front",
+"component","C24",,,,,3,"H6","capacitor","15p",,"B","LAN9512 ETH (EEPROM)","front",
+"component","C23",,,,,3,"H6","capacitor","15p",,"B","LAN9512 ETH (EEPROM)","front",
+"component","C22",,,,,3,"I6","capacitor","15p",,"B","LAN9512 ETH (EEPROM)","front",
+"component","C21",,,,,3,"I6","capacitor","22n",,"B","LAN9512 ETH (EEPROM)","front",
+"component","P4",,,,,3,"J6","connector","10/100 Ethernet","PD-8/095","B","LAN9512 ETH (EEPROM)","front",
+"component","D7",,,,,3,"G7","diode (light emitting)","GRN",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R33",,,,,3,"H7","resistor","1K0",,"B","LAN9512 ETH (EEPROM)","back",
+"component","D8",,,,,3,"G7","diode (light emitting)","GRN",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R32",,,,,3,"H7","resistor","1K0",,"B","LAN9512 ETH (EEPROM)","back",
+"component","D9",,,,,3,"G8","diode (light emitting)","YEL",,"B","LAN9512 ETH (EEPROM)","front",
+"component","R31",,,,,3,"H8","resistor","1K0",,"B","LAN9512 ETH (EEPROM)","back",
+"signal",,"X1",4,,"GND",3,"E6",,,,,"LAN9512 ETH (EEPROM)",,"ground"
+"signal",,"X1",2,,"GND",3,"E6",,,,,"LAN9512 ETH (EEPROM)",,"ground"
+"signal",,"X1",3,,"XI",3,"E6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"X1",1,,"XO",3,"E6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",26,"EEDI","nc",3,"F5",,,,,"LAN9512 ETH (EEPROM)",,"nc"
+"signal",,"IC3",25,"EEDO","nc",3,"F5",,,,,"LAN9512 ETH (EEPROM)",,"nc"
+"signal",,"IC3",24,"EECS","nc",3,"F5",,,,,"LAN9512 ETH (EEPROM)",,"nc"
+"signal",,"IC3",23,"EECLK","nc",3,"F5",,,,,"LAN9512 ETH (EEPROM)",,"nc"
+"signal",,"IC3",41,"AUTOMDIX_EN","AUTO",3,"F5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",50,"EXTRES","EXTRES",3,"F5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",61,"XI","XI",3,"F6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",60,"XO","XO",3,"F6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",52,"RXP","RXP",3,"G5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",53,"RXN","RXN",3,"G5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",55,"TXP","TXP",3,"G5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",56,"TXN","TXN",3,"G5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",20,"N_FDX_LED","FDX_LED",3,"G6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",21,"N_LNKA_LED","LNK_LED",3,"G6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"IC3",22,"N_SPD_LED","SPD_LED",3,"G6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"P4",1,,"TXP",3,"I5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"P4",2,,"ETX_3V3",3,"I5",,,,,"LAN9512 ETH (EEPROM)",,"power"
+"signal",,"P4",3,,"TXN",3,"I5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"P4",4,,"RXP",3,"I5",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"P4",5,,"ETX_3V3",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,"power"
+"signal",,"P4",6,,"RXN",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,"data"
+"signal",,"P4",7,,"nc",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,"nc"
+"signal",,"P4",8,,"nc",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,"nc"
+"signal",,"P4",9,,"PE",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,"ground"
+"signal",,"P4",10,,"PE",3,"I6",,,,,"LAN9512 ETH (EEPROM)",,"ground"
+"power",,,,,"+3V3",3,"B5",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"B6",,,,,"BCM2835 USB",,
+"power",,,,,"+1V8",3,"A6",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"A6",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"B7",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"B7",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"C7",,,,,"BCM2835 USB",,
+"power",,,,,"+5V0",3,"E7",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"E8",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"F8",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"F9",,,,,"BCM2835 USB",,
+"power",,,,,"GND",3,"F10",,,,,"BCM2835 USB",,
+"power",,,,,"PE",3,"F10",,,,,"BCM2835 USB",,
+"component","C70",,,,,3,"B5","capacitor","100n",,,"BCM2835 USB","back",
+"component","C84",,,,,3,"A6","capacitor","100n",,,"BCM2835 USB","back",
+"component","C19",,,,,3,"A7","capacitor","100p",,,"BCM2835 USB","front",
+"component","R18",,,,,3,"B7","resistor","3K9",,,"BCM2835 USB","front",
+"component","R36",,,,,3,"D8","resistor","0R0",,"A","BCM2835 USB","back",
+"component","R37",,,,,3,"D8","resistor","0R0",,"A","BCM2835 USB","back",
+"component","C33",,,,,3,"E8","capacitor","100n",,,"BCM2835 USB","back",
+"component","C32",,,,,3,"E8","capacitor (polarized)","47u",,,"BCM2835 USB","front",
+"component","F1",,,,,3,"F7","fuse","140m 60V","miniSMDC014","B","BCM2835 USB","front",
+"component","C30",,,,,3,"F8","capacitor","100n",,"B","BCM2835 USB","front",
+"component","F2",,,,,3,"F8","fuse","140m 60V","miniSMDC014",,"BCM2835 USB","front",
+"component","C31",,,,,3,"F8","capacitor","100n",,,"BCM2835 USB","front",
+"component","S7",,,,,3,"G10","connector","DUAL USB TYPE A","PD-USB/109",,"BCM2835 USB","front",
+"signal",,"IC2","P13","USB_3V3","+3V3",3,"B6",,,,,"BCM2835 USB",,"power"
+"signal",,"IC2","N13","USB_1V8","+1V8",3,"B6",,,,,"BCM2835 USB",,"power"
+"signal",,"IC2","L18","USB_REF","USB_REF",3,"B6",,,,,"BCM2835 USB",,"data"
+"signal",,"IC2","F14","USB_AGND1","GND",3,"B7",,,,,"BCM2835 USB",,"ground"
+"signal",,"IC2","V6","USB_AGND2","GND",3,"B7",,,,,"BCM2835 USB",,"ground"
+"signal",,"IC2","J18","USB_MONPLL","nc",3,"C6",,,,,"BCM2835 USB",,"nc"
+"signal",,"IC2","J17","USB_MONCDR","nc",3,"C6",,,,,"BCM2835 USB",,"nc"
+"signal",,"IC2","U16","USB_DM","USB_DM",3,"C6",,,,,"BCM2835 USB",,"data"
+"signal",,"IC2","V16","USB_DP","USB_DP",3,"C6",,,,,"BCM2835 USB",,"data"
+"signal",,"IC2","K16","USB_OTGID","GND",3,"C7",,,,,"BCM2835 USB",,"ground"
+"signal",,"S7","a1","Vcc","+5V0_USBB",3,"G9",,,,,"BCM2835 USB",,"power"
+"signal",,"S7","a2","USB D- (Upper)","USB_DM2",3,"G9",,,,,"BCM2835 USB",,"data"
+"signal",,"S7","a3","USB D+ (Upper)","USB_DP2",3,"G9",,,,,"BCM2835 USB",,"data"
+"signal",,"S7","a4","Gnd","GND",3,"G9",,,,,"BCM2835 USB",,"ground"
+"signal",,"S7","b1","Vcc","+5V0_USBA",3,"G9",,,,,"BCM2835 USB",,"power"
+"signal",,"S7","b2","USB D- (Lower)","USB_DM3",3,"G9",,,,,"BCM2835 USB",,"data"
+"signal",,"S7","b3","USB D+ (Lower)","USB_DP3",3,"G10",,,,,"BCM2835 USB",,"data"
+"signal",,"S7","b4","Gnd","GND",3,"G10",,,,,"BCM2835 USB",,"ground"
+"signal",,"S7",1,"Shield","PE",3,"G10",,,,,"BCM2835 USB",,"ground"
+"signal",,"S7",2,"Shield","PE",3,"G10",,,,,"BCM2835 USB",,"ground"
+"signal",,"S7",3,"Shield","PE",3,"G10",,,,,"BCM2835 USB",,"ground"
+"signal",,"S7",4,"Shield","PE",3,"G10",,,,,"BCM2835 USB",,"ground"
+"power",,,,,"+3V3",3,"C8",,,,,"LAN9512 USB",,
+"power",,,,,"GND",3,"B9",,,,,"LAN9512 USB",,
+"power",,,,,"GND",3,"B9",,,,,"LAN9512 USB",,
+"component","R38",,,,,3,"B8","resistor","12K",,"B","LAN9512 USB","back",
+"component","D11",,,,,3,"C8","diode",,"BAS16","B","LAN9512 USB","back",
+"component","D10",,,,,3,"D10","diode",,"BAS16","B","LAN9512 USB","back",
+"signal",,"IC3",63,"USB_RBIAS","USB_RBIAS",3,"B8",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",44,"CLK24_EN","GND",3,"B9",,,,,"LAN9512 USB",,"ground"
+"signal",,"IC3",58,"USB_DM0","USB_DM",3,"C8",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",59,"USB_DP0","USB_DP",3,"C8",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",11,"VBUS_DET","+3V3",3,"C8",,,,,"LAN9512 USB",,"power"
+"signal",,"IC3",1,"USB_DM2","USB_DM2",3,"C8",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",2,"USB_DP2","USB_DP2",3,"C8",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",14,"PRTCTRL_2","PRTC_2",3,"C8",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",3,"USB_DM3","USB_DM3",3,"C9",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",4,"USB_DP3","USB_DP3",3,"C9",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",16,"PRTCTRL_3","PRTC_3",3,"C9",,,,,"LAN9512 USB",,"data"
+"signal",,"IC3",45,"CLK24_OUT","nc",3,"C9",,,,,"LAN9512 USB",,"nc"
+"power",,,,,"+3V3",4,"A1",,,,,"BCM2835 HD",,
+"power",,,,,"GND",4,"B1",,,,,"BCM2835 HD",,
+"power",,,,,"+3V3",4,"B3",,,,,"BCM2835 HD",,
+"signal",,"IC2","E10","VDDIO0_1","+3V3",4,"A1",,,,,"BCM2835 HD",,"power"
+"signal",,"IC2","F11","VDDIO0_2","+3V3",4,"A1",,,,,"BCM2835 HD",,"power"
+"signal",,"IC2","F12","HD0","GND",4,"B1",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","C11","HD1","GND",4,"B1",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","F16","HD2","GND",4,"B1",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","D11","HD3","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","E11","HD4","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","G11","HD5","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","G16","HD6","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","G10","HD7","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","E17","HD8","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","D17","HD9","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","F9","HD10","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","D10","HD11","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","F10","HD12","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","A8","HD13","GND",4,"B2",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","G9","HD14","GND",4,"B3",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","H8","HD15","GND",4,"B3",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","D14","HA0","GND",4,"B3",,,,,"BCM2835 HD",,"ground"
+"signal",,"IC2","C10","HRD_N","+3V3",4,"B3",,,,,"BCM2835 HD",,"power"
+"signal",,"IC2","B10","HWR_N","+3V3",4,"B3",,,,,"BCM2835 HD",,"power"
+"signal",,"IC2","E12","HCE_N","+3V3",4,"B3",,,,,"BCM2835 HD",,"power"
+"signal",,"IC2","E13","HAT","nc",4,"B3",,,,,"BCM2835 HD",,"nc"
+"power",,,,,"+1V8",4,"A4",,,,,"BCM2835 CCPTX",,
+"power",,,,,"GND",4,"A5",,,,,"BCM2835 CCPTX",,
+"signal",,"IC2","P8","CCP2TX_1V8","+1V8",4,"A4",,,,,"BCM2835 CCPTX",,"power"
+"signal",,"IC2","V2","CCP2TX_AGND1","GND",4,"A4",,,,,"BCM2835 CCPTX",,"ground"
+"signal",,"IC2","R13","CCP2TX_AGND2","GND",4,"A5",,,,,"BCM2835 CCPTX",,"ground"
+"signal",,"IC2","R16","CCP2TX_AGND3","GND",4,"A5",,,,,"BCM2835 CCPTX",,"ground"
+"signal",,"IC2","P5","CCP2TX_CP","nc",4,"B4",,,,,"BCM2835 CCPTX",,"nc"
+"signal",,"IC2","N5","CCP2TX_CN","nc",4,"B4",,,,,"BCM2835 CCPTX",,"nc"
+"signal",,"IC2","P6","CCP2TX_DP","nc",4,"B4",,,,,"BCM2835 CCPTX",,"nc"
+"signal",,"IC2","N6","CCP2TX_DN","nc",4,"B5",,,,,"BCM2835 CCPTX",,"nc"
+"power",,,,,"+1V8",4,"B5",,,,,"BCM2835 CAM0",,
+"power",,,,,"GND",4,"B6",,,,,"BCM2835 CAM0",,
+"signal",,"IC2","R11","CAM0_CP","nc",4,"A5",,,,,"BCM2835 CAM0",,"nc"
+"signal",,"IC2","P11","CAM0_CN","nc",4,"A5",,,,,"BCM2835 CAM0",,"nc"
+"signal",,"IC2","N11","CAM0_DP0","nc",4,"A6",,,,,"BCM2835 CAM0",,"nc"
+"signal",,"IC2","M11","CAM0_DN0","nc",4,"A6",,,,,"BCM2835 CAM0",,"nc"
+"signal",,"IC2","N12","CAM0_DP1","nc",4,"A6",,,,,"BCM2835 CAM0",,"nc"
+"signal",,"IC2","M12","CAM0_DN1","nc",4,"A6",,,,,"BCM2835 CAM0",,"nc"
+"signal",,"IC2","R10","CAM0_1V8","+1V8",4,"B6",,,,,"BCM2835 CAM0",,"power"
+"signal",,"IC2","T5","CAM0_AGND","GND",4,"B6",,,,,"BCM2835 CAM0",,"ground"
+"power",,,,,"+1V8",4,"A7",,,,,"BCM2835 DSI0",,
+"power",,,,,"GND",4,"A8",,,,,"BCM2835 DSI0",,
+"signal",,"IC2","R7","DSI0_1V8","+1V8",4,"A7",,,,,"BCM2835 DSI0",,"power"
+"signal",,"IC2","T10","DSI0_AGND","GND",4,"A7",,,,,"BCM2835 DSI0",,"ground"
+"signal",,"IC2","T6","DSI0_CP","nc",4,"B7",,,,,"BCM2835 DSI0",,"nc"
+"signal",,"IC2","R6","DSI0_CN","nc",4,"B7",,,,,"BCM2835 DSI0",,"nc"
+"signal",,"IC2","V5","DSI0_DP0","nc",4,"B7",,,,,"BCM2835 DSI0",,"nc"
+"signal",,"IC2","U5","DSI0_DN0","nc",4,"B7",,,,,"BCM2835 DSI0",,"nc"
+"signal",,"IC2","V4","DSI0_DP1","nc",4,"B7",,,,,"BCM2835 DSI0",,"nc"
+"signal",,"IC2","U4","DSI0_DN1","nc",4,"B7",,,,,"BCM2835 DSI0",,"nc"
+"power",,,,,"+1V8",4,"A8",,,,,"BCM2835 SLIM",,
+"signal",,"IC2","M4","VDDIO6","+1V8",4,"A8",,,,,"BCM2835 SLIM",,"power"
+"signal",,"IC2","M1","SLIM_CLK","nc",4,"B8",,,,,"BCM2835 SLIM",,"nc"
+"signal",,"IC2","N3","SLIM_DAT","nc",4,"B9",,,,,"BCM2835 SLIM",,"nc"
+"power",,,,,"+3V3",4,"E1",,,,,"Status LEDs",,
+"power",,,,,"GND",4,"E3",,,,,"Status LEDs",,
+"component","R35",,,,,4,"D2","resistor","1K0",,,"Status LEDs","back",
+"component","D5",,,,,4,"D2","diode (light emitting)","GRN",,,"Status LEDs","front",
+"component","R34",,,,,4,"E2","resistor","1K0",,,"Status LEDs","back",
+"component","D6",,,,,4,"E2","diode (light emitting)","RED",,,"Status LEDs","front",
+"power",,,,,"+3V3",4,"E4",,,,,"CSI-2 interface",,
+"power",,,,,"GND",4,"F5",,,,,"CSI-2 interface",,
+"power",,,,,"+3V3",4,"E5",,,,,"CSI-2 interface",,
+"power",,,,,"GND",4,"E6",,,,,"CSI-2 interface",,
+"component","R43",,,,,4,"E4","resistor","1K6",,,"CSI-2 interface","back",
+"component","R42",,,,,4,"E4","resistor","1K6",,,"CSI-2 interface","back",
+"component","C52",,,,,4,"E5","capacitor","100n",,,"CSI-2 interface","back",
+"component","S5",,,,,4,"F5","connector","15-pin flat flex","PF-15/026",,"CSI-2 interface","front",
+"signal",,"S5",1,,"GND",4,"F3",,,,,"CSI-2 interface",,"ground"
+"signal",,"S5",2,,"CAM1_DN0",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",3,,"CAM1_DP0",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",4,,"GND",4,"F4",,,,,"CSI-2 interface",,"ground"
+"signal",,"S5",5,,"CAM1_DN1",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",6,,"CAM1_DP1",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",7,,"GND",4,"F4",,,,,"CSI-2 interface",,"ground"
+"signal",,"S5",8,,"CAM1_CN",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",9,,"CAM1_CP",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",10,,"GND",4,"F4",,,,,"CSI-2 interface",,"ground"
+"signal",,"S5",11,,"CAM_GPIO",4,"F4",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",12,,"CAM_CLK",4,"F5",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",13,,"SCL1",4,"F5",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",14,,"SDA1",4,"F5",,,,,"CSI-2 interface",,"data"
+"signal",,"S5",15,,"+3V3",4,"F5",,,,,"CSI-2 interface",,"power"
+"power",,,,,"+1V8",4,"D7",,,,,"BCM2835 DSI1",,
+"power",,,,,"GND",4,"D8",,,,,"BCM2835 DSI1",,
+"signal",,"IC2","R4","DSI1_1V8","+1V8",4,"D8",,,,,"BCM2835 DSI1",,"power"
+"signal",,"IC2","T11","DSI1_AGND","GND",4,"D8",,,,,"BCM2835 DSI1",,"ground"
+"signal",,"IC2","R1","DSI1_CP","DSI1_CP",4,"D6",,,,,"BCM2835 DSI1",,"data"
+"signal",,"IC2","R2","DSI1_CN","DSI1_CN",4,"D6",,,,,"BCM2835 DSI1",,"data"
+"signal",,"IC2","P1","DSI1_DP0","DSI1_DP0",4,"D7",,,,,"BCM2835 DSI1",,"data"
+"signal",,"IC2","P2","DSI1_DN0","DSI1_DN0",4,"D7",,,,,"BCM2835 DSI1",,"data"
+"signal",,"IC2","V3","DSI1_DP1","DSI1_DP1",4,"D7",,,,,"BCM2835 DSI1",,"data"
+"signal",,"IC2","U3","DSI1_DN1","DSI1_DN1",4,"D7",,,,,"BCM2835 DSI1",,"data"
+"signal",,"IC2","T1","DSI1_DP2","nc",4,"D7",,,,,"BCM2835 DSI1",,"nc"
+"signal",,"IC2","T2","DSI1_DN2","nc",4,"D8",,,,,"BCM2835 DSI1",,"nc"
+"signal",,"IC2","P3","DSI1_DP3","nc",4,"D8",,,,,"BCM2835 DSI1",,"nc"
+"signal",,"IC2","P4","DSI1_DN3","nc",4,"D8",,,,,"BCM2835 DSI1",,"nc"
+"power",,,,,"+3V3",4,"E8",,,,,"DSI interface",,
+"power",,,,,"GND",4,"E8",,,,,"DSI interface",,
+"power",,,,,"GND",4,"F8",,,,,"DSI interface",,
+"component","C1",,,,,4,"E8","capacitor","100n",,,"DSI interface","front",
+"component","S2",,,,,4,"F8","connector","15-pin flat flex","PF-15/026",,"DSI interface","front",
+"signal",,"S2",1,,"GND",4,"F6",,,,,"DSI interface",,"ground"
+"signal",,"S2",2,,"DSI1_DN1",4,"F6",,,,,"DSI interface",,"data"
+"signal",,"S2",3,,"DSI1_DP1",4,"F6",,,,,"DSI interface",,"data"
+"signal",,"S2",4,,"GND",4,"F7",,,,,"DSI interface",,"ground"
+"signal",,"S2",5,,"DSI1_CN",4,"F7",,,,,"DSI interface",,"data"
+"signal",,"S2",6,,"DSI1_CP",4,"F7",,,,,"DSI interface",,"data"
+"signal",,"S2",7,,"GND",4,"F7",,,,,"DSI interface",,"ground"
+"signal",,"S2",8,,"DSI1_DN0",4,"F7",,,,,"DSI interface",,"data"
+"signal",,"S2",9,,"DSI1_DP0",4,"F7",,,,,"DSI interface",,"data"
+"signal",,"S2",10,,"GND",4,"F7",,,,,"DSI interface",,"ground"
+"signal",,"S2",11,,"nc",4,"F7",,,,,"DSI interface",,"nc"
+"signal",,"S2",12,,"nc",4,"F7",,,,,"DSI interface",,"nc"
+"signal",,"S2",13,,"GND",4,"F7",,,,,"DSI interface",,"ground"
+"signal",,"S2",14,,"+3V3",4,"F8",,,,,"DSI interface",,"power"
+"signal",,"S2",15,,"+3V3",4,"F8",,,,,"DSI interface",,"power"
+"power",,,,,"+3V3",4,"H1",,,,,"BCM2835 JTAG",,
+"power",,,,,"GND",4,"H2",,,,,"BCM2835 JTAG",,
+"component","P2",,,,,4,"G2","header","GPU JTAG","PH-8/001","NF","BCM2835 JTAG","front",
+"signal",,"IC2","M13","VDDIO5","+3V3",4,"I2",,,,,"BCM2835 JTAG",,"power"
+"signal",,"IC2","N17","TMS","VC_TMS",4,"I2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"IC2","N16","TRSTN","VC_TRST_N",4,"I2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"IC2","M17","TCK","VC_TCLK",4,"I2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"IC2","P17","TDI","VC_TDI",4,"I2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"IC2","M18","TDO","VC_TDO",4,"I2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"P2",1,,"+3V3",4,"G1",,,,,"BCM2835 JTAG",,"power"
+"signal",,"P2",2,,"VC_TRST_N",4,"G2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"P2",3,,"VC_TDI",4,"G2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"P2",4,,"VC_TDO",4,"G2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"P2",5,,"VC_TMS",4,"G2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"P2",6,,"VC_TCLK",4,"G2",,,,,"BCM2835 JTAG",,"data"
+"signal",,"P2",7,,"GND",4,"G2",,,,,"BCM2835 JTAG",,"ground"
+"signal",,"P2",8,,"GND",4,"G2",,,,,"BCM2835 JTAG",,"ground"
+"power",,,,,"GND",4,"I5",,,,,"BCM2835 CAM1",,
+"signal",,"IC2","V13","CAM1_CP","CAM1_CP",4,"H4",,,,,"BCM2835 CAM1",,"data"
+"signal",,"IC2","U13","CAM1_CN","CAM1_CN",4,"H4",,,,,"BCM2835 CAM1",,"data"
+"signal",,"IC2","V15","CAM1_DP0","CAM1_DP0",4,"H4",,,,,"BCM2835 CAM1",,"data"
+"signal",,"IC2","U15","CAM1_DN0","CAM1_DN0",4,"H4",,,,,"BCM2835 CAM1",,"data"
+"signal",,"IC2","V14","CAM1_DP1","CAM1_DP1",4,"H4",,,,,"BCM2835 CAM1",,"data"
+"signal",,"IC2","U14","CAM1_DN1","CAM1_DN1",4,"H4",,,,,"BCM2835 CAM1",,"data"
+"signal",,"IC2","V12","CAM1_DP2","nc",4,"H5",,,,,"BCM2835 CAM1",,"nc"
+"signal",,"IC2","U12","CAM1_DN2","nc",4,"H5",,,,,"BCM2835 CAM1",,"nc"
+"signal",,"IC2","V11","CAM1_DP3","nc",4,"H5",,,,,"BCM2835 CAM1",,"nc"
+"signal",,"IC2","U11","CAM1_DN3","nc",4,"H5",,,,,"BCM2835 CAM1",,"nc"
+"signal",,"IC2","T8","CAM1_AGND","GND",4,"I5",,,,,"BCM2835 CAM1",,"ground"
