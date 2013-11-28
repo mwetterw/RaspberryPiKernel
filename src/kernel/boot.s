@@ -31,32 +31,22 @@ reset:
 	ldmia r0!,{r2,r3,r4,r5,r6,r7,r8,r9}
 	stmia r1!,{r2,r3,r4,r5,r6,r7,r8,r9}
 
-	;@ force the bit 0 (M) of the control register 1 to 0
-	;@ doc_arm_specs.pdf chapter B3.4
+	;@ doc_arm_specs.pdf chapter B3.4.1, P.694/P.1138 & B4.9.2, P.740/P.1138
 	;@ This disables MMU.
+	;@ Sets the bit 0 of the c1 register of the CP15 coprocessor to 0
+	;@ c1 is the control register of co-processor CP15.
 	mrc p15, #0, r0, c1, c0, 0
 	bic r0, #1
 	mcr p15, #0, r0, c1, c0, 0
 
-    ;@ Switch to IRQ Mode
-	;@ IRQ Disabled
-	;@ FIQ Disabled
-    mov r0,#0xD2
-    msr cpsr_c,r0
+    ;@ Switch to IRQ Mode, disables IRQ & FIQ
+	cpsid if, #0x12
+	;@ Initializes IRQ stack pointer
     mov sp,#0x8000
 
-    ;@ Switch to FIQ Mode
-	;@ IRQ Disabled
-	;@ FIQ Disabled
-    mov r0,#0xD1
-    msr cpsr_c,r0
-    mov sp,#0x4000
-
     ;@ Switch to SUPERVISOR Mode
-	;@ IRQ Disabled
-	;@ FIQ Disabled
-    mov r0,#0xD3
-    msr cpsr_c,r0
+	cps #0x13
+	;@ Initializes Supervisor stack pointer
     mov sp,#0x8000000
 
 	b kernel_main
@@ -86,7 +76,7 @@ irq: b irq
  * Q  overflow DSP instruction
  * J  Current instruction set [ARM, Thumb, Jazelle] (together with T)
  * GE Greater or Equal (SIMD instruction)
- * E  Endianness
+ * E  Endianness (0 = Little Endian, 1 = Big Endian) @see setend instruction
  * A  Imprecise Data Aborts (1=off, 0=on)
  * I  IRQ (1=off, 0=on)
  * F  FIQ (1=off, 0=on)
@@ -95,13 +85,13 @@ irq: b irq
  *
  *
  * MODE
- * 10000 User
- * 10001 FIQ
- * 10010 IRQ
- * 10011 Supervisor
- * 10111 Abort
- * 11011 Undefined
- * 11111 System
+ * 10000 16 0x10 User
+ * 10001 17 0x11 FIQ
+ * 10010 18 0x12 IRQ
+ * 10011 19 0x13 Supervisor
+ * 10111 23 0x17 Abort
+ * 11011 27 0x1B Undefined
+ * 11111 31 0x1F System
  *
  *
  * J   T   Instruction set
