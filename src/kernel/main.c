@@ -8,7 +8,5 @@ void __attribute__ ( ( noreturn, naked ) ) kernel_main ( )
 	kernel_hardware_init ( );
 	kernel_scheduler_init ( );
 
-	for ( ; ; );
-
-	__builtin_unreachable ( );
+	kernel_scheduler_yield_noreturn ( );
 }
