@@ -19,12 +19,14 @@ void kernel_scheduler_init ( )
 	kernel_pcb_enable_irq ( &kernel_pcb_idle );
 
 	kernel_pcb_turnstile_init ( &kernel_turnstile_round_robin );
+
 	kernel_pcb_running = 0;
 }
 
 void kernel_scheduler_yield_noreturn ( )
 {
 	kernel_scheduler_elect ( );
+
 	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
 	__asm ( "ldr r0, [sp, #+0x3c]" ); // Loads cpsr into r0
 	__asm ( "msr cpsr_cxsf, r0" ); // Stores it into processor
