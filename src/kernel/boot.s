@@ -58,7 +58,7 @@ data: b data
 unused: b unused
 fiq: b fiq
 
-irq: b irq
+irq: b kernel_scheduler_handler
 
 
 /*

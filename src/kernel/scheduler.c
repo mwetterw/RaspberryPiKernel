@@ -36,6 +36,11 @@ void kernel_scheduler_yield_noreturn ( )
 	__builtin_unreachable ( );
 }
 
+void kernel_scheduler_handler ( )
+{
+	for ( ; ; );
+}
+
 void __attribute__((unused)) kernel_scheduler_elect ( )
 {
 	if ( kernel_turnstile_round_robin.mpFirst )
