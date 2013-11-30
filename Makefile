@@ -11,6 +11,9 @@ BINDIR = $(BUILDDIR)bin/
 MISCDIR = $(BUILDDIR)misc/
 SRCDIR = src/
 MAKEINCDIR = make/
+GDBDIR = gdb/
+GDBDEFAULT = $(GDBDIR)default.gdb
+
 CLEANDIR = $(DEPDIR) $(PREDIR) $(ASMDIR) $(OBJDIR) $(MISCDIR)
 
 #--------AUTOMATIC RECURSIVE FILE FINDING--------#
@@ -55,7 +58,7 @@ include make/colors.inc.mk
 include make/errorHandler.inc.mk
 
 #--------SPECIAL RULES--------#
-.PHONY: all clean mrproper emu run list deploy sdcopy umount
+.PHONY: all clean mrproper emu run list deploy sdcopy umount default
 .PRECIOUS: $(PRE) $(ASM) $(OBJ) $(DEP)
 .SECONDEXPANSION:
 
