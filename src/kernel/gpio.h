@@ -13,19 +13,26 @@
 #define GPIO_FSEL_ALT4 3
 #define GPIO_FSEL_ALT5 2
 
-#define GPIO_GPFSEL0 kernel_arm_addr ( 0x20200000 )
-#define GPIO_GPFSEL1 kernel_arm_addr ( 0x20200004 )
-#define GPIO_GPFSEL2 kernel_arm_addr ( 0x20200008 )
-#define GPIO_GPFSEL3 kernel_arm_addr ( 0x2020000c )
-#define GPIO_GPFSEL4 kernel_arm_addr ( 0x20200010 )
-#define GPIO_GPFSEL5 kernel_arm_addr ( 0x20200014 )
 
-#define GPIO_BASE_ADDR GPIO_GPFSEL0
-
+/*
+ * Configures a GPIO pin.
+ * Can be:
+ * - an input ;
+ * - an output ;
+ * - an alternate functon.
+ * Use one of the constants above.
+ */
 void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
 
-void kernel_gpio_set ( unsigned char gpioPin );
-void kernel_gpio_clear ( unsigned char gpioPin );
+
+/*
+ * For a GPIO configured as an output,
+ * sets or clears the pin.
+ * ASSERT: The GPIO is configured as an output.
+ */
+void kernel_gpio_output_set ( unsigned char gpioPin );
+void kernel_gpio_output_clear ( unsigned char gpioPin );
+
 
 #define GPIO0 0
 #define GPIO1 1

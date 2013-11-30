@@ -7,28 +7,6 @@
 #define kernel_arm_addr32(addr) ( * ( uint32_t * ) ( addr ) )
 #define kernel_arm_array32(addr, i) ( ( ( uint32_t * ) ( addr ) ) [ i ] )
 
-#define r0 0
-#define r1 1
-#define r2 2
-#define r3 3
-#define r4 4
-#define r5 5
-#define r6 6
-#define r7 7
-#define r8 8
-#define r9 9
-#define r10 10
-#define r11 11
-#define r12 12
-#define r13 13
-#define r14 14
-#define r15 15
-#define cpsr 16
-
-#define sp r13
-#define lr r14
-#define pc r15
-
 #define KERNEL_ARM_MODE_USR 0x10
 #define KERNEL_ARM_MODE_FIQ 0x11
 #define KERNEL_ARM_MODE_IRQ 0x12
@@ -37,40 +15,49 @@
 #define KERNEL_ARM_MODE_UND 0x18
 #define KERNEL_ARM_MODE_SYS 0x1F
 
+#define KERNEL_ARM_CPSR_IRQ_MASK 0x80
+
+// BCM2835_SoC-Periphericals.pdf P112
+#define KERNEL_ARM_IRQ_ENABLE_REGISTER1 0x2000B210
+
+#define KERNEL_ARM_IRQ_SOURCE_TIMER 0x1
+#define KERNEL_ARM_IRQ_SOURCE_MAILBOX 0x2
+#define KERNEL_ARM_IRQ_SOURCE_DORBELL0 0x4
+#define KERNEL_ARM_IRQ_SOURCE_DORBELL1 0x8
+#define KERNEL_ARM_IRQ_SOURCE_GPU0_HALTED 0x10
+#define KERNEL_ARM_IRQ_SOURCE_GPU1_HALTED 0x20
+#define KERNEL_ARM_IRQ_SOURCE_ACCESS_ERROR1_HALTED 0x40
+#define KERNEL_ARM_IRQ_SOURCE_ACCESS_ERROR0_HALTED 0x80
+
+#define kernel_arm_enable_irq_source(source) \
+	kernel_arm_addr32 ( KERNEL_ARM_IRQ_ENABLE_REGISTER1 ) = ( source )
+
+
 /*
  * Gets current processor mode
  * @see KERNEL_ARM_MODE_*
  */
 uint32_t kernel_arm_get_mode ( );
 
-
 /*
  * Sets processor mode
  */
-void kernel_arm_set_mode_usr ( );
-void kernel_arm_set_mode_fiq ( );
-void kernel_arm_set_mode_irq ( );
-void kernel_arm_set_mode_svc ( );
-void kernel_arm_set_mode_abt ( );
-void kernel_arm_set_mode_und ( );
-void kernel_arm_set_mode_sys ( );
-
+#define _kernel_arm_set_mode(mode) __asm ( "cps #" #mode )
+#define kernel_arm_set_mode(mode) _kernel_arm_set_mode(mode)
 
 /*
  * Gets current CPSR (Status Register) value
  */
 uint32_t kernel_arm_get_cpsr ( );
 
-
 /*
  * Enables IRQ in CPSR
  */
-void kernel_arm_enable_irq ( );
-
+#define kernel_arm_enable_irq() __asm ( "cpsie i" )
 
 /*
  * Disables IRQ in CPSR
  */
-void kernel_arm_disable_irq ( );
+#define kernel_arm_disable_irq() __asm ( "cpsid i" )
 
 #endif
