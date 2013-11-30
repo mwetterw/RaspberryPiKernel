@@ -28,12 +28,12 @@ void kernel_scheduler_yield_noreturn ( )
 	kernel_scheduler_elect ( );
 
 	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
-	__asm ( "ldr r0, [sp, #+0x3c]" ); // Loads cpsr into r0
-	__asm ( "msr cpsr_cxsf, r0" ); // Stores it into processor
+	//__asm ( "ldr r0, [sp, #+0x3c]" ); // Loads cpsr into r0
+	//__asm ( "msr cpsr_cxsf, r0" ); // Stores it into processor
 	__asm ( "ldmfd sp!, { r0 - r12, lr }" );
-	__asm ( "add sp, sp, #8" ); // Gets rid of cpsr and pc
-	__asm ( "ldr pc, [sp, #-8]" ); // Manually gets back pc from the stack
-	//__asm ( "rfefd sp!" );
+	//__asm ( "add sp, sp, #8" ); // Gets rid of cpsr and pc
+	//__asm ( "ldr pc, [sp, #-8]" ); // Manually gets back pc from the stack
+	__asm ( "rfefd sp!" );
 
 	__builtin_unreachable ( );
 }
@@ -43,7 +43,7 @@ void kernel_scheduler_handler ( )
 	for ( ; ; );
 }
 
-void __attribute__((unused)) kernel_scheduler_elect ( )
+void kernel_scheduler_elect ( )
 {
 	if ( kernel_turnstile_round_robin.mpFirst )
 	{
