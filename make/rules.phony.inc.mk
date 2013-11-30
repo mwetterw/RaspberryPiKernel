@@ -1,17 +1,26 @@
 MAKEFLAGS += --output-sync=none
 .NOTPARALLEL:
 
+default: $(KERNELIMG)
+
 emu: $(KERNELIMG)
 	$(HIDE)$(QEMU) $(QEMU_FLAGS)
 
-run: $(KERNELIMG)
+define qemugdblauncher
 	$(PRINTF) "%-13s <qemu>...\n" "Launching"
 	$(HIDE)$(QEMU) $(QEMU_FLAGS) > $(MISCDIR)qemu.stdout 2> $(MISCDIR)qemu.stderr & \
 	QEMU_PID=$$!; \
 	printf "%-13s <gdb>...\n" "Launching"; \
-	$(GDB) $(KERNELELF) -x gdb/default.gdb; \
+	$(GDB) $(KERNELELF) -x $1; \
 	printf "%-13s <qemu>...\n" "Killing"; \
 	kill -9 $$QEMU_PID;
+endef
+
+run: $(KERNELIMG)
+	$(call qemugdblauncher,$(GDBDEFAULT))
+
+%.gdb: default
+	$(call qemugdblauncher,$@)
 
 all: mrproper $(KERNELIMG)
 
