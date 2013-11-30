@@ -10,7 +10,5 @@ void __attribute__ ( ( noreturn, naked ) ) kernel_main ( )
 	kernel_timer_init ( );
 	kernel_scheduler_init ( );
 
-	kernel_scheduler_set_next_deadline ( );
-
 	kernel_scheduler_yield_noreturn ( );
 }

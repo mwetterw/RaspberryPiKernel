@@ -27,20 +27,48 @@ void kernel_scheduler_yield_noreturn ( )
 {
 	kernel_scheduler_elect ( );
 
+	kernel_scheduler_set_next_deadline ( );
+
 	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
-	//__asm ( "ldr r0, [sp, #+0x3c]" ); // Loads cpsr into r0
-	//__asm ( "msr cpsr_cxsf, r0" ); // Stores it into processor
 	__asm ( "ldmfd sp!, { r0 - r12, lr }" );
-	//__asm ( "add sp, sp, #8" ); // Gets rid of cpsr and pc
-	//__asm ( "ldr pc, [sp, #-8]" ); // Manually gets back pc from the stack
 	__asm ( "rfefd sp!" );
 
 	__builtin_unreachable ( );
 }
 
-void kernel_scheduler_handler ( )
+void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_handler ( )
 {
-	for ( ; ; );
+	// Correct lr_irq value (A2.6.1, P.55/1138, "Note" section)
+	__asm ( "sub lr, lr, #4" );
+
+	// Store Return State: push {lr_irq, spsr_irq} => sp_svc
+	kernel_arm_srsfd ( KERNEL_ARM_MODE_SVC );
+
+	// Switch to SVC mode
+	kernel_arm_set_mode ( KERNEL_ARM_MODE_SVC );
+
+	// Save current process context (Push r0 - r12, lr)
+	__asm ( "stmfd sp!, {r0 - r12, lr}" );
+
+	// Store sp address in PCB
+	__asm ( "mov %0, sp" : "=r" ( kernel_pcb_running -> mpSP ) );
+
+	// Elect new process
+	kernel_scheduler_elect ( );
+
+	// Fix next IRQ deadline (reset timer)
+	kernel_scheduler_set_next_deadline ( );
+
+	// Load elected process's sp address into sp
+	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
+
+	// Restore elected process context (Pop r0 - r12, lr)
+	__asm ( "ldmfd sp!, {r0 - r12, lr}" );
+
+	// Return From Interrupt: pop {pc, cpsr}
+	__asm ( "rfefd sp!" );
+
+	__builtin_unreachable ( );
 }
 
 void kernel_scheduler_elect ( )

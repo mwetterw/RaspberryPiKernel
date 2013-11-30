@@ -46,6 +46,12 @@ uint32_t kernel_arm_get_mode ( );
 #define kernel_arm_set_mode(mode) _kernel_arm_set_mode(mode)
 
 /*
+ * Launches srsfd #mode!
+ */
+#define _kernel_arm_srsfd(mode) __asm ( "srsfd #" #mode "!" )
+#define kernel_arm_srsfd(mode) _kernel_arm_srsfd(mode)
+
+/*
  * Gets current CPSR (Status Register) value
  */
 uint32_t kernel_arm_get_cpsr ( );
