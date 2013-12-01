@@ -2,8 +2,10 @@
 #include "scheduler.h"
 
 kernel_pcb_t * kernel_pcb_running;
-kernel_pcb_turnstile_t kernel_turnstile_round_robin;
 static kernel_pcb_t kernel_pcb_idle;
+
+kernel_pcb_turnstile_t kernel_turnstile_round_robin;
+kernel_pcb_turnstile_t kernel_turnstile_sleeping;
 
 static void kernel_scheduler_elect ( );
 static void __attribute__ ( ( noreturn, naked ) ) kernel_idle_process ( );
@@ -18,6 +20,7 @@ void kernel_scheduler_init ( )
 	kernel_pcb_enable_irq ( &kernel_pcb_idle );
 
 	kernel_pcb_turnstile_init ( &kernel_turnstile_round_robin );
+	kernel_pcb_turnstile_init ( &kernel_turnstile_sleeping );
 
 	kernel_pcb_running = 0;
 }

@@ -7,6 +7,7 @@
 #include "pcb_turnstile.h"
 
 extern kernel_pcb_turnstile_t kernel_turnstile_round_robin;
+extern kernel_pcb_turnstile_t kernel_turnstile_sleeping;
 
 #ifndef _C_KERNEL_SCHEDULER
 extern kernel_pcb_t * const kernel_pcb_running;
