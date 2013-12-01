@@ -3,6 +3,13 @@
 
 #include "timer.h"
 #include "config.h"
+#include "pcb.h"
+
+extern kernel_pcb_turnstile_t kernel_turnstile_round_robin;
+
+#ifndef _C_KERNEL_SCHEDULER
+extern kernel_pcb_t * const kernel_pcb_running;
+#endif
 
 void kernel_scheduler_init ( );
 

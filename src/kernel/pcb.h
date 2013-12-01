@@ -37,6 +37,15 @@ void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * tur
  */
 void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
 
+/*
+ * Creates a new PCB
+ * @params:
+ * - f is a pointer to the process function ;
+ * - args is a pointer to the first argument.
+ */
+kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
+
+
 #define r0 0
 #define r1 1
 #define r2 2

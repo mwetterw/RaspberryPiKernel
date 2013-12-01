@@ -1,8 +1,8 @@
+#define _C_KERNEL_SCHEDULER
 #include "scheduler.h"
-#include "pcb.h"
 
-static kernel_pcb_t * kernel_pcb_running;
-static kernel_pcb_turnstile_t kernel_turnstile_round_robin;
+kernel_pcb_t * kernel_pcb_running;
+kernel_pcb_turnstile_t kernel_turnstile_round_robin;
 static kernel_pcb_t kernel_pcb_idle;
 
 static void kernel_scheduler_elect ( );
@@ -76,6 +76,7 @@ void kernel_scheduler_elect ( )
 	if ( kernel_turnstile_round_robin.mpFirst )
 	{
 		kernel_pcb_running = kernel_turnstile_round_robin.mpFirst;
+		kernel_pcb_turnstile_rotate ( &kernel_turnstile_round_robin );
 		return;
 	}
 
