@@ -16,11 +16,19 @@ typedef struct kernel_pcb_turnstile_s
 void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
 
 /*
- * Adds a pcb to the end of a turnstile.
+ * Adds a PCB to the end of a turnstile.
  * @param PCB to add
  * @param Turnstile to add to
  */
 void kernel_pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
+
+/*
+ * Insert a PCB, sorted by mWakeUpDeadline
+ * Nearest (lowest) deadline will be first.
+ * @param PCB to add
+ * @param Turnstile to add to
+ */
+void kernel_pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
 
 /*
  * Lets the first PCB become the last,

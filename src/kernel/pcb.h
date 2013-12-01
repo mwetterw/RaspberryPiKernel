@@ -8,6 +8,7 @@ typedef struct kernel_pcb_s
 {
 	uint32_t * mpSP;
 	uint32_t * mpStack;
+	uint32_t mWakeUpDate;
 	struct kernel_pcb_s * mpNext;
 } kernel_pcb_t;
 

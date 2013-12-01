@@ -21,6 +21,44 @@ void kernel_pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t 
 	turnstile -> mpLast = pcb;
 }
 
+void kernel_pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
+{
+	// Empty turnstile
+	if ( ! turnstile -> mpFirst )
+	{
+		turnstile -> mpFirst = pcb;
+		turnstile -> mpLast = pcb;
+		return;
+	}
+
+	// Push front
+	if ( pcb -> mWakeUpDate <= turnstile -> mpFirst -> mWakeUpDate )
+	{
+		pcb -> mpNext = turnstile -> mpFirst;
+		turnstile -> mpFirst = pcb;
+		return;
+	}
+
+	// Push back
+	if ( pcb -> mWakeUpDate >= turnstile -> mpLast -> mWakeUpDate )
+	{
+		turnstile -> mpLast -> mpNext = pcb;
+		turnstile -> mpLast = pcb;
+		pcb -> mpNext = 0;
+		return;
+	}
+
+	kernel_pcb_t * * it;
+	for
+	(
+			it = & ( turnstile -> mpFirst ) ;
+			pcb -> mWakeUpDate > ( * it ) -> mWakeUpDate ;
+			it = & ( ( * it ) -> mpNext )
+	);
+	pcb -> mpNext = * it;
+	* it = pcb;
+}
+
 void kernel_pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
     kernel_pcb_t * previous = 0;
