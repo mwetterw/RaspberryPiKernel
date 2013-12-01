@@ -30,8 +30,7 @@ kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
  * - duration of the nap in microseconds
  * ASSERT: IRQ have to be disabled prior to call.
  */
-void __attribute__ ( ( noreturn ) )
-kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
+void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
 
 
 #define r0 0

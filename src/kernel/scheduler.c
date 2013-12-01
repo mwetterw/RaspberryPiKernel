@@ -95,7 +95,7 @@ void kernel_scheduler_elect ( )
 	{
 		if
 		(
-			kernel_turnstile_sleeping.mpFirst -> mWakeUpDate >=
+			kernel_turnstile_sleeping.mpFirst -> mWakeUpDate <=
 			kernel_timer_get_clock ( )
 		)
 		{

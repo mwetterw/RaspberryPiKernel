@@ -69,6 +69,11 @@ kernel_pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile )
 
 	kernel_pcb_t * head = turnstile -> mpFirst;
 	turnstile -> mpFirst = head -> mpNext;
+
+	if ( turnstile -> mpLast == head )
+	{
+		turnstile -> mpLast = 0;
+	}
 	return head;
 }
 

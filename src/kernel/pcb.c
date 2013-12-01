@@ -41,5 +41,8 @@ void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration )
 	pcb -> mWakeUpDate = kernel_timer_get_clock ( ) + duration;
 	kernel_pcb_turnstile_sorted_insert ( pcb, &kernel_turnstile_sleeping );
 
-	kernel_scheduler_yield ( );
+	if ( pcb == kernel_pcb_running )
+	{
+		kernel_scheduler_yield ( );
+	}
 }
