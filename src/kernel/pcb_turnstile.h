@@ -38,6 +38,15 @@ void kernel_pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnsti
 void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
 
 /*
+ * Removes the first PCB of the list.
+ * @param PCB to remove
+ * @param Turnstile in which the deletion has to be done
+ * @return pointer to removed PCB.
+ */
+kernel_pcb_t *
+kernel_pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile );
+
+/*
  * Remove PCB from turnstile
  * @param PCB to remove
  * @param Turnstile in which the deletion has to be done

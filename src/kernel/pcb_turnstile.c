@@ -59,6 +59,19 @@ void kernel_pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnsti
 	* it = pcb;
 }
 
+kernel_pcb_t *
+kernel_pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile )
+{
+	if ( ! turnstile -> mpFirst )
+	{
+		return 0;
+	}
+
+	kernel_pcb_t * head = turnstile -> mpFirst;
+	turnstile -> mpFirst = head -> mpNext;
+	return head;
+}
+
 void kernel_pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
     kernel_pcb_t * previous = 0;
