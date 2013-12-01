@@ -6,7 +6,6 @@ kernel_pcb_turnstile_t kernel_turnstile_round_robin;
 static kernel_pcb_t kernel_pcb_idle;
 
 static void kernel_scheduler_elect ( );
-
 static void __attribute__ ( ( noreturn, naked ) ) kernel_idle_process ( );
 
 

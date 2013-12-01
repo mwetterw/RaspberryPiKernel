@@ -4,6 +4,7 @@
 #include "timer.h"
 #include "config.h"
 #include "pcb.h"
+#include "pcb_turnstile.h"
 
 extern kernel_pcb_turnstile_t kernel_turnstile_round_robin;
 
