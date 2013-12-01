@@ -93,3 +93,9 @@ void kernel_pcb_bigbang ( void * ( * f ) ( void * ), void * args )
 
     kernel_scheduler_yield_noreturn ( );
 }
+
+void kernel_pcb_sleep ( kernel_pcb_t * pcb,
+		uint32_t __attribute__ ( ( unused ) ) duration )
+{
+	kernel_pcb_remove_turnstile ( pcb, &kernel_turnstile_round_robin );
+}

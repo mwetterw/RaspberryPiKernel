@@ -48,6 +48,14 @@ void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
  */
 kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
 
+/*
+ * Puts pcb in sleeping state during duration microseconds.
+ * @params:
+ * - pcb to let sleep
+ * - duration of the nap in microseconds
+ */
+void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
+
 
 #define r0 0
 #define r1 1
