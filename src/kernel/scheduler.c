@@ -51,25 +51,11 @@ void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_handler ( )
 	// Save current process context (Push r0 - r12, lr)
 	__asm ( "stmfd sp!, {r0 - r12, lr}" );
 
-	// Store sp address in PCB
+	// Store sp in PCB
 	__asm ( "mov %0, sp" : "=r" ( kernel_pcb_running -> mpSP ) );
 
-	// Elect new process
-	kernel_scheduler_elect ( );
-
-	// Fix next IRQ deadline (reset timer)
-	kernel_scheduler_set_next_deadline ( );
-
-	// Load elected process's sp address into sp
-	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
-
-	// Restore elected process context (Pop r0 - r12, lr)
-	__asm ( "ldmfd sp!, {r0 - r12, lr}" );
-
-	// Return From Interrupt: pop {pc, cpsr}
-	__asm ( "rfefd sp!" );
-
-	__builtin_unreachable ( );
+	// Elect new process and hands over CPU to elected process
+	kernel_scheduler_yield_noreturn ( );
 }
 
 void kernel_scheduler_elect ( )
