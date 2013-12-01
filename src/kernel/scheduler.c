@@ -91,6 +91,20 @@ void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_handler ( )
 
 void kernel_scheduler_elect ( )
 {
+	if ( kernel_turnstile_sleeping.mpFirst )
+	{
+		if
+		(
+			kernel_turnstile_sleeping.mpFirst -> mWakeUpDate >=
+			kernel_timer_get_clock ( )
+		)
+		{
+			kernel_pcb_t * current;
+			current = kernel_pcb_turnstile_popfront ( &kernel_turnstile_sleeping );
+			kernel_pcb_turnstile_pushback ( current, &kernel_turnstile_round_robin );
+		}
+	}
+
 	if ( kernel_turnstile_round_robin.mpFirst )
 	{
 		kernel_pcb_running = kernel_turnstile_round_robin.mpFirst;
