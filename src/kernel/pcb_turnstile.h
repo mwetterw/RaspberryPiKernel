@@ -16,11 +16,11 @@ typedef struct kernel_pcb_turnstile_s
 void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
 
 /*
- * Adds a pcb to a turnstile.
+ * Adds a pcb to the end of a turnstile.
  * @param PCB to add
  * @param Turnstile to add to
  */
-void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
+void kernel_pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
 
 /*
  * Lets the first PCB become the last,
@@ -31,10 +31,9 @@ void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
 
 /*
  * Remove PCB from turnstile
- * @param:
- * - PCB to remove ;
- * - Turnstile in which the deletion has to be done.
+ * @param PCB to remove
+ * @param Turnstile in which the deletion has to be done
  */
-void kernel_pcb_remove_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
+void kernel_pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
 
 #endif

@@ -6,7 +6,7 @@ void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile )
 	turnstile -> mpLast = 0;
 }
 
-void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
+void kernel_pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
 	pcb -> mpNext = 0;
 
@@ -21,7 +21,7 @@ void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * tur
 	turnstile -> mpLast = pcb;
 }
 
-void kernel_pcb_remove_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
+void kernel_pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
     kernel_pcb_t * previous = 0;
 
