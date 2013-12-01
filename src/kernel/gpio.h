@@ -1,7 +1,6 @@
 #ifndef _H_KERNEL_GPIO
 #define _H_KERNEL_GPIO
 
-#include <stdint.h>
 #include "arm.h"
 
 #define GPIO_FSEL_INPUT 0

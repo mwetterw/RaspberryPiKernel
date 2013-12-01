@@ -29,6 +29,7 @@ void kernel_scheduler_yield_noreturn ( )
 
 	kernel_scheduler_set_next_deadline ( );
 
+	// Hands over CPU to the elected process
 	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
 	__asm ( "ldmfd sp!, { r0 - r12, lr }" );
 	__asm ( "rfefd sp!" );

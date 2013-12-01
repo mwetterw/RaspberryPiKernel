@@ -29,6 +29,9 @@
 #define KERNEL_ARM_IRQ_SOURCE_ACCESS_ERROR1_HALTED 0x40
 #define KERNEL_ARM_IRQ_SOURCE_ACCESS_ERROR0_HALTED 0x80
 
+/*
+ * Sets the desired IRQ source (one of the KERNEL_ARM_IRQ_SOURCE_*)
+ */
 #define kernel_arm_enable_irq_source(source) \
 	kernel_arm_addr32 ( KERNEL_ARM_IRQ_ENABLE_REGISTER1 ) = ( source )
 

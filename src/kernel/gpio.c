@@ -1,4 +1,5 @@
 #include "gpio.h"
+#include <stdint.h>
 
 #define GPIO_GPFSEL0 kernel_arm_addr ( 0x20200000 )
 #define GPIO_GPFSEL1 kernel_arm_addr ( 0x20200004 )

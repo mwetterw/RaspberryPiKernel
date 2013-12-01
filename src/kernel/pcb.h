@@ -42,6 +42,9 @@ void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
  * @params:
  * - f is a pointer to the process function ;
  * - args is a pointer to the first argument.
+ *
+ * @return:
+ * - pointer to new allocated pcb.
  */
 kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
 
@@ -66,15 +69,32 @@ kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
 #define lr r14
 #define pc r15
 
+/*
+ * Writes register value into the pcb's stack.
+ * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
+ */
 #define kernel_pcb_set_register(pcb, register, value) \
 	( pcb ) -> mpSP [ register ] = ( uint32_t ) ( value )
 
+/*
+ * Changes pcb's cpsr (in pcb's stack) to enable IRQs.
+ * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
+ */
 #define kernel_pcb_enable_irq(pcb) \
 	( pcb ) -> mpSP [ cpsr ] &= ~( KERNEL_ARM_CPSR_IRQ_MASK )
 
+/*
+ * Changes pcb's cpsr (in pcb's stack) to disable IRQs.
+ * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
+ */
 #define kernel_pcb_disable_irq(pcb) \
 	( pcb ) -> mpSP [ cpsr ] |= KERNEL_ARM_CPSR_IRQ_MASK
 
+
+/*
+ * Put caller's cpsr into pcb's cpsr (into pcb's stack)
+ * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
+ */
 #define kernel_pcb_inherit_cpsr(pcb) \
 	( pcb ) -> mpSP [ cpsr ] = kernel_arm_get_cpsr ( )
 

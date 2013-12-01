@@ -19,12 +19,21 @@
 #define KERNEL_TIMER_C2 0x20003014
 #define KERNEL_TIMER_C3 0x20003018
 
+/*
+ * Initializes timer
+ */
 #define kernel_timer_init() \
 	kernel_arm_enable_irq_source ( KERNEL_ARM_IRQ_SOURCE_MAILBOX )
 
+/*
+ * Resets the channel in the System Timer Control / Status Register.
+ */
 #define kernel_timer_enable(channel) \
 	kernel_arm_addr32 ( KERNEL_TIMER_CS ) |= ( 1 << ( channel ) )
 
+/*
+ * Gets the 32 least-significant bits of the timer clock.
+ */
 #define kernel_timer_get_clock() \
 	kernel_arm_addr32 ( KERNEL_TIMER_CLO )
 
