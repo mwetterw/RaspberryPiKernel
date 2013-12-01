@@ -37,6 +37,35 @@ void kernel_scheduler_yield_noreturn ( )
 	__builtin_unreachable ( );
 }
 
+void kernel_scheduler_yield ( )
+{
+	// Push r0 cause we're gonna erase it
+	__asm ( "str r0, [sp, #-4]" );
+
+	// Load cpsr into r0
+	__asm ( "mrs r0, cpsr" );
+
+	// Push r0 (cpsr)
+	__asm ( "stmfd sp!, {r0}" );
+
+	// Restore the r0 we saved
+	__asm ( "ldr r0, [sp]" );
+
+	// Push lr (will be pcb's pc)
+	__asm ( "stmfd sp!, {lr}" );
+
+	// Push r0 - r12, lr
+	// This lr doesn't really matter since caller pushed it before
+	// calling us.
+	__asm ( "stmfd sp!, {r0 - r12, lr}" );
+
+	// Store sp in PCB
+	__asm ( "mov %0, sp" : "=r" ( kernel_pcb_running -> mpSP ) );
+
+	// Elect new process and hands over CPU to elected process
+	kernel_scheduler_yield_noreturn ( );
+}
+
 void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_handler ( )
 {
 	// Correct lr_irq value (A2.6.1, P.55/1138, "Note" section)

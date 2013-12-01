@@ -28,6 +28,15 @@ void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_yield_noreturn ( );
 
 
 /*
+ * Hands over control to the scheduler.
+ * The current running process's context will be saved,
+ * because we're going to reschedule it later.
+ * ASSERT: IRQ already disabled before call.
+ */
+void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_yield ( );
+
+
+/*
  * Rearms timer and sets the next deadline for scheduling operation.
  */
 #define kernel_scheduler_set_next_deadline() \
