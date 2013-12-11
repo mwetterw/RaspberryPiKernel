@@ -1,7 +1,9 @@
 #include "led_morse.h"
+#include "led.h"
+#include "process.h"
 
-#define MORSE_DOT 1000000
-#define MORSE_DASH ( DOT * 3 )
+#define MORSE_DOT 250000
+#define MORSE_DASH ( MORSE_DOT * 3 )
 
 #define MORSE_INTRA_LETTER_DELAY MORSE_DOT
 #define MORSE_INTER_LETTER_DELAY MORSE_DASH
@@ -20,6 +22,9 @@ typedef union morse_letter_u
 
 	unsigned char code;
 } morse_letter_t;
+
+static inline void morse_write_dot ( );
+static inline void morse_write_dash ( );
 
 static const morse_letter_t MORSE_CODE [ 36 ] =
 {
@@ -61,3 +66,37 @@ static const morse_letter_t MORSE_CODE [ 36 ] =
 	morse_cast ( 0xe5 ),   	// 8
 	morse_cast ( 0xf5 )   	// 9
 };
+
+static inline void morse_write_letter ( morse_letter_t morseLetter )
+{
+	unsigned char i;
+	for ( i = morseLetter.signifbits ; i >= 1 ; --i )
+	{
+		if ( morseLetter.codebits & ( 1 << ( i - 1 ) ) )
+		{
+			morse_write_dash ( );
+		}
+		else
+		{
+			morse_write_dot ( );
+		}
+	}
+
+	api_process_sleep ( MORSE_INTER_LETTER_DELAY );
+}
+
+static inline void morse_write_dot ( )
+{
+	api_led_on ( );
+	api_process_sleep ( MORSE_DOT );
+	api_led_off ( );
+	api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
+}
+
+static inline void morse_write_dash ( )
+{
+	api_led_on ( );
+	api_process_sleep ( MORSE_DASH );
+	api_led_off ( );
+	api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
+}
