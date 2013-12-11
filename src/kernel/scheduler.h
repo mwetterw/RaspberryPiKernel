@@ -4,8 +4,10 @@
 #include "timer.h"
 #include "config.h"
 #include "pcb.h"
+#include "pcb_turnstile.h"
 
 extern kernel_pcb_turnstile_t kernel_turnstile_round_robin;
+extern kernel_pcb_turnstile_t kernel_turnstile_sleeping;
 
 #ifndef _C_KERNEL_SCHEDULER
 extern kernel_pcb_t * const kernel_pcb_running;
@@ -25,6 +27,15 @@ void kernel_scheduler_init ( );
  * ASSERT: IRQ already disabled before call.
  */
 void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_yield_noreturn ( );
+
+
+/*
+ * Hands over control to the scheduler.
+ * The current running process's context will be saved,
+ * because we're going to reschedule it later.
+ * ASSERT: IRQ already disabled before call.
+ */
+void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_yield ( );
 
 
 /*

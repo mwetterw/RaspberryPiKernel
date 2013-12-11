@@ -8,34 +8,9 @@ typedef struct kernel_pcb_s
 {
 	uint32_t * mpSP;
 	uint32_t * mpStack;
+	uint32_t mWakeUpDate;
 	struct kernel_pcb_s * mpNext;
 } kernel_pcb_t;
-
-typedef struct kernel_pcb_turnstile_s
-{
-	kernel_pcb_t * mpFirst;
-	kernel_pcb_t * mpLast;
-} kernel_pcb_turnstile_t;
-
-/*
- * Initializes a PCB turnstile
- * @param Turnstile to initialize
- */
-void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
-
-/*
- * Adds a pcb to a turnstile.
- * @param PCB to add
- * @param Turnstile to add to
- */
-void kernel_pcb_add_turnstile ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile );
-
-/*
- * Lets the first PCB become the last,
- * the second the first, etc.
- * @param Turnstile to rotate
- */
-void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
 
 /*
  * Creates a new PCB
@@ -47,6 +22,15 @@ void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile );
  * - pointer to new allocated pcb.
  */
 kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
+
+/*
+ * Puts pcb in sleeping state during duration microseconds.
+ * @params:
+ * - pcb to let sleep
+ * - duration of the nap in microseconds
+ * ASSERT: IRQ have to be disabled prior to call.
+ */
+void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
 
 
 #define r0 0
