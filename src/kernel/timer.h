@@ -29,7 +29,7 @@
  * Resets the channel in the System Timer Control / Status Register.
  */
 #define kernel_timer_enable(channel) \
-	kernel_arm_addr32 ( KERNEL_TIMER_CS ) |= ( 1 << ( channel ) )
+	kernel_arm_addr32 ( KERNEL_TIMER_CS ) = ( 1 << ( channel ) )
 
 /*
  * Gets the 32 least-significant bits of the timer clock.

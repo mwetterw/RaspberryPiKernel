@@ -42,7 +42,7 @@ void kernel_scheduler_yield_noreturn ( )
 void kernel_scheduler_yield ( )
 {
 	// Push r0 cause we're gonna erase it
-	__asm ( "str r0, [sp, #-4]" );
+	__asm ( "str r0, [sp, #-8]" );
 
 	// Load cpsr into r0
 	__asm ( "mrs r0, cpsr" );
@@ -51,7 +51,7 @@ void kernel_scheduler_yield ( )
 	__asm ( "stmfd sp!, {r0}" );
 
 	// Restore the r0 we saved
-	__asm ( "ldr r0, [sp]" );
+	__asm ( "ldr r0, [sp, #-4]" );
 
 	// Push lr (will be pcb's pc)
 	__asm ( "stmfd sp!, {lr}" );
@@ -91,6 +91,7 @@ void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_handler ( )
 
 void kernel_scheduler_elect ( )
 {
+	// We wake up sleeping processes
 	if ( kernel_turnstile_sleeping.mpFirst )
 	{
 		if
