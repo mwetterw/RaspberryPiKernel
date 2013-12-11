@@ -1,0 +1,10 @@
+#include "led_morse.h"
+
+#define MORSE_DOT 1000000
+#define MORSE_DASH ( DOT * 3 )
+
+#define MORSE_INTRA_LETTER_DELAY MORSE_DOT
+#define MORSE_INTER_LETTER_DELAY MORSE_DASH
+#define MORSE_INTER_WORDS_DELAY ( MORSE_DOT * 7 )
+
+
