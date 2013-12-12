@@ -23,8 +23,8 @@ typedef union morse_letter_u
 	unsigned char code;
 } morse_letter_t;
 
-static inline void morse_write_dot ( );
-static inline void morse_write_dash ( );
+static inline void morse_write_char ( char letter );
+static inline void morse_write_letter ( morse_letter_t morseLetter );
 
 static const morse_letter_t MORSE_CODE [ 36 ] =
 {
@@ -67,36 +67,48 @@ static const morse_letter_t MORSE_CODE [ 36 ] =
 	morse_cast ( 0xf5 )   	// 9
 };
 
+static inline void morse_write_char ( char letter )
+{
+	morse_letter_t morseLetter;
+	if ( letter >= 'a' && letter <= 'z' )
+	{
+		morseLetter = MORSE_CODE [ letter - 'a' ];
+	}
+	else if ( letter >= '0' && letter <= '9' )
+	{
+		morseLetter = MORSE_CODE [ 26 + ( letter - '0' ) ];
+	}
+	else
+	{
+		return;
+	}
+
+	morse_write_letter ( morseLetter );
+}
+
 static inline void morse_write_letter ( morse_letter_t morseLetter )
 {
 	unsigned char i;
 	for ( i = morseLetter.signifbits ; i >= 1 ; --i )
 	{
+		api_led_on ( );
+
 		if ( morseLetter.codebits & ( 1 << ( i - 1 ) ) )
 		{
-			morse_write_dash ( );
+			api_process_sleep ( MORSE_DASH );
 		}
 		else
 		{
-			morse_write_dot ( );
+			api_process_sleep ( MORSE_DOT );
+		}
+
+		api_led_off ( );
+
+		if ( i > 1 )
+		{
+			api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
 		}
 	}
 
 	api_process_sleep ( MORSE_INTER_LETTER_DELAY );
-}
-
-static inline void morse_write_dot ( )
-{
-	api_led_on ( );
-	api_process_sleep ( MORSE_DOT );
-	api_led_off ( );
-	api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
-}
-
-static inline void morse_write_dash ( )
-{
-	api_led_on ( );
-	api_process_sleep ( MORSE_DASH );
-	api_led_off ( );
-	api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
 }
