@@ -67,6 +67,32 @@ static const morse_letter_t MORSE_CODE [ 36 ] =
 	morse_cast ( 0xf5 )   	// 9
 };
 
+void api_led_morse ( const char * string )
+{
+	if ( string == 0 )
+	{
+		return;
+	}
+
+	while ( * string != '\0' )
+	{
+		if ( * string != ' ' )
+		{
+			morse_write_char ( * string );
+			if ( string [ 1 ] != '\0' && string [ 1 ] != ' ' )
+			{
+				api_process_sleep ( MORSE_INTER_LETTER_DELAY );
+			}
+		}
+		else if ( string [ 1 ] != '\0' )
+		{
+			api_process_sleep ( MORSE_INTER_WORD_DELAY );
+		}
+
+		++string;
+	}
+}
+
 static inline void morse_write_char ( char letter )
 {
 	morse_letter_t morseLetter;
@@ -109,6 +135,4 @@ static inline void morse_write_letter ( morse_letter_t morseLetter )
 			api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
 		}
 	}
-
-	api_process_sleep ( MORSE_INTER_LETTER_DELAY );
 }
