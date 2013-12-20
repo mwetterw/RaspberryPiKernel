@@ -8,7 +8,8 @@ static void led_morse_write_dash ( );
 
 void api_led_morse ( const char * string )
 {
-	_morse_write_str ( string, led_morse_write_dot, led_morse_write_dash );
+	_morse_write_str
+	( string, & ( ( morse_write_way_t ) { led_morse_write_dot, led_morse_write_dash } ) );
 }
 
 static void led_morse_write_dot ( )

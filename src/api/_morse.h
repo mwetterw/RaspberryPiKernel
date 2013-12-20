@@ -8,6 +8,9 @@
 #define MORSE_INTER_LETTER_DELAY MORSE_DASH
 #define MORSE_INTER_WORD_DELAY ( MORSE_DOT * 7 )
 
+struct morse_write_way_s;
+typedef struct morse_write_way_s morse_write_way_t;
+
 /**
  * Represents a morse letter.
  * - 'signifbits' is the number of symbols in this morse letter
@@ -33,15 +36,26 @@ typedef union morse_letter_u
 /**
  * Writes morse from a string.
  * @param string: The string to write
- * @param write_dot: A function pointer to the way a dot is written
- * @param write_dash: A function pointer to the way a dash is written
- * These 2 pointers can be used to get various implementations (led, sound) of morse code.
+ * @param morse_write_way: The way a morse letter has to be written (dot & dash)
+ * This param can be used to get various implementations (led, sound) of morse code.
  *
  * ASSERT: string has to be a valid C string, i.e end with '\0'.
  * ASSERT: string only contains lower case ASCII letters and space.
  * Unknown letters/symbols will just be skipped.
  */
 void _morse_write_str
-( const char * string, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) );
+( const char * string, morse_write_way_t * morse_write_way );
+
+
+/**
+ * Represents the way a morse letter is written
+ * @member dot: function pointer to the way a dot is written
+ * @member dash: function pointer to the way a dash is written
+ */
+struct morse_write_way_s
+{
+	void ( * dot ) ( );
+	void ( * dash ) ( );
+};
 
 #endif
