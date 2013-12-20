@@ -1,18 +1,12 @@
 #include "led.h"
-#include "../kernel/hardware.h"
-#include "../kernel/arm.h"
-
+#include "../kernel/gpio.h"
 
 void api_led_on ( )
 {
-	kernel_arm_disable_irq ( );
-	kernel_hardware_led_on ( );
-	kernel_arm_enable_irq ( );
+	kernel_gpio_output_clear ( GPIO_LED );
 }
 
 void api_led_off ( )
 {
-	kernel_arm_disable_irq ( );
-	kernel_hardware_led_off ( );
-	kernel_arm_enable_irq ( );
+	kernel_gpio_output_set ( GPIO_LED );
 }

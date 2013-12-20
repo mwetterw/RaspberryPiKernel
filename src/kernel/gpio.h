@@ -88,4 +88,6 @@ void kernel_gpio_output_clear ( unsigned char gpioPin );
 #define GPIO52 52
 #define GPIO53 53
 
+#define GPIO_LED GPIO16
+
 #endif
