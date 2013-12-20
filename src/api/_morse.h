@@ -33,13 +33,15 @@ typedef union morse_letter_u
 /**
  * Writes morse from a string.
  * @param string: The string to write
- * @param f: A function pointer to the way a morse_letter_t can be written.
- *		This could be turn on and off a led, play a sound, etc.
+ * @param write_dot: A function pointer to the way a dot is written
+ * @param write_dash: A function pointer to the way a dash is written
+ * These 2 pointers can be used to get various implementations (led, sound) of morse code.
  *
  * ASSERT: string has to be a valid C string, i.e end with '\0'.
  * ASSERT: string only contains lower case ASCII letters and space.
  * Unknown letters/symbols will just be skipped.
  */
-void _morse_write_str ( const char * string, void ( * f ) ( morse_letter_t morseLetter ) );
+void _morse_write_str
+( const char * string, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) );
 
 #endif

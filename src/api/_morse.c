@@ -45,9 +45,14 @@ static const morse_letter_t MORSE_CODE [ 36 ] =
 	morse_cast ( 0xf5 )   	// 9 _ _ _ _ .
 };
 
-static inline void _morse_write_char ( char letter, void ( * f ) ( morse_letter_t morseLetter ) );
+static inline void _morse_write_char
+( char letter, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) );
 
-void _morse_write_str ( const char * string, void ( * f ) ( morse_letter_t morseLetter ) )
+static void _morse_write_letter
+( morse_letter_t morseLetter, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) );
+
+void _morse_write_str
+( const char * string, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) )
 {
 	if ( string == 0 )
 	{
@@ -58,7 +63,7 @@ void _morse_write_str ( const char * string, void ( * f ) ( morse_letter_t morse
 	{
 		if ( * string != ' ' )
 		{
-			_morse_write_char ( * string, f );
+			_morse_write_char ( * string, write_dot, write_dash );
 			if ( string [ 1 ] != '\0' && string [ 1 ] != ' ' )
 			{
 				api_process_sleep ( MORSE_INTER_LETTER_DELAY );
@@ -73,7 +78,8 @@ void _morse_write_str ( const char * string, void ( * f ) ( morse_letter_t morse
 	}
 }
 
-static inline void _morse_write_char ( char letter, void ( * f ) ( morse_letter_t morseLetter ) )
+static inline void _morse_write_char
+( char letter, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) )
 {
 	morse_letter_t morseLetter;
 	if ( letter >= 'a' && letter <= 'z' )
@@ -89,5 +95,27 @@ static inline void _morse_write_char ( char letter, void ( * f ) ( morse_letter_
 		return;
 	}
 
-	f ( morseLetter );
+	_morse_write_letter ( morseLetter, write_dot, write_dash );
+}
+
+static void _morse_write_letter
+( morse_letter_t morseLetter, void ( * write_dot ) ( void ), void ( * write_dash ) ( void ) )
+{
+	unsigned char i;
+	for ( i = morseLetter.signifbits ; i >= 1 ; --i )
+	{
+		if ( morseLetter.codebits & ( 1 << ( i - 1 ) ) )
+		{
+			write_dash ( );
+		}
+		else
+		{
+			write_dot ( );
+		}
+
+		if ( i > 1 )
+		{
+			api_process_sleep ( MORSE_INTRA_LETTER_DELAY );
+		}
+	}
 }
