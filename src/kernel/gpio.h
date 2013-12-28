@@ -18,7 +18,7 @@
  * Can be:
  * - an input ;
  * - an output ;
- * - an alternate functon.
+ * - an alternate function.
  * Use one of the constants above.
  */
 void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
