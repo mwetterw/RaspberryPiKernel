@@ -18,7 +18,7 @@
  * Can be:
  * - an input ;
  * - an output ;
- * - an alternate functon.
+ * - an alternate function.
  * Use one of the constants above.
  */
 void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
@@ -87,5 +87,7 @@ void kernel_gpio_output_clear ( unsigned char gpioPin );
 #define GPIO51 51
 #define GPIO52 52
 #define GPIO53 53
+
+#define GPIO_LED GPIO16
 
 #endif
