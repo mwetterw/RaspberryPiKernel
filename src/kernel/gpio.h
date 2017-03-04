@@ -12,9 +12,8 @@
 #define GPIO_FSEL_ALT4 3
 #define GPIO_FSEL_ALT5 2
 
-
 /*
- * Configures a GPIO pin.
+ * Configure a GPIO pin.
  * Can be:
  * - an input ;
  * - an output ;
@@ -22,6 +21,24 @@
  * Use one of the constants above.
  */
 void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
+
+
+
+#define GPPUD_OFF 0
+#define GPPUD_DOWN 1
+#define GPPUD_UP 2
+
+/*
+ * Configure the Pull-Up/Down state of GPIOs
+ * Several GPIOs can be provided by oring them
+ * State can be:
+ * - OFF ;
+ * - Pull Down ;
+ * - Pull Up.
+ * Use one of the constants above.
+ * XXX: Only GPIO 0 - 31 are supported for now
+ */
+void kernel_gpio_configure_pull_up_down ( unsigned char gpioPins, unsigned char state );
 
 
 /*
