@@ -1,6 +1,3 @@
-#ifndef _H_BCM2835_UART
-#define _H_BCM2835_UART
-
 enum uart_regs
 {
     DR      = 0x00, // Data Register
@@ -44,7 +41,6 @@ enum RSRECR
 // Flag Register
 enum FR
 {
-    FR_RI       = ( 1 << 8 ),
     FR_TXFE     = ( 1 << 7 ), // TX FIFO Empty
     FR_RXFF     = ( 1 << 6 ), // RX FIFO Full
     FR_TXFF     = ( 1 << 5 ), // TX FIFO Full
@@ -127,5 +123,3 @@ enum INT
 
     INT_ALL     = 0x7f2,
 };
-
-#endif
