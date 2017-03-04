@@ -29,44 +29,37 @@
 #define KERNEL_ARM_IRQ_SOURCE_ACCESS_ERROR1_HALTED 0x40
 #define KERNEL_ARM_IRQ_SOURCE_ACCESS_ERROR0_HALTED 0x80
 
-/*
- * Sets the desired IRQ source (one of the KERNEL_ARM_IRQ_SOURCE_*)
- */
+// Sets the desired IRQ source (one of the KERNEL_ARM_IRQ_SOURCE_*)
 #define kernel_arm_enable_irq_source(source) \
 	kernel_arm_addr32 ( KERNEL_ARM_IRQ_ENABLE_REGISTER1 ) = ( source )
 
+// IO helpers
+uint32_t ioread ( );
+uint32_t ioreadi ( );
+void iowrite ( );
+void iowritei ( );
 
-/*
- * Gets current processor mode
- * @see KERNEL_ARM_MODE_*
- */
+// Wait a number of cycles
+void cdelay ( int cycles );
+
+// Get the processor mode
 uint32_t kernel_arm_get_mode ( );
 
-/*
- * Sets processor mode
- */
+// Set processor mode
 #define _kernel_arm_set_mode(mode) __asm ( "cps #" #mode )
 #define kernel_arm_set_mode(mode) _kernel_arm_set_mode(mode)
 
-/*
- * Launches srsfd #mode!
- */
+// Launch srsfd #mode!
 #define _kernel_arm_srsfd(mode) __asm ( "srsfd #" #mode "!" )
 #define kernel_arm_srsfd(mode) _kernel_arm_srsfd(mode)
 
-/*
- * Gets current CPSR (Status Register) value
- */
+// Get current CPSR (Status Register) value
 uint32_t kernel_arm_get_cpsr ( );
 
-/*
- * Enables IRQ in CPSR
- */
+// Enable IRQ in CPSR
 #define kernel_arm_enable_irq() __asm ( "cpsie i" )
 
-/*
- * Disables IRQ in CPSR
- */
+// Disable IRQ in CPSR
 #define kernel_arm_disable_irq() __asm ( "cpsid i" )
 
 #endif
