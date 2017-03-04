@@ -40,8 +40,9 @@ reset_handler:
     bic r0, #1
     mcr p15, #0, r0, c1, c0, 0
 
-    @ Switch to IRQ Mode, disables IRQ & FIQ, initialize IRQ stack pointer
-    cpsid if, #0x12
+    @ Switch to IRQ Mode, initialize IRQ stack pointer
+    @ There's no need to disable IRQ/FIQ: entering reset already disabled them
+    cps #0x12
     mov sp,#0x8000
 
     @ Switch to SUPERVISOR Mode, initialize SVC stack pointer
