@@ -3,3 +3,4 @@ build/
 *.map
 *~*
 make/config.inc.mk
+.gdb_history
