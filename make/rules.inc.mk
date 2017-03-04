@@ -17,7 +17,7 @@ $(KERNELELF): $(OBJ) $(LINKERSCRIPT)
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MISCDIR)
 	$(PRINTF) "$(COLOR_LN)%-13s$(COLOR_END) %-30s" "Linking" "<$(notdir $@)>..."
-	$(CMD_PREFIX)ld -Map $(MAPFILE) -o $@ -T $(LINKERSCRIPT) $(OBJ) \
+	$(CMD_PREFIX)gcc -nostartfiles -nostdlib -o $@ -T $(LINKERSCRIPT) $(OBJ) -lgcc \
 	$(call errorHandler,$@,$<,build,ld)
 	$(ECHO)
 
