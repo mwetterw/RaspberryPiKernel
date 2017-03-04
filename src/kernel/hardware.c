@@ -1,16 +1,18 @@
 #include "hardware.h"
 #include "gpio.h"
+#include "bcm2835/uart.h"
 
 
 static inline void kernel_hardware_led_init ( );
 
 void kernel_hardware_init ( )
 {
-	kernel_hardware_led_init ( );
+    kernel_hardware_led_init ( );
+    uart_init ( );
 }
 
 void kernel_hardware_led_init ( )
 {
-	kernel_gpio_configure ( GPIO_LED, GPIO_FSEL_OUTPUT );
-	kernel_gpio_output_set ( GPIO_LED );
+    kernel_gpio_configure ( GPIO_LED, GPIO_FSEL_OUTPUT );
+    kernel_gpio_output_set ( GPIO_LED );
 }
