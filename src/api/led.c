@@ -1,5 +1,5 @@
 #include "led.h"
-#include "../kernel/gpio.h"
+#include "../kernel/bcm2835/gpio.h"
 
 void api_led_on ( )
 {

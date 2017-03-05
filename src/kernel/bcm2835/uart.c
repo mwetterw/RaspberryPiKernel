@@ -1,6 +1,6 @@
 #include "uart_regs.h"
 #include "uart.h"
-#include "../gpio.h"
+#include "gpio.h"
 
 #include <stdint.h>
 

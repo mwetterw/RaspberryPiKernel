@@ -1,5 +1,5 @@
 #include "hardware.h"
-#include "gpio.h"
+#include "bcm2835/gpio.h"
 #include "bcm2835/uart.h"
 
 
