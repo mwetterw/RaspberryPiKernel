@@ -9,6 +9,9 @@ void kernel_hardware_init ( )
 {
     kernel_hardware_led_init ( );
     uart_init ( );
+    printu ( "Welcome!" );
+
+    printu ( "Hardware initialization complete" );
 }
 
 void kernel_hardware_led_init ( )

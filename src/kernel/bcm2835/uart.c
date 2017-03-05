@@ -60,4 +60,6 @@ void printu ( const char * str )
     {
         uart_write_char ( str [ i ] );
     }
+    uart_write_char ( '\r' );
+    uart_write_char ( '\n' );
 }
