@@ -3,7 +3,7 @@ MAKEFLAGS += --output-sync=none
 
 default: $(KERNELIMG)
 
-emu: $(KERNELIMG)
+emu: $(KERNELELF)
 	$(HIDE)$(QEMU) $(QEMU_FLAGS)
 
 define qemugdblauncher
@@ -16,7 +16,7 @@ define qemugdblauncher
 	kill -9 $$QEMU_PID;
 endef
 
-run: $(KERNELIMG)
+run: $(KERNELELF)
 	$(call qemugdblauncher,$(GDBDEFAULT))
 
 %.gdb: default

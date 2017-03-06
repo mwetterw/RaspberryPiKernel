@@ -41,8 +41,9 @@ MAPFILE = $(MISCDIR)$(TARGETNAME).map
 
 #--------COMMANDS--------#
 HIDE ?= @
-CMD_PREFIX ?= $(HIDE)arm-none-eabi-
-GDB ?= gdb-multiarch
+PREFIX ?= arm-none-eabi-
+CMD_PREFIX ?= $(HIDE)$(PREFIX)
+GDB ?= $(PREFIX)gdb
 QEMU ?= qemu-system-arm
 MKDIR = $(HIDE)mkdir -p
 ECHO = $(HIDE)echo
