@@ -50,3 +50,5 @@ else
 deploy sdcopy umount:
 	$(error "Please set SDCARD variable!")
 endif
+
+ubootscript: $(UBOOTSCRIPT)

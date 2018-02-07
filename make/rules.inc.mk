@@ -1,3 +1,9 @@
+$(UIMAGE): $(KERNELIMG)
+	$(MKDIR) $(BINDIR)
+	$(PRINTF) "$(COLOR_GEN)%-13s$(COLOR_END) %-30s" "Generating" "<$(notdir $@)>..."
+	$(HIDE)mkimage -A arm -T kernel -C none -a 0x8000 -e 0x8000 -n $(TARGETNAME) -d $< $@ \
+	$(call errorHandler,$@,$<,build,genuimage)
+
 $(KERNELIMG): $(KERNELELF)
 	$(MKDIR) $(BINDIR)
 	$(PRINTF) "$(COLOR_WHITE)%-13s$(COLOR_END) %-30s" "Generating" "<$(notdir $@)>..."

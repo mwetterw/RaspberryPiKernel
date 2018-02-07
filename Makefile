@@ -13,6 +13,7 @@ SRCDIR = src/
 MAKEINCDIR = make/
 GDBDIR = gdb/
 GDBDEFAULT = $(GDBDIR)default.gdb
+UIMAGE = $(BINDIR)u$(TARGETNAME).img
 
 CLEANDIR = $(DEPDIR) $(PREDIR) $(ASMDIR) $(OBJDIR) $(MISCDIR)
 
@@ -36,6 +37,7 @@ KERNELELF = $(BINDIR)$(TARGETNAME).elf
 KERNELLIST = $(MISCDIR)$(TARGETNAME).list
 LINKERSCRIPT = $(MAKEINCDIR)$(TARGETNAME).ld
 MAPFILE = $(MISCDIR)$(TARGETNAME).map
+UBOOTSCRIPT = $(MISCDIR)$(UBOOTSRC).uimg
 
 -include $(MAKEINCDIR)config.inc.mk
 
@@ -59,7 +61,7 @@ include $(MAKEINCDIR)colors.inc.mk
 include $(MAKEINCDIR)errorHandler.inc.mk
 
 #--------SPECIAL RULES--------#
-.PHONY: all clean mrproper emu run list deploy sdcopy umount default
+.PHONY: all clean mrproper emu run list deploy sdcopy umount ubootscript default
 .PRECIOUS: $(PRE) $(ASM) $(OBJ) $(DEP)
 .SECONDEXPANSION:
 

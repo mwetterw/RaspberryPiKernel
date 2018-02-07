@@ -47,7 +47,7 @@ define printError
 			echo -n "$(COLOR_GEN)KERNEL GENERATION$(COLOR_END)"; \
 			;; \
 		*) \
-			echo -n "$(COLOR_RED)UNDEFINED BUILD$(COLOR_END)"; \
+			echo -n "$(COLOR_GEN)BUILD MISC$(COLOR_END)"; \
 		esac; \
 		;; \
 	"sdcard") \
