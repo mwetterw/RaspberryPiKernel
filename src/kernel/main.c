@@ -7,7 +7,7 @@
 
 void init ( );
 
-void __attribute__ ( ( noreturn, naked ) ) kernel_main ( )
+void __attribute__ ( ( noreturn ) ) kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
 {
     kernel_memory_init ( );
     kernel_hardware_init ( );
