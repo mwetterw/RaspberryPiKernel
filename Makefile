@@ -53,8 +53,9 @@ RM = $(HIDE)rm -rf
 PRINTF = $(HIDE)printf
 
 #--------COMP, ASM & EXE OPTIONS--------#
-CC_FLAGS = -std=c99 -Wall -Wextra -Werror -nostdlib -fomit-frame-pointer -mno-apcs-frame -nostartfiles -ffreestanding -g -march=armv6z -marm
-ASM_FLAGS = -g -march=armv6z
+CC_FLAGS_KERNEL = -nostdlib -fomit-frame-pointer -mno-apcs-frame -nostartfiles -ffreestanding
+CC_FLAGS = $(CC_FLAGS_KERNEL) -mcpu=arm1176jzf-s -std=c99 -Wall -Wextra -Werror -g -O0
+ASM_FLAGS = -mcpu=arm1176jzf-s -g
 QEMU_FLAGS = -kernel $(KERNELELF) -cpu arm1176 -m 512 -M raspi2 -nographic -no-reboot -S -s
 
 include $(MAKEINCDIR)colors.inc.mk
