@@ -33,12 +33,6 @@
 #define kernel_arm_enable_irq_source(source) \
 	kernel_arm_addr32 ( KERNEL_ARM_IRQ_ENABLE_REGISTER1 ) = ( source )
 
-// IO helpers
-uint32_t ioread ( );
-uint32_t ioreadi ( );
-void iowrite ( );
-void iowritei ( );
-
 // Wait a number of cycles
 void cdelay ( int cycles );
 

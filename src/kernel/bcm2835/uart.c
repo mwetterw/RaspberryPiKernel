@@ -7,15 +7,9 @@
 #define UART_BASE 0x20201000
 #define UART_CLK 3000000
 
-static inline void uart_w32 ( int reg, int data )
-{
-    iowrite ( UART_BASE, reg, data );
-}
-
-static inline uint32_t uart_r32 ( int reg )
-{
-    return ioread ( UART_BASE, reg );
-}
+#define uart_reg(reg) ( ( uint32_t volatile * ) ( UART_BASE + reg ) )
+#define uart_r32(reg) * uart_reg ( reg )
+#define uart_w32(reg,data) * uart_reg ( reg ) = data
 
 static void uart_set_baud_rate ( int brate )
 {
@@ -35,8 +29,8 @@ void uart_init ( )
     // Configure GPIO
     kernel_gpio_configure ( GPIO14, GPIO_FSEL_ALT0 );
     kernel_gpio_configure ( GPIO15, GPIO_FSEL_ALT0 );
-
-    kernel_gpio_configure_pull_up_down ( GPIO14 | GPIO15, GPPUD_OFF );
+    kernel_gpio_configure_pull_up_down ( GPIO14, GPPUD_OFF );
+    kernel_gpio_configure_pull_up_down ( GPIO15, GPPUD_OFF );
 
     // Configure the UART
     uart_w32 ( ICR, INT_ALL ); // Clear all interrupts
