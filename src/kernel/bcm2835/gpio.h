@@ -29,16 +29,14 @@ void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
 #define GPPUD_UP 2
 
 /*
- * Configure the Pull-Up/Down state of GPIOs
- * Several GPIOs can be provided by oring them
+ * Configure the Pull-Up/Down state of a GPIO pin
  * State can be:
  * - OFF ;
  * - Pull Down ;
  * - Pull Up.
  * Use one of the constants above.
- * XXX: Only GPIO 0 - 31 are supported for now
  */
-void kernel_gpio_configure_pull_up_down ( unsigned char gpioPins, unsigned char state );
+void kernel_gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state );
 
 
 /*

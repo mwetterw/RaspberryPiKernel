@@ -4,21 +4,17 @@
 #include <stdint.h>
 
 #define GPIO_BASE 0x20200000
+#define gpio_reg(reg) ( ( uint32_t volatile * ) ( GPIO_BASE + reg ) )
 
-static inline void gpio_w32 ( int reg, int data )
-{
-    iowrite ( GPIO_BASE, reg, data );
-}
-
-static inline void gpio_w32i ( int reg, int offset, int data )
-{
-    iowritei ( GPIO_BASE, reg, offset, data );
-}
+#define gpio_r32(reg) ( * gpio_reg ( reg ) )
+#define gpio_r32i(reg,offset) gpio_reg ( reg ) [ offset ]
+#define gpio_w32(reg,data) ( * gpio_reg ( reg ) = data )
+#define gpio_w32i(reg,offset,data) ( gpio_reg ( reg ) [ offset ] = data )
 
 void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel )
 {
-    uint32_t gpfselNumber = ( gpioPin / 10 );
-    uint32_t currentConfig = ioreadi ( GPFSEL0, gpfselNumber );
+    uint32_t gpfselNumber = gpioPin / 10;
+    uint32_t currentConfig = gpio_r32i ( GPFSEL0, gpfselNumber );
     uint32_t gpioPinRelativePos = gpioPin - 10 * gpfselNumber;
 
     // Resets the three FSEL bits of the chosen gpioPin
@@ -31,7 +27,7 @@ void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel )
     gpio_w32i ( GPFSEL0, gpfselNumber, currentConfig );
 }
 
-void kernel_gpio_configure_pull_up_down ( unsigned char gpioPins, unsigned char state )
+void kernel_gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state )
 {
     // Set desired state
     gpio_w32 ( GPPUD, state );
@@ -39,8 +35,8 @@ void kernel_gpio_configure_pull_up_down ( unsigned char gpioPins, unsigned char 
     // Wait 150 cycles (control signal is setting up)
     cdelay ( 150 );
 
-    // Clock the control signal in for the GPIOS we want to impact
-    gpio_w32 ( GPPUDCLK0, gpioPins );
+    // Clock the control signal in for the GPIO we want to impact
+    gpio_w32i ( GPPUDCLK0, gpioPin >> 5, gpioPin );
 
     // Wait 150 cycles (required hold time for control signal)
     cdelay ( 150 );
@@ -49,18 +45,16 @@ void kernel_gpio_configure_pull_up_down ( unsigned char gpioPins, unsigned char 
     gpio_w32 ( GPPUD, 0 );
 
     // Remove the clock
-    gpio_w32 ( GPPUDCLK0, 0 );
+    gpio_w32i ( GPPUDCLK0, gpioPin >> 5, 0 );
 
 }
 
 void kernel_gpio_output_set ( unsigned char gpioPin )
 {
-    uint32_t gpset = ( gpioPin < 32 ? GPSET0 : GPSET1 );
-    gpio_w32 ( gpset, ( 1 << ( gpioPin % 32 ) ) );
+    gpio_w32i ( GPSET0, gpioPin >> 5, ( 1 << ( gpioPin & 31 ) ) );
 }
 
 void kernel_gpio_output_clear ( unsigned char gpioPin )
 {
-    uint32_t gpclr = ( gpioPin < 32 ? GPCLR0 : GPCLR1 );
-    gpio_w32 ( gpclr, ( 1 << ( gpioPin % 32 ) ) );
+    gpio_w32i ( GPCLR0, gpioPin >> 5, ( 1 << ( gpioPin & 31 ) ) );
 }
