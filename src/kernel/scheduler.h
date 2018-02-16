@@ -1,7 +1,6 @@
 #ifndef _H_KERNEL_SCHEDULER
 #define _H_KERNEL_SCHEDULER
 
-#include "timer.h"
 #include "config.h"
 #include "pcb.h"
 #include "pcb_turnstile.h"

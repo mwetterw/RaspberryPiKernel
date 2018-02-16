@@ -1,9 +1,9 @@
 #include "memory.h"
 #include "hardware.h"
-#include "timer.h"
 #include "scheduler.h"
 #include "pcb.h"
 #include "bcm2835/uart.h"
+#include "bcm2835/systimer.h"
 
 void init ( );
 
@@ -13,7 +13,7 @@ void __attribute__ ( ( noreturn ) ) kernel_main ( uint32_t z, uint32_t mach, uin
     kernel_hardware_init ( );
 
     printu ( "Initializing Timer" );
-    kernel_timer_init ( );
+    systimer_init ( );
 
     printu ( "Initializing Scheduler" );
     kernel_scheduler_init ( );

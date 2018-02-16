@@ -1,9 +1,10 @@
 #include "gpio.h"
 #include "gpio_regs.h"
+#include "bcm2835.h"
+#include "../arm.h" // cdelay
 
 #include <stdint.h>
 
-#define GPIO_BASE 0x20200000
 #define gpio_reg(reg) ( ( uint32_t volatile * ) ( GPIO_BASE + reg ) )
 
 #define gpio_r32(reg) ( * gpio_reg ( reg ) )

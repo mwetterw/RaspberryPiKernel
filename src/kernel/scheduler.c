@@ -1,7 +1,8 @@
 #define _C_KERNEL_SCHEDULER
 #include "scheduler.h"
+#include "bcm2835/systimer.h"
 
-kernel_pcb_t * kernel_pcb_running;
+kernel_pcb_t volatile * kernel_pcb_running;
 static kernel_pcb_t kernel_pcb_idle;
 
 kernel_pcb_turnstile_t kernel_turnstile_round_robin;
@@ -29,7 +30,7 @@ void kernel_scheduler_yield_noreturn ( )
 {
 	kernel_scheduler_elect ( );
 
-	kernel_scheduler_set_next_deadline ( );
+    systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
 
 	// Hands over CPU to the elected process
 	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
@@ -97,7 +98,7 @@ void kernel_scheduler_elect ( )
 		if
 		(
 			kernel_turnstile_sleeping.mpFirst -> mWakeUpDate <=
-			kernel_timer_get_clock ( )
+		    systimer_get_clock ( )
 		)
 		{
 			kernel_pcb_t * current;

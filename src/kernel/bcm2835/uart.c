@@ -1,10 +1,10 @@
 #include "uart_regs.h"
 #include "uart.h"
 #include "gpio.h"
+#include "bcm2835.h"
 
 #include <stdint.h>
 
-#define UART_BASE 0x20201000
 #define UART_CLK 3000000
 
 #define uart_reg(reg) ( ( uint32_t volatile * ) ( UART_BASE + reg ) )
