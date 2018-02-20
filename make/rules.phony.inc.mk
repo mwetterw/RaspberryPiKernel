@@ -3,9 +3,6 @@ MAKEFLAGS += --output-sync=none
 
 default: $(KERNELIMG)
 
-emu: $(KERNELELF)
-	$(HIDE)$(QEMU) $(QEMU_FLAGS)
-
 define qemugdblauncher
 	$(PRINTF) "%-13s <qemu>...\n" "Launching"
 	$(HIDE)$(QEMU) $(QEMU_FLAGS) > $(MISCDIR)qemu.stdout 2> $(MISCDIR)qemu.stderr & \
@@ -16,11 +13,14 @@ define qemugdblauncher
 	kill -9 $$QEMU_PID;
 endef
 
+emu: $(KERNELELF)
+	$(HIDE)$(QEMU) $(QEMU_FLAGS)
+
 run: $(KERNELELF)
 	$(call qemugdblauncher,$(GDBDEFAULT))
 
 %.gdb: default
-	$(call qemugdblauncher,$@)
+	$(GDB) $(KERNELELF) -x $@
 
 all: mrproper $(KERNELIMG)
 

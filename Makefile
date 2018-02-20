@@ -56,7 +56,7 @@ PRINTF = $(HIDE)printf
 CC_FLAGS_KERNEL = -nostdlib -fomit-frame-pointer -mno-apcs-frame -nostartfiles -ffreestanding
 CC_FLAGS = $(CC_FLAGS_KERNEL) -mcpu=arm1176jzf-s -std=c99 -Wall -Wextra -Werror -g -O0
 ASM_FLAGS = -mcpu=arm1176jzf-s -g
-QEMU_FLAGS = -kernel $(KERNELELF) -cpu arm1176 -m 512 -M raspi2 -nographic -no-reboot -S -s
+QEMU_FLAGS = -kernel $(KERNELELF) -cpu arm1176 -m 512 -M raspi -nographic -monitor none -no-reboot -S -s -serial stdio
 
 include $(MAKEINCDIR)colors.inc.mk
 include $(MAKEINCDIR)errorHandler.inc.mk
