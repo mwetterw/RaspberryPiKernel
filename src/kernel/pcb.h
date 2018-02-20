@@ -57,8 +57,8 @@ void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
  * Writes register value into the pcb's stack.
  * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
  */
-#define kernel_pcb_set_register(pcb, register, value) \
-	( pcb ) -> mpSP [ register ] = ( uint32_t ) ( value )
+#define kernel_pcb_set_register(pcb, reg, value) \
+	( pcb ) -> mpSP [ reg ] = ( uint32_t ) ( value )
 
 /*
  * Changes pcb's cpsr (in pcb's stack) to enable IRQs.

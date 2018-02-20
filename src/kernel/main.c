@@ -9,6 +9,8 @@ void init ( );
 
 void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
 {
+    ( void ) z; ( void ) mach; ( void ) atags;
+
     kernel_memory_init ( );
     kernel_hardware_init ( );
 
