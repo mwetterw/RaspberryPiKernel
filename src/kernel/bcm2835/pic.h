@@ -2,6 +2,7 @@
 #define _H_BCM2835_PIC
 
 #include <stdint.h>
+#include "bcm2835.h"
 
 struct pic
 {
@@ -14,7 +15,7 @@ struct pic
     uint32_t enable_basic;
     uint32_t disable1;
     uint32_t disable2;
-    uint32_t disable_pending;
+    uint32_t disable_basic;
 };
 
 #define IRQ_TIMER0  0
