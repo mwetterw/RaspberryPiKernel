@@ -52,8 +52,6 @@ reset_handler:
     @ Launch our kernel!
     b kernel_main
 
-irq_handler: b kernel_scheduler_handler
-
 undefined_handler:
 softirq_handler:
 prefetch_handler:

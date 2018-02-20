@@ -16,33 +16,11 @@ extern kernel_pcb_t * const kernel_pcb_running;
  * Initializes kernel schedulers.
  * To be called once before the schedulers can be used.
  */
-void kernel_scheduler_init ( );
+void scheduler_init ( );
 
+void scheduler_handler ( uint32_t * oldSP );
+void scheduler_reschedule ( );
 
-/*
- * Hands over control to the scheduler.
- * The current running process's context will be thrown away,
- * because we're not going to schedule it anymore.
- * ASSERT: IRQ already disabled before call.
- */
-void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_yield_noreturn ( );
-
-
-/*
- * Hands over control to the scheduler.
- * The current running process's context will be saved,
- * because we're going to reschedule it later.
- * ASSERT: IRQ already disabled before call.
- */
-void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_yield ( );
-
-
-/*
- * Rearms timer and sets the next deadline for scheduling operation.
- */
-#define kernel_scheduler_set_next_deadline() \
-	kernel_timer_channel ( KERNEL_SCHEDULER_TIMER_CHANNEL ) = \
-		kernel_timer_get_clock ( ) + KERNEL_SCHEDULER_TIMER_PERIOD; \
-	kernel_timer_enable ( KERNEL_SCHEDULER_TIMER_CHANNEL )
+extern void scheduler_yield ( );
 
 #endif

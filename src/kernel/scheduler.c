@@ -2,21 +2,23 @@
 #include "scheduler.h"
 #include "bcm2835/systimer.h"
 
-kernel_pcb_t volatile * kernel_pcb_running;
+kernel_pcb_t * kernel_pcb_running;
 static kernel_pcb_t kernel_pcb_idle;
 
 kernel_pcb_turnstile_t kernel_turnstile_round_robin;
 kernel_pcb_turnstile_t kernel_turnstile_sleeping;
 
-static void kernel_scheduler_elect ( );
-static void __attribute__ ( ( noreturn, naked ) ) kernel_idle_process ( );
+static void scheduler_elect ( );
+static void __attribute__ ( ( noreturn ) ) kernel_idle_process ( );
+
+extern void scheduler_ctxsw ( );
 
 
-void kernel_scheduler_init ( )
+void scheduler_init ( )
 {
 	kernel_pcb_idle.mpStack = 0;
 	kernel_pcb_idle.mpSP = ( void * ) 0x3000;
-	kernel_pcb_set_register ( &kernel_pcb_idle, pc, kernel_idle_process );
+	kernel_pcb_set_register ( &kernel_pcb_idle, pc, ( uintptr_t ) kernel_idle_process );
 	kernel_pcb_inherit_cpsr ( &kernel_pcb_idle );
 	kernel_pcb_enable_irq ( &kernel_pcb_idle );
 
@@ -26,71 +28,20 @@ void kernel_scheduler_init ( )
 	kernel_pcb_running = 0;
 }
 
-void kernel_scheduler_yield_noreturn ( )
+void scheduler_handler ( uint32_t * oldSP )
 {
-	kernel_scheduler_elect ( );
+    kernel_pcb_running -> mpSP = oldSP;
+    scheduler_reschedule ( );
+}
 
+void scheduler_reschedule ( )
+{
+	scheduler_elect ( );
     systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
-
-	// Hands over CPU to the elected process
-	__asm ( "mov sp, %0" : : "r" ( kernel_pcb_running -> mpSP ) );
-	__asm ( "ldmfd sp!, { r0 - r12, lr }" );
-	__asm ( "rfefd sp!" );
-
-	__builtin_unreachable ( );
+    scheduler_ctxsw ( kernel_pcb_running -> mpSP );
 }
 
-void kernel_scheduler_yield ( )
-{
-	// Push r0 cause we're gonna erase it
-	__asm ( "str r0, [sp, #-8]" );
-
-	// Load cpsr into r0
-	__asm ( "mrs r0, cpsr" );
-
-	// Push r0 (cpsr)
-	__asm ( "stmfd sp!, {r0}" );
-
-	// Restore the r0 we saved
-	__asm ( "ldr r0, [sp, #-4]" );
-
-	// Push lr (will be pcb's pc)
-	__asm ( "stmfd sp!, {lr}" );
-
-	// Push r0 - r12, lr
-	// This lr doesn't really matter since caller pushed it before
-	// calling us.
-	__asm ( "stmfd sp!, {r0 - r12, lr}" );
-
-	// Store sp in PCB
-	__asm ( "mov %0, sp" : "=r" ( kernel_pcb_running -> mpSP ) );
-
-	// Elect new process and hands over CPU to elected process
-	kernel_scheduler_yield_noreturn ( );
-}
-
-void __attribute__ ( ( noreturn, naked ) ) kernel_scheduler_handler ( )
-{
-	// Correct lr_irq value (A2.6.1, P.55/1138, "Note" section)
-	__asm ( "sub lr, lr, #4" );
-
-	// Store Return State: push {lr_irq, spsr_irq} => sp_svc
-	kernel_arm_srsfd ( KERNEL_ARM_MODE_SVC );
-
-	// Switch to SVC mode
-	kernel_arm_set_mode ( KERNEL_ARM_MODE_SVC );
-
-	// Save current process context (Push r0 - r12, lr)
-	__asm ( "stmfd sp!, {r0 - r12, lr}" );
-
-	// Store sp in PCB
-	__asm ( "mov %0, sp" : "=r" ( kernel_pcb_running -> mpSP ) );
-
-	// Elect new process and hands over CPU to elected process
-	kernel_scheduler_yield_noreturn ( );
-}
-
-void kernel_scheduler_elect ( )
+void scheduler_elect ( )
 {
 	// We wake up sleeping processes
 	if ( kernel_turnstile_sleeping.mpFirst )

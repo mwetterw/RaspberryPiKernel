@@ -5,7 +5,7 @@
 #include "scheduler.h"
 #include "bcm2835/systimer.h"
 
-static void __attribute__ ( ( noreturn ) )
+static void
 kernel_pcb_bigbang ( void * ( * f ) ( void * ), void * args );
 
 kernel_pcb_t * kernel_pcb_create ( void * f, void * args )
@@ -33,7 +33,7 @@ void kernel_pcb_bigbang ( void * ( * f ) ( void * ), void * args )
     kernel_memory_deallocate ( kernel_pcb_running -> mpStack );
     kernel_memory_deallocate ( kernel_pcb_running );
 
-    kernel_scheduler_yield_noreturn ( );
+    scheduler_reschedule ( );
 }
 
 void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration )
@@ -44,6 +44,6 @@ void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration )
 
 	if ( pcb == kernel_pcb_running )
 	{
-		kernel_scheduler_yield ( );
+		scheduler_yield ( );
 	}
 }

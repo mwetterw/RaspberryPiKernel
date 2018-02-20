@@ -3,10 +3,6 @@
 
 #include <stdint.h>
 
-#define kernel_arm_addr(addr) ( uint32_t * ) ( addr )
-#define kernel_arm_addr32(addr) ( * ( uint32_t * ) ( addr ) )
-#define kernel_arm_array32(addr, i) ( ( ( uint32_t * ) ( addr ) ) [ i ] )
-
 #define KERNEL_ARM_MODE_USR 0x10
 #define KERNEL_ARM_MODE_FIQ 0x11
 #define KERNEL_ARM_MODE_IRQ 0x12

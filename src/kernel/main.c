@@ -7,7 +7,7 @@
 
 void init ( );
 
-void __attribute__ ( ( noreturn ) ) kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
+void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
 {
     kernel_memory_init ( );
     kernel_hardware_init ( );
@@ -16,10 +16,10 @@ void __attribute__ ( ( noreturn ) ) kernel_main ( uint32_t z, uint32_t mach, uin
     systimer_init ( );
 
     printu ( "Initializing Scheduler" );
-    kernel_scheduler_init ( );
+    scheduler_init ( );
 
     kernel_pcb_create ( init, 0 );
 
     printu ( "Bootup sequence complete! Yielding CPU to userspace..." );
-    kernel_scheduler_yield_noreturn ( );
+    scheduler_reschedule ( );
 }

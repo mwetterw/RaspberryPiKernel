@@ -1,7 +1,9 @@
 source gdb/init.gdb
 b kernel_main
-b kernel_scheduler_handler
-b kernel_scheduler_yield_noreturn
-b kernel_scheduler_yield
+b irq_handler
+b irq_dispatch
+b scheduler_handler
+b scheduler_reschedule
+b scheduler_yield
 b kernel_pcb_bigbang
 c
