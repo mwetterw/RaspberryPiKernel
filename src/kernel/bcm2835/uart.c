@@ -57,3 +57,25 @@ void printu ( const char * str )
     uart_write_char ( '\r' );
     uart_write_char ( '\n' );
 }
+
+void printu_32h ( uint32_t val )
+{
+    uart_write_char ( '0' );
+    uart_write_char ( 'x' );
+
+    uint32_t cur;
+    for ( int byte = 7 ; byte >= 0 ; --byte, val <<= 4 )
+    {
+        cur = ( val & ( 0xf << 28 ) ) >> 28;
+        if ( cur <= 0x9 )
+        {
+            uart_write_char ( '0' + cur );
+        }
+        else if ( cur >= 0xa && cur <= 0xf )
+        {
+            uart_write_char ( 'a' + cur - 0xa );
+        }
+    }
+    uart_write_char ( '\r' );
+    uart_write_char ( '\n' );
+}
