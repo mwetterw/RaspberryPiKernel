@@ -1,6 +1,7 @@
 #define _C_KERNEL_SCHEDULER
 #include "scheduler.h"
 #include "bcm2835/systimer.h"
+#include "bcm2835/pic.h"
 
 kernel_pcb_t * kernel_pcb_running;
 static kernel_pcb_t kernel_pcb_idle;
@@ -70,7 +71,8 @@ void scheduler_elect ( )
 
 void kernel_idle_process ( )
 {
-	for ( ; ; );
-
-	__builtin_unreachable ( );
+    for ( ; ; )
+    {
+        pause ( );
+    }
 }
