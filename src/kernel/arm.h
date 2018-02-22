@@ -36,4 +36,6 @@ uint32_t kernel_arm_get_cpsr ( );
 // Disable IRQ in CPSR
 #define kernel_arm_disable_irq() __asm ( "cpsid i" )
 
+extern void dmb ( );
+
 #endif
