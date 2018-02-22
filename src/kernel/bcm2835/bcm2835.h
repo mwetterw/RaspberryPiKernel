@@ -4,7 +4,9 @@
 #define PERI_BASE       0x20000000
 #define SYSTIMER_BASE   ( PERI_BASE + 0x3000 )
 #define PIC_BASE        ( PERI_BASE + 0xB200 )
+#define MBOX_BASE       ( PERI_BASE + 0xB880 )
 #define GPIO_BASE       ( PERI_BASE + 0x200000 )
 #define UART_BASE       ( PERI_BASE + 0x201000 )
+
 
 #endif
