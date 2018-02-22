@@ -25,5 +25,7 @@ struct pic
 #define IRQ_UART    57
 
 void pic_enable_irq ( int irq );
+void pic_disable_irq ( int irq );
+void pic_disable_all_interrupts ( );
 
 #endif

@@ -38,4 +38,7 @@ uint32_t kernel_arm_get_cpsr ( );
 
 extern void dmb ( );
 
+extern void pause ( );
+extern void __attribute__ (( noreturn )) halt ( );
+
 #endif
