@@ -33,7 +33,7 @@ void kernel_pcb_bigbang ( void * ( * f ) ( void * ), void * args )
     kernel_memory_deallocate ( kernel_pcb_running -> mpStack );
     kernel_memory_deallocate ( kernel_pcb_running );
 
-    scheduler_reschedule ( );
+    scheduler_reschedule ( 0 );
 }
 
 void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration )

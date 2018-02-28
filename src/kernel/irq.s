@@ -1,24 +1,31 @@
 @ vim: ft=arm
 .globl irq_handler
 irq_handler:
-	// Correct lr_irq value (A2.6.1, P.55/1138, "Note" section)
+	// Correct lr_irq value due to the ARM pipeline design
 	sub lr, lr, #4
 
-	// Store Return State: push {lr_irq, spsr_irq} => sp_svc, then switch
+    // Push lr_irq and spsr_irq to sp_svc
     srsfd #0x13!
-    cps #0x13
 
-	// Save current process context (Push r0 - r12, lr)
+    // Switch to SVC mode, store context
+    cps #0x13
 	stmfd sp!, { r0 - r12, lr }
 
+    // Retrieve sp_svc to r0. Then switch back to IRQ mode.
+    // r0 isn't banked: we gain access to sp_svc from IRQ mode.
     mov r0, sp
+    cps #0x12
 
-    and r11, sp, #4
-    sub sp, sp, r11
+    // r0 contain the old stack
 
     bl irq_dispatch
 
-    add sp, sp, r11
+    // r0 Contain the new stack to load
+
+    // Switch back to SVC mode
+    cps #0x13
+
 	// Restore current process context (Pop r0 - r12, lr)
+    mov sp, r0
 	ldmfd sp!, { r0 - r12, lr }
 	rfefd sp!

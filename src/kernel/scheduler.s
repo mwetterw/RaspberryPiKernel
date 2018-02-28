@@ -17,4 +17,4 @@ scheduler_yield:
     stmfd sp!, { r0 - r12, lr }
     mov r0, sp
 
-    b scheduler_handler
+    b scheduler_reschedule

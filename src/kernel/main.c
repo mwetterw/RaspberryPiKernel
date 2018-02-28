@@ -23,5 +23,5 @@ void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
     kernel_pcb_create ( init, 0 );
 
     printu ( "Bootup sequence complete! Yielding CPU to userspace..." );
-    scheduler_reschedule ( );
+    scheduler_reschedule ( 0 );
 }

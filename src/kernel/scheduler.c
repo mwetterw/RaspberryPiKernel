@@ -29,14 +29,21 @@ void scheduler_init ( )
 	kernel_pcb_running = 0;
 }
 
-void scheduler_handler ( uint32_t * oldSP )
+void * scheduler_handler ( void * oldSP )
 {
     kernel_pcb_running -> mpSP = oldSP;
-    scheduler_reschedule ( );
+	scheduler_elect ( );
+    systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
+    return kernel_pcb_running -> mpSP;
 }
 
-void scheduler_reschedule ( )
+void scheduler_reschedule ( void * oldSP )
 {
+    if ( oldSP )
+    {
+        kernel_pcb_running -> mpSP = oldSP;
+    }
+
 	scheduler_elect ( );
     systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
     scheduler_ctxsw ( kernel_pcb_running -> mpSP );
