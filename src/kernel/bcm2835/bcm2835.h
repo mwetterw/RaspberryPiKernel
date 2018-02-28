@@ -7,6 +7,7 @@
 #define MBOX_BASE       ( PERI_BASE + 0xB880 )
 #define GPIO_BASE       ( PERI_BASE + 0x200000 )
 #define UART_BASE       ( PERI_BASE + 0x201000 )
+#define USB_HCD_BASE    ( PERI_BASE + 0x980000 )
 
 
 #endif
