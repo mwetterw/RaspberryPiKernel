@@ -27,5 +27,6 @@ struct pic
 void pic_enable_irq ( int irq );
 void pic_disable_irq ( int irq );
 void pic_disable_all_interrupts ( );
+int pic_irq_pending ( int irq );
 
 #endif

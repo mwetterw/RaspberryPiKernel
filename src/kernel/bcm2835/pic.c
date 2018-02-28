@@ -20,3 +20,8 @@ void pic_disable_all_interrupts ( )
     pic -> disable2 = ~0;
     pic -> fiq_ctrl = 0;
 }
+
+int pic_irq_pending ( int irq )
+{
+    return ( ( & ( pic -> pending1 ) ) [ irq >> 5 ] ) & ( 1 << ( irq & 31 ) );
+}
