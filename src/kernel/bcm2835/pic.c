@@ -1,4 +1,5 @@
 #include "pic.h"
+#include "../scheduler.h"
 
 static volatile struct pic * pic =
     ( volatile struct pic * ) PIC_BASE;
@@ -24,4 +25,14 @@ void pic_disable_all_interrupts ( )
 int pic_irq_pending ( int irq )
 {
     return ( ( & ( pic -> pending1 ) ) [ irq >> 5 ] ) & ( 1 << ( irq & 31 ) );
+}
+
+void * irq_dispatch ( void * oldSP )
+{
+    if ( pic_irq_pending ( IRQ_TIMER1 ) )
+    {
+        return scheduler_handler ( oldSP );
+    }
+
+    return oldSP;
 }
