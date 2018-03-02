@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "usb_dwc2_regs_inner.h"
+
 #define DWC2_MAX_CHAN 16
 #define DWC2_MAX_EP DWC2_MAX_CHAN
 
@@ -14,8 +16,8 @@ struct dwc2_regs_core
     uint32_t gahbcfg;           // 0x00008 AHB Configuration Register
     uint32_t gusbcfg;           // 0x0000C USB Configuration Register
     uint32_t grstctl;           // 0x00010 Reset Control Register
-    uint32_t gintsts;           // 0x00014 Interrupt Status Register
-    uint32_t gintmsk;           // 0x00018 Interrupt Mask Register
+    union gint gintsts;         // 0x00014 Interrupt Status Register
+    union gint gintmsk;         // 0x00018 Interrupt Mask Register
     uint32_t grxstsr;           // 0x0001C Receive Status Debug Read Register
     uint32_t grxstsp;           // 0x00020 Receive Status Stack Pointer (Read Pop) Register
     uint32_t grxfsiz;           // 0x00024 Receive FIFO Size Register
@@ -27,7 +29,7 @@ struct dwc2_regs_core
     uint32_t guid;              // 0x0003C User ID Register
     uint32_t gsnpsid;           // 0x00040 Synopsys ID Register
     uint32_t ghwcfg1;           // 0x00044 User Hardware Config1 Register
-    uint32_t ghwcfg2;           // 0x00048 User Hardware Config2 Register
+    union ghwcfg2 ghwcfg2;      // 0x00048 User Hardware Config2 Register
     uint32_t ghwcfg3;           // 0x0004C User Hardware Config3 Register
     uint32_t ghwcfg4;           // 0x00050 User Hardware Config4 Register
     uint32_t glpmcfg;           // 0x00054 Core LPM Configuration Register
@@ -46,14 +48,14 @@ struct dwc2_regs_core
 // Host Channel-Specific Registers
 struct dwc2_regs_host_hc
 {
-    uint32_t hcchar;    // Host Channel Characteristics Register
-    uint32_t hcsplt;    // Host Channel Split Control Register
-    uint32_t hcint;     // Host Channel Interrupt Register
-    uint32_t hcintmsk;  // Host Channel Interrupt Mask Register
-    uint32_t hcsiz;     // Host Channel Transfer Size Register
-    uint32_t hcdma;     // Host Channel DMA Address Register
-    uint32_t reserved1; // Is this just after hcdmab?
-    uint32_t hcdmab;    // Host Channel DMA Buffer Address Register
+    uint32_t hcchar;        // Host Channel Characteristics Register
+    uint32_t hcsplt;        // Host Channel Split Control Register
+    union hcint hcint;      // Host Channel Interrupt Register
+    union hcint hcintmsk;   // Host Channel Interrupt Mask Register
+    uint32_t hcsiz;         // Host Channel Transfer Size Register
+    uint32_t hcdma;         // Host Channel DMA Address Register
+    uint32_t reserved1;     // Is this just after hcdmab?
+    uint32_t hcdmab;        // Host Channel DMA Buffer Address Register
 };
 
 // Host Mode CSRs

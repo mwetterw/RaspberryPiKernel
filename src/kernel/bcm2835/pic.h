@@ -9,6 +9,7 @@
 #define IRQ_TIMER1  1
 #define IRQ_TIMER2  2
 #define IRQ_TIMER3  3
+#define IRQ_USB_HCD 9
 #define IRQ_UART    57
 
 typedef void ( * interrupt_handler_t ) ( void );
