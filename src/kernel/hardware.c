@@ -3,6 +3,7 @@
 #include "bcm2835/uart.h"
 #include "bcm2835/power.h"
 #include "bcm2835/pic.h"
+#include "usb_hcdi.h"
 
 static inline void kernel_hardware_led_init ( );
 
@@ -19,6 +20,8 @@ void kernel_hardware_init ( )
 
     printu ( "Welcome!" );
     printu ( "Hardware initialization complete" );
+
+    hcd_start ( );
 }
 
 void kernel_hardware_led_init ( )
