@@ -16,7 +16,7 @@ static void uart_set_baud_rate ( int brate )
 {
     float baudiv = ( float ) UART_CLK / ( 16 * brate );
     int baudiv_int = baudiv;
-    int baudiv_frac = ( ( baudiv - baudiv_int ) * FBRD_MASK + 0.5 );
+    int baudiv_frac = ( ( baudiv - baudiv_int ) * ( FBRD_MASK + 1 ) + 0.5 );
 
     uart_w32 ( IBRD, baudiv_int & IBRD_MASK );
     uart_w32 ( FBRD, baudiv_frac & FBRD_MASK );

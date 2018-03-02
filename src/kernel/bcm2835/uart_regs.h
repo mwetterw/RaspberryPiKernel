@@ -53,13 +53,15 @@ enum FR
 // BAUDIV = (FUARTCLK/(16*BAUD RATE))
 enum IBRD
 {
-    IBRD_MASK   = 0xf, // Lower 16 bits only
+    IBRD_BITS   = 16, // Lower 16 bits only
+    IBRD_MASK   = ( 1 << IBRD_BITS ) - 1,
 };
 
 // Fractional Baud Rate Divisor
 enum FBRD
 {
-    FBRD_MASK   = 0x3f, // Lower 6 bits only
+    FBRD_BITS   = 6, // Lower 6 bits only
+    FBRD_MASK   = ( 1 << FBRD_BITS ) - 1,
 };
 
 // Line Control Register
