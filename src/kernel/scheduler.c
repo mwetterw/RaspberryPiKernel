@@ -1,7 +1,6 @@
 #define _C_KERNEL_SCHEDULER
 #include "scheduler.h"
 #include "bcm2835/systimer.h"
-#include "bcm2835/pic.h"
 
 kernel_pcb_t * kernel_pcb_running;
 static kernel_pcb_t kernel_pcb_idle;
@@ -34,6 +33,7 @@ void * scheduler_handler ( void * oldSP )
     kernel_pcb_running -> mpSP = oldSP;
 	scheduler_elect ( );
     systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
+
     return kernel_pcb_running -> mpSP;
 }
 

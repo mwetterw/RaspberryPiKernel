@@ -1,4 +1,5 @@
 #include "systimer.h"
+#include "bcm2835.h"
 #include "pic.h"
 
 static volatile struct systimer * systimer =

@@ -19,6 +19,7 @@ extern kernel_pcb_t * const kernel_pcb_running;
 void scheduler_init ( );
 
 void * scheduler_handler ( void * oldSP );
+
 void scheduler_reschedule ( void * oldSP );
 
 extern void scheduler_yield ( );

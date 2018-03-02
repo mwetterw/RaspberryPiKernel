@@ -15,6 +15,12 @@ scheduler_yield:
 
     stmfd sp!, { lr }
     stmfd sp!, { r0 - r12, lr }
+
     mov r0, sp
+
+    // We're going to call an external interface
+    // Make sure sp is 8-bytes aligned
+    and r11, sp, #4
+    sub sp, sp, r11
 
     b scheduler_reschedule
