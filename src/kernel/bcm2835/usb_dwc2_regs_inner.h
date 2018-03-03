@@ -87,6 +87,27 @@ union ghwcfg2
     };
 };
 
+// 0x0004C User Hardware Config3 Register
+union ghwcfg3
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t xfersizewidth  : 4;  // Width of Transfer Size Counters
+        uint32_t pktsizewidth   : 3;  // Width of Packet Size Counters
+        uint32_t otgen          : 1;  // OTG Function Enabled
+        uint32_t i2cintsel      : 1;  // I²C Interface Selection
+        uint32_t vndctlsupt     : 1;  // Vendor Control Interface Supported
+        uint32_t optfeature     : 1;  // Optionnal Features Supported
+        uint32_t rsttype        : 1;  // Reset Type (synchronous)
+        uint32_t adpsupport     : 1;  // ADP Logic Support
+        uint32_t hsicmode       : 1;  // HSIC Mode Support
+        uint32_t bcsupport      : 1;  // Battery Charger Support
+        uint32_t lpmmode        : 1;  // LPM Mode Enable/Disabled
+        uint32_t dfifodepth     : 16; // Data FIFO Depth (35-bits words)
+    };
+};
+
 // Host Channel-Specific Interrupts (hcint and hcintmsk)
 union hcint
 {

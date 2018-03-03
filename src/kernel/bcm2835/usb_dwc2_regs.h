@@ -5,8 +5,8 @@
 
 #include "usb_dwc2_regs_inner.h"
 
-#define DWC2_MAX_CHAN 16
-#define DWC2_MAX_EP DWC2_MAX_CHAN
+#define MAX_CHAN 16
+#define MAX_EP MAX_CHAN
 
 // Core Global CSRs
 struct dwc2_regs_core
@@ -30,7 +30,7 @@ struct dwc2_regs_core
     uint32_t gsnpsid;           // 0x00040 Synopsys ID Register
     uint32_t ghwcfg1;           // 0x00044 User Hardware Config1 Register
     union ghwcfg2 ghwcfg2;      // 0x00048 User Hardware Config2 Register
-    uint32_t ghwcfg3;           // 0x0004C User Hardware Config3 Register
+    union ghwcfg3 ghwcfg3;      // 0x0004C User Hardware Config3 Register
     uint32_t ghwcfg4;           // 0x00050 User Hardware Config4 Register
     uint32_t glpmcfg;           // 0x00054 Core LPM Configuration Register
     uint32_t gpwrdn;            // 0x00058 Power Down Register
@@ -40,7 +40,7 @@ struct dwc2_regs_core
     unsigned char reserved1 [ 0x9C ];
 
     uint32_t hptxfsiz;                      // 0x00100 Host Periodic Transmit FIFO Size Register
-    uint32_t dieptxfn [ DWC2_MAX_EP - 1 ];  // 0x00104 -> 0x0013F Device IN Endpoint Transmit FIFO Size Register
+    uint32_t dieptxfn [ MAX_EP - 1 ];  // 0x00104 -> 0x0013F Device IN Endpoint Transmit FIFO Size Register
 
     unsigned char reserved2 [ 0x2C0 ];      // 0x00140 -> 0x003FF
 };
@@ -76,7 +76,7 @@ struct dwc2_regs_host
 
     unsigned char reserved3 [ 0xBC ];
 
-    struct dwc2_regs_host_hc hc [ DWC2_MAX_CHAN ];  // 0x00500 -> 0x006FF Host Channel-Specific Registers
+    struct dwc2_regs_host_hc hc [ MAX_CHAN ];  // 0x00500 -> 0x006FF Host Channel-Specific Registers
 
     unsigned char reserved4 [ 0x100 ];  // 0x00700 -> 0x007FF
 };
@@ -121,14 +121,14 @@ struct dwc2_regs_device
         uint32_t dtknqr4;       // 0x00834 Device IN Token Sequence Learning Queue Read Register 4
         uint32_t diepempmsk;    // 0x00834 Device IN Endpoint FIFO Empty Interrupt Mask Register
     };
-    uint32_t deachint;                      // 0x00838 Device Each Endpoint Interrupt Register
-    uint32_t deachintmsk;                   // 0x0083C Device Each Endpoint Interrupt Mask
-    uint32_t diepeachmsk [ DWC2_MAX_EP ];   // 0x00840 -> 0x0087F Device Each IN Endpoint Interrupt Register
-    uint32_t doepeachmsk [ DWC2_MAX_EP ];   // 0x00880 -> 0x008BF Device Each OUT Endpoint Interrupt Register
+    uint32_t deachint;                  // 0x00838 Device Each Endpoint Interrupt Register
+    uint32_t deachintmsk;               // 0x0083C Device Each Endpoint Interrupt Mask
+    uint32_t diepeachmsk [ MAX_EP ];    // 0x00840 -> 0x0087F Device Each IN Endpoint Interrupt Register
+    uint32_t doepeachmsk [ MAX_EP ];    // 0x00880 -> 0x008BF Device Each OUT Endpoint Interrupt Register
 
-    unsigned char reserved2 [ 0x40 ];       // 0x008C0 -> 0x008FF
+    unsigned char reserved2 [ 0x40 ];   // 0x008C0 -> 0x008FF
 
-    struct dwc2_regs_device_dioep dioep [ 2 ] [ DWC2_MAX_EP ]; // 0x00900 -> 0x00CFF Device IN/OUT Endpoint Registers
+    struct dwc2_regs_device_dioep dioep [ 2 ] [ MAX_EP ]; // 0x00900 -> 0x00CFF Device IN/OUT Endpoint Registers
 
     unsigned char reserved3 [ 0x100 ];  // 0x00D00 -> 0x00DFF
 };
@@ -143,14 +143,14 @@ struct dwc2_regs_pcg
 struct dwc2_regs
 {
     // Control and Status Registers (CSRs)
-    struct dwc2_regs_core core;             // 0x00000 -> 0x003FF Core Global CSRs
-    struct dwc2_regs_host host;             // 0x00400 -> 0x007FF Host Mode CSRs
-    struct dwc2_regs_device device;         // 0x00800 -> 0x00DFF Device Mode CSRs
-    struct dwc2_regs_pcg pcg;               // 0x00E00 -> 0x00FFF Power and Clock Gating CSRs
+    struct dwc2_regs_core core;         // 0x00000 -> 0x003FF Core Global CSRs
+    struct dwc2_regs_host host;         // 0x00400 -> 0x007FF Host Mode CSRs
+    struct dwc2_regs_device device;     // 0x00800 -> 0x00DFF Device Mode CSRs
+    struct dwc2_regs_pcg pcg;           // 0x00E00 -> 0x00FFF Power and Clock Gating CSRs
 
-    unsigned char fifos [ DWC2_MAX_CHAN ] [ 0x1000 ]; // 0x01000 -> 0x10FFF Device Endpoints / Host Channels FIFOs
-    unsigned char reserved [ 0xF000 ];      // 0x11000 -> 0x1FFFF
-    unsigned char dfifodbg [ 0x20000 ];     // 0x20000 -> 0x3FFFF Direct Access to Data FIFO RAM for Debugging
+    unsigned char fifos [ MAX_CHAN ] [ 0x1000 ]; // 0x01000 -> 0x10FFF Device Endpoints / Host Channels FIFOs
+    unsigned char reserved [ 0xF000 ];  // 0x11000 -> 0x1FFFF
+    unsigned char dfifodbg [ 0x20000 ]; // 0x20000 -> 0x3FFFF Direct Access to Data FIFO RAM for Debugging
 };
 
 #endif
