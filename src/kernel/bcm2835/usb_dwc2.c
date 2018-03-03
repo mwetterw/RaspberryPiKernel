@@ -25,9 +25,6 @@ void hcd_start ( )
     // Fetch the specific factory configuration of the chip
     dwc2_parse_config ( );
 
-    // Force Host Mode
-    regs -> core.gusbcfg = ( 1 << 29 );
-
     dwc2_setup_interrupts ( );
 }
 
@@ -73,8 +70,24 @@ static void dwc2_setup_interrupts ( )
 
 static void dwc2_reset ( )
 {
-    regs -> core.grstctl = 1;
-    while ( ( regs -> core.grstctl ) & 1 );
+    union grstctl rst;
+    rst.raw = 0;
+
+    // Perform the reset
+    rst.csftrst = 1;
+    regs -> core.grstctl = rst;
+
+    // Wait until reset is complete and AHB is idle
+    do
+    {
+        rst = regs -> core.grstctl;
+    }
+    while ( ( rst.csftrst ) || ! ( rst.ahbidle ) );
+
+    /* Just after reset, the controller temporarily transitions to device mode.
+     * We need to wait until it comes back to host mode.
+     * This is important as some SPRAM registers will be auto-updated. */
+    while ( regs -> core.gintsts.curmod != HOST_MODE );
 }
 
 static void dwc2_parse_config ( )

@@ -15,7 +15,7 @@ struct dwc2_regs_core
     uint32_t gotgint;           // 0x00004 OTG Interrupt Register
     uint32_t gahbcfg;           // 0x00008 AHB Configuration Register
     uint32_t gusbcfg;           // 0x0000C USB Configuration Register
-    uint32_t grstctl;           // 0x00010 Reset Control Register
+    union grstctl grstctl;      // 0x00010 Reset Control Register
     union gint gintsts;         // 0x00014 Interrupt Status Register
     union gint gintmsk;         // 0x00018 Interrupt Mask Register
     uint32_t grxstsr;           // 0x0001C Receive Status Debug Read Register

@@ -1,6 +1,25 @@
 #ifndef _H_BCM2835_DWC2_REGS_INNER
 #define _H_BCM2835_DWC2_REGS_INNER
 
+// 0x00010 Reset Control Register
+union grstctl
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t csftrst    : 1; // Core Soft Reset
+        uint32_t hsftrst    : 1; // Hclk Soft Reset
+        uint32_t frmcntrrst : 1; // Host Frame Counter Reset
+        uint32_t intknqflsh : 1; // IN Token Sequence Learning Queue Flush
+        uint32_t rxfflsh    : 1; // RX FIFO Flush
+        uint32_t txfflsh    : 1; // TX FIFO Flush
+        uint32_t txfnum     : 5; // TX FIFO Number
+        uint32_t reserved   : 19;
+        uint32_t dmareq     : 1; // DMA Request Signal
+        uint32_t ahbidle    : 1; // Internal Bus Master Idle
+    };
+};
+
 // 0x00014 and 18 Interrupt Status & Mask Registers
 union gint
 {
@@ -43,6 +62,7 @@ union gint
         uint32_t wkupint        : 1; //   Resume / Remote Wakeup Detected
     };
 };
+enum mode { DEVICE_MODE, HOST_MODE }; // For gint.curmod
 
 // 0x00048 User Hardware Config2 Register
 union ghwcfg2
