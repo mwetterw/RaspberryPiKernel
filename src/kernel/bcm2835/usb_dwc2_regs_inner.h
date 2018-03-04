@@ -64,6 +64,28 @@ union gint
 };
 enum mode { DEVICE_MODE, HOST_MODE }; // For gint.curmod
 
+// 0x00024 Receive FIFO Size Register
+union grxf
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t siz        : 16;
+        uint32_t reserved   : 16;
+    };
+};
+
+// 0x00028 Non-Periodic Transmit FIFO Size Register
+union gnptxf
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t addr   : 16;
+        uint32_t siz    : 16;
+    };
+};
+
 // 0x00048 User Hardware Config2 Register
 union ghwcfg2
 {
@@ -105,6 +127,17 @@ union ghwcfg3
         uint32_t bcsupport      : 1;  // Battery Charger Support
         uint32_t lpmmode        : 1;  // LPM Mode Enable/Disabled
         uint32_t dfifodepth     : 16; // Data FIFO Depth (35-bits words)
+    };
+};
+
+// 0x00100 Host Periodic Transmit FIFO Size Register
+union hptxf
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t addr   : 16;
+        uint32_t siz    : 16;
     };
 };
 
