@@ -13,7 +13,7 @@ struct dwc2_regs_core
 {
     uint32_t gotgctl;           // 0x00000 OTG Control and Status Register
     uint32_t gotgint;           // 0x00004 OTG Interrupt Register
-    uint32_t gahbcfg;           // 0x00008 AHB Configuration Register
+    union gahbcfg gahbcfg;      // 0x00008 AHB Configuration Register
     uint32_t gusbcfg;           // 0x0000C USB Configuration Register
     union grstctl grstctl;      // 0x00010 Reset Control Register
     union gint gintsts;         // 0x00014 Interrupt Status Register

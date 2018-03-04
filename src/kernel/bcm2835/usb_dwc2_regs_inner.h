@@ -1,6 +1,36 @@
 #ifndef _H_BCM2835_DWC2_REGS_INNER
 #define _H_BCM2835_DWC2_REGS_INNER
 
+// 0x00008 AHB Configuration Register
+union gahbcfg
+{
+    uint32_t raw;
+    struct
+    {
+        // Note: Broadcom has changed the meaning of hbstlen
+        uint32_t glblintrmsk    : 1; // Global Interrupt Mask
+        uint32_t hbstlen        : 4; // Burst Length / Type
+        uint32_t dmaen          : 1; // DMA Enable
+        uint32_t reserved1      : 1;
+        uint32_t nptxfemplvl    : 1; // Non-Periodic TX FIFO Empty Level
+        uint32_t ptxfemplvl     : 1; // Periodic TX FIFO Empty Level
+        uint32_t reserved2      : 12;
+        uint32_t remmemsupp     : 1; // Remote Memory Support
+        uint32_t notialldmawrit : 1; // Notify all DMA Write Transactions
+        uint32_t ahbsingle      : 1; // AHB Single Support
+        uint32_t endian         : 1; // Inverse Descriptor Endianness
+        uint32_t reserved3      : 7;
+    };
+};
+#define BCM2708_AXI_WAIT ( 1 << 3 )
+enum bcm2708_gahbcfg_hbstlen
+{
+    BCM2708_AXI_BURST_4,
+    BCM2708_AXI_BURST_3,
+    BCM2708_AXI_BURST_2,
+    BCM2708_AXI_BURST_1,
+};
+
 // 0x00010 Reset Control Register
 union grstctl
 {

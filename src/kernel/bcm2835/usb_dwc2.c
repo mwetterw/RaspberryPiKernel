@@ -10,6 +10,7 @@
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 static uint32_t CHANCOUNT;
+static int IS_BCM2708_INSTANCE;
 
 void dwc2_interrupt ( )
 {
@@ -134,6 +135,21 @@ static void dwc2_setup_fifos ( )
     printu_32h ( regs -> core.hptxf.raw );
 }
 
+static void dwc2_enable_dma ( )
+{
+    union gahbcfg gahbcfg = regs -> core.gahbcfg;
+
+    if ( IS_BCM2708_INSTANCE )
+    {
+        gahbcfg.hbstlen |= BCM2708_AXI_WAIT;
+    }
+
+    // Enable DMA
+    gahbcfg.dmaen = 1;
+
+    regs -> core.gahbcfg = gahbcfg;
+}
+
 static void dwc2_setup_interrupts ( )
 {
     // Clear host channel specific interrupts
@@ -162,7 +178,11 @@ static void dwc2_setup_interrupts ( )
     }
 
     // Enable global interrupt generation
-    regs -> core.gahbcfg |= 1;
+    {
+        union gahbcfg gahbcfg = regs -> core.gahbcfg;
+        gahbcfg.glblintrmsk = 1;
+        regs -> core.gahbcfg = gahbcfg;
+    }
 
     // Route the top level interrupt to CPU
     interrupt_handlers [ IRQ_USB_HCD ] = dwc2_interrupt;
@@ -194,6 +214,7 @@ static void dwc2_reset ( )
 static void dwc2_parse_config ( )
 {
     CHANCOUNT = ( regs -> core.ghwcfg2.numhstchnl ) + 1;
+    IS_BCM2708_INSTANCE = ( regs -> core.guid == 0x2708A000 );
 }
 
 void hcd_start ( )
@@ -208,6 +229,6 @@ void hcd_start ( )
     dwc2_parse_config ( );
 
     dwc2_setup_fifos ( );
-
+    dwc2_enable_dma ( );
     dwc2_setup_interrupts ( );
 }
