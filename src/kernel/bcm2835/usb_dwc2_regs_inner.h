@@ -75,8 +75,8 @@ union grxf
     };
 };
 
-// 0x00028 Non-Periodic Transmit FIFO Size Register
-union gnptxf
+// 0x00028 & 100 : Non-Periodic / Host Periodic Transmit FIFO Size Registers
+union txf
 {
     uint32_t raw;
     struct
@@ -127,17 +127,6 @@ union ghwcfg3
         uint32_t bcsupport      : 1;  // Battery Charger Support
         uint32_t lpmmode        : 1;  // LPM Mode Enable/Disabled
         uint32_t dfifodepth     : 16; // Data FIFO Depth (35-bits words)
-    };
-};
-
-// 0x00100 Host Periodic Transmit FIFO Size Register
-union hptxf
-{
-    uint32_t raw;
-    struct
-    {
-        uint32_t addr   : 16;
-        uint32_t siz    : 16;
     };
 };
 

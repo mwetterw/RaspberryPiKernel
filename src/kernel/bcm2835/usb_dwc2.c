@@ -5,87 +5,55 @@
 #include "power.h"
 #include "pic.h"
 #include "uart.h"
+#include "../../libc/math.h"
 
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
-static void dwc2_reset ( );
-static void dwc2_setup_fifos ( );
-static void dwc2_setup_interrupts ( );
-static void dwc2_parse_config ( );
-
 static uint32_t CHANCOUNT;
-
-#define NB_FIFOS 3
-
-void hcd_start ( )
-{
-    // Ask the GPU to power the USB controller on
-    power_device ( POWER_USB_HCD, POWER_ON );
-
-    // Ask the core to reset and wait until complete
-    dwc2_reset ( );
-
-    // Fetch the specific factory configuration of the chip
-    dwc2_parse_config ( );
-
-    dwc2_setup_fifos ( );
-
-    dwc2_setup_interrupts ( );
-}
 
 void dwc2_interrupt ( )
 {
     printu ( "USB IRQ" );
 }
 
+#define NB_FIFOS 3
 struct fifos
 {
     uint32_t * size;
     uint32_t max;
 };
+typedef struct fifos fifos_t [ NB_FIFOS ];
 
-static void resize_fifos ( struct fifos fifos [ NB_FIFOS ], uint32_t dfifodepth )
+static void resize_fifos ( fifos_t fifos, uint32_t remaining_space )
 {
     uint32_t remaining_fifos = NB_FIFOS;
-    uint32_t remaining_space = dfifodepth;
 
     while ( remaining_space > 0 )
     {
         // Compute an equal share to give to every still-hungry FIFO
-        uint32_t equal_share = remaining_space / remaining_fifos;
-
-        /* If the last 2 FIFOs are racing to get the last rice grain,
-         * just give it to the first and prevent infinite 1/2 = 0 */
-        equal_share = ( equal_share == 0 ) ? 1 : equal_share;
+        uint32_t equal_share = max ( remaining_space / remaining_fifos, 1 );
 
         for ( int i = 0 ; i < NB_FIFOS ; ++i )
         {
+            uint32_t until_full = fifos [ i ].max - * ( fifos [ i ].size );
+
             // Skip FIFO which has already eaten until full
-            if ( fifos [ i ].size == 0 )
+            if ( until_full == 0 )
             {
                 continue;
             }
 
-            // FIFO is still hungry: try to give it an equal share
-            * ( fifos [ i ].size ) += equal_share;
+            // FIFO is still hungry: feed it
+            uint32_t eat = min ( equal_share, until_full );
+            * ( fifos [ i ].size ) += eat;
 
-            uint32_t greediness = 0;
-
-            // FIFO is full, and has even eaten too much!
-            if ( * ( fifos [ i ].size ) > fifos [ i ].max )
+            // FIFO is satisfied and optimum
+            if ( * ( fifos [ i ].size ) == fifos [ i ].max )
             {
-                // Find out in what extent FIFO has eaten too much
-                greediness = * ( fifos [ i ].size ) - fifos [ i ].max;
-
-                // Cap to max to give opportunity to other still-hungry FIFOs
-                * ( fifos [ i ].size ) = fifos [ i ].max;
-
-                // Mark FIFO as full and satisfied!
-                fifos [ i ].size = 0;
                 remaining_fifos--;
             }
 
-            remaining_space -= equal_share - greediness;
+            remaining_space -= eat;
 
             // No food left! Good job! =) Wasting is not good...
             if ( remaining_space == 0 )
@@ -121,7 +89,7 @@ static void dwc2_setup_fifos ( )
     {
         printu ( "FIFOs don't fit into DFIFO. Resizing..." );
 
-        struct fifos fifos [ NB_FIFOS ] = {
+        fifos_t fifos = {
             { & grxfsiz, max_grxfsiz },
             { & gnptxfsiz, max_gnptxfsiz },
             { & hptxfsiz, max_hptxfsiz },
@@ -137,8 +105,7 @@ static void dwc2_setup_fifos ( )
     }
 
     union grxf grxf;
-    union gnptxf gnptxf;
-    union hptxf hptxf;
+    union txf gnptxf, hptxf;
 
     grxf.raw = 0; // Necessary because of the reserved bits
     grxf.siz = grxfsiz;
@@ -227,4 +194,20 @@ static void dwc2_reset ( )
 static void dwc2_parse_config ( )
 {
     CHANCOUNT = ( regs -> core.ghwcfg2.numhstchnl ) + 1;
+}
+
+void hcd_start ( )
+{
+    // Ask the GPU to power the USB controller on
+    power_device ( POWER_USB_HCD, POWER_ON );
+
+    // Ask the core to reset and wait until complete
+    dwc2_reset ( );
+
+    // Fetch the specific factory configuration of the chip
+    dwc2_parse_config ( );
+
+    dwc2_setup_fifos ( );
+
+    dwc2_setup_interrupts ( );
 }

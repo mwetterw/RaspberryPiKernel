@@ -21,7 +21,7 @@ struct dwc2_regs_core
     uint32_t grxstsr;           // 0x0001C Receive Status Debug Read Register
     uint32_t grxstsp;           // 0x00020 Receive Status Stack Pointer (Read Pop) Register
     union grxf grxf;            // 0x00024 Receive FIFO Size Register
-    union gnptxf gnptxf;        // 0x00028 Non-Periodic Transmit FIFO Size Register
+    union txf gnptxf;           // 0x00028 Non-Periodic Transmit FIFO Size Register
     uint32_t gnptxsts;          // 0x0002C Non-Periodic Transmit FIFO Queue Status Register
     uint32_t gi2cctl;           // 0x00030 I²C Address Register
     uint32_t gpvndctl;          // 0x00034 PHY Vendor Control Register
@@ -39,7 +39,7 @@ struct dwc2_regs_core
 
     unsigned char reserved1 [ 0x9C ];
 
-    union hptxf hptxf;          // 0x00100 Host Periodic Transmit FIFO Size Register
+    union txf hptxf;            // 0x00100 Host Periodic Transmit FIFO Size Register
     uint32_t dieptxfn [ MAX_EP - 1 ];   // 0x00104 -> 0x0013F Device IN Endpoint Transmit FIFO Size Register
 
     unsigned char reserved2 [ 0x2C0 ];      // 0x00140 -> 0x003FF
