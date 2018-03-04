@@ -219,6 +219,7 @@ static void dwc2_parse_config ( )
 
 void hcd_start ( )
 {
+    printu ( "Starting up Synopsys Designware USB 2.0 OTG Controller" );
     // Ask the GPU to power the USB controller on
     power_device ( POWER_USB_HCD, POWER_ON );
 
