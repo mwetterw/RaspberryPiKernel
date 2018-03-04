@@ -1,5 +1,5 @@
-#ifndef _H_KERNEL_PCB
-#define _H_KERNEL_PCB
+#ifndef _H_PCB
+#define _H_PCB
 
 #include <stdint.h>
 #include "arm.h"
@@ -21,7 +21,7 @@ typedef struct kernel_pcb_s
  * @return:
  * - pointer to new allocated pcb.
  */
-kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
+kernel_pcb_t * pcb_create ( void * f, void * args );
 
 /*
  * Puts pcb in sleeping state during duration microseconds.
@@ -30,7 +30,7 @@ kernel_pcb_t * kernel_pcb_create ( void * f, void * args );
  * - duration of the nap in microseconds
  * ASSERT: IRQ have to be disabled prior to call.
  */
-void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
+void pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
 
 
 #define r0 0
@@ -57,29 +57,29 @@ void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration );
  * Writes register value into the pcb's stack.
  * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
  */
-#define kernel_pcb_set_register(pcb, reg, value) \
+#define pcb_set_register(pcb, reg, value) \
 	( pcb ) -> mpSP [ reg ] = ( uint32_t ) ( value )
 
 /*
  * Changes pcb's cpsr (in pcb's stack) to enable IRQs.
  * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
  */
-#define kernel_pcb_enable_irq(pcb) \
-	( pcb ) -> mpSP [ cpsr ] &= ~( KERNEL_ARM_CPSR_IRQ_MASK )
+#define pcb_enable_irq(pcb) \
+	( pcb ) -> mpSP [ cpsr ] &= ~( ARM_CPSR_IRQ_MASK )
 
 /*
  * Changes pcb's cpsr (in pcb's stack) to disable IRQs.
  * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
  */
-#define kernel_pcb_disable_irq(pcb) \
-	( pcb ) -> mpSP [ cpsr ] |= KERNEL_ARM_CPSR_IRQ_MASK
+#define pcb_disable_irq(pcb) \
+	( pcb ) -> mpSP [ cpsr ] |= ARM_CPSR_IRQ_MASK
 
 
 /*
  * Put caller's cpsr into pcb's cpsr (into pcb's stack)
  * ASSERT: pcb is not currently running and pcb->mpSP is on r0.
  */
-#define kernel_pcb_inherit_cpsr(pcb) \
-	( pcb ) -> mpSP [ cpsr ] = kernel_arm_get_cpsr ( )
+#define pcb_inherit_cpsr(pcb) \
+	( pcb ) -> mpSP [ cpsr ] = arm_get_cpsr ( )
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _H_KERNEL_GPIO
-#define _H_KERNEL_GPIO
+#ifndef _H_GPIO
+#define _H_GPIO
 
 #define GPIO_FSEL_INPUT 0
 #define GPIO_FSEL_OUTPUT 1
@@ -18,7 +18,7 @@
  * - an alternate function.
  * Use one of the constants above.
  */
-void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
+void gpio_configure ( unsigned char gpioPin, unsigned char fsel );
 
 
 
@@ -34,7 +34,7 @@ void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel );
  * - Pull Up.
  * Use one of the constants above.
  */
-void kernel_gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state );
+void gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state );
 
 
 /*
@@ -42,8 +42,8 @@ void kernel_gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char s
  * sets or clears the pin.
  * ASSERT: The GPIO is configured as an output.
  */
-void kernel_gpio_output_set ( unsigned char gpioPin );
-void kernel_gpio_output_clear ( unsigned char gpioPin );
+void gpio_output_set ( unsigned char gpioPin );
+void gpio_output_clear ( unsigned char gpioPin );
 
 
 #define GPIO0 0

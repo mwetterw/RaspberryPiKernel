@@ -6,9 +6,9 @@
 #include "bcm2835/gpio.h"
 #include "usb_core.h"
 
-static inline void kernel_hardware_led_init ( );
+static inline void hardware_led_init ( );
 
-void kernel_hardware_init ( )
+void hardware_init ( )
 {
     // Make sure all peripherals are powered off
     power_init ( );
@@ -22,8 +22,8 @@ void kernel_hardware_init ( )
     printu ( "Initializing Timer" );
     systimer_init ( );
 
-    printu ( "Configuring OK LED" );
-    kernel_hardware_led_init ( );
+    printu ( "Configuring OK_LED" );
+    hardware_led_init ( );
 
     printu ( "Initializing USB Core" );
     usb_init ( );
@@ -31,8 +31,8 @@ void kernel_hardware_init ( )
     printu ( "Hardware initialization complete" );
 }
 
-void kernel_hardware_led_init ( )
+void hardware_led_init ( )
 {
-    kernel_gpio_configure ( GPIO_LED, GPIO_FSEL_OUTPUT );
-    kernel_gpio_output_set ( GPIO_LED );
+    gpio_configure ( GPIO_LED, GPIO_FSEL_OUTPUT );
+    gpio_output_set ( GPIO_LED );
 }

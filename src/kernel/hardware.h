@@ -1,6 +1,6 @@
-#ifndef _H_KERNEL_HARDWARE
-#define _H_KERNEL_HARDWARE
+#ifndef _H_HARDWARE
+#define _H_HARDWARE
 
-void kernel_hardware_init ( );
+void hardware_init ( );
 
 #endif

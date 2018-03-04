@@ -1,5 +1,5 @@
-#ifndef _H_KERNEL_API_LED_MORSE
-#define _H_KERNEL_API_LED_MORSE
+#ifndef _H_API_LED_MORSE
+#define _H_API_LED_MORSE
 
 /**
  * Dispays a string as a morse message using the led.

@@ -31,10 +31,8 @@ void uart_init ( )
     uart_w32 ( CR, 0 );
 
     // Configure GPIO
-    kernel_gpio_configure ( GPIO14, GPIO_FSEL_ALT0 );
-    kernel_gpio_configure ( GPIO15, GPIO_FSEL_ALT0 );
-    kernel_gpio_configure_pull_up_down ( GPIO14, GPPUD_OFF );
-    kernel_gpio_configure_pull_up_down ( GPIO15, GPPUD_OFF );
+    gpio_configure ( GPIO14, GPIO_FSEL_ALT0 );
+    gpio_configure ( GPIO15, GPIO_FSEL_ALT0 );
 
     // Configure the UART
     uart_w32 ( ICR, INT_ALL ); // Clear all interrupts

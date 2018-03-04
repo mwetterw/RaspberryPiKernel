@@ -1,5 +1,5 @@
-#ifndef _H_KERNEL_MEMORY
-#define _H_KERNEL_MEMORY
+#ifndef _H_MEMORY
+#define _H_MEMORY
 
 #include <stdint.h>
 
@@ -10,7 +10,7 @@
  *
  * @return: void
  */
-void kernel_memory_init ( );
+void memory_init ( );
 
 
 
@@ -21,7 +21,7 @@ void kernel_memory_init ( );
  *  - pointer to allocated user memory
  *  - 0 if allocation was not possible
  */
-void * kernel_memory_allocate ( uint32_t size );
+void * memory_allocate ( uint32_t size );
 
 
 
@@ -36,6 +36,6 @@ void * kernel_memory_allocate ( uint32_t size );
  *
  * @return: void
  */
-void kernel_memory_deallocate ( void * address );
+void memory_deallocate ( void * address );
 
 #endif

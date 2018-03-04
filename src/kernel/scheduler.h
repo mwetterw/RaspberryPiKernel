@@ -1,20 +1,20 @@
-#ifndef _H_KERNEL_SCHEDULER
-#define _H_KERNEL_SCHEDULER
+#ifndef _H_SCHEDULER
+#define _H_SCHEDULER
 
 #include "config.h"
 #include "pcb.h"
 #include "pcb_turnstile.h"
 
-extern kernel_pcb_turnstile_t kernel_turnstile_round_robin;
-extern kernel_pcb_turnstile_t kernel_turnstile_sleeping;
+extern kernel_pcb_turnstile_t turnstile_round_robin;
+extern kernel_pcb_turnstile_t turnstile_sleeping;
 
-#ifndef _C_KERNEL_SCHEDULER
-extern kernel_pcb_t * const kernel_pcb_running;
+#ifndef _C_SCHEDULER
+extern kernel_pcb_t * const pcb_running;
 #endif
 
 /*
- * Initializes kernel schedulers.
- * To be called once before the schedulers can be used.
+ * Initializes kernel scheduler.
+ * To be called once before the scheduler can be used.
  */
 void scheduler_init ( );
 

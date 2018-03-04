@@ -1,12 +1,12 @@
 #include "pcb_turnstile.h"
 
-void kernel_pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile )
+void pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile )
 {
 	turnstile -> mpFirst = 0;
 	turnstile -> mpLast = 0;
 }
 
-void kernel_pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
+void pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
 	pcb -> mpNext = 0;
 
@@ -21,7 +21,7 @@ void kernel_pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t 
 	turnstile -> mpLast = pcb;
 }
 
-void kernel_pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
+void pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
 	// Empty turnstile
 	if ( ! turnstile -> mpFirst )
@@ -60,7 +60,7 @@ void kernel_pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnsti
 }
 
 kernel_pcb_t *
-kernel_pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile )
+pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile )
 {
 	if ( ! turnstile -> mpFirst )
 	{
@@ -77,7 +77,7 @@ kernel_pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile )
 	return head;
 }
 
-void kernel_pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
+void pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
     kernel_pcb_t * previous = 0;
 
@@ -100,7 +100,7 @@ void kernel_pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * 
     }
 }
 
-void kernel_pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile )
+void pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile )
 {
 	if ( ( ! turnstile -> mpFirst ) || turnstile -> mpFirst == turnstile -> mpLast )
 	{

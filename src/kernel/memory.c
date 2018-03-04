@@ -17,7 +17,7 @@ typedef struct kernel_heap_part_s
 } kernel_heap_part_t;
 
 static kernel_heap_part_t *
-kernel_memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious );
+memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious );
 
 static char kernel_memory_heap [ KERNEL_HEAP_SIZE ];
 
@@ -32,7 +32,7 @@ static const void *
 
 
 
-void kernel_memory_init ( )
+void memory_init ( )
 {
 	kernel_heap_part_t * pHead = ( kernel_heap_part_t * ) kernel_memory_heap;
 
@@ -51,7 +51,7 @@ void kernel_memory_init ( )
 	pHead -> mSize = 0;
 }
 
-void * kernel_memory_allocate ( uint32_t size )
+void * memory_allocate ( uint32_t size )
 {
 	// Overflow check
 	if ( size >= ( ~0 - sizeof ( kernel_heap_part_t ) ) )
@@ -76,7 +76,7 @@ void * kernel_memory_allocate ( uint32_t size )
 			)
 		)
 		{
-			kernel_heap_part_t * new = kernel_memory_private_allocate ( size, current );
+			kernel_heap_part_t * new = memory_private_allocate ( size, current );
 			return new + 1;
 		}
 
@@ -87,7 +87,7 @@ void * kernel_memory_allocate ( uint32_t size )
 	return 0;
 }
 
-void kernel_memory_deallocate ( void * address )
+void memory_deallocate ( void * address )
 {
 	// Boudaries check for address
 	if ( address < KERNEL_HEAP_ADDR_MIN || address >= KERNEL_HEAP_ADDR_MAX )
@@ -113,7 +113,7 @@ void kernel_memory_deallocate ( void * address )
 
 // ASSERT
 // pPrevious HAS TO be valid. There is no check
-kernel_heap_part_t * kernel_memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious )
+kernel_heap_part_t * memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious )
 {
 	kernel_heap_part_t * new = ( kernel_heap_part_t * ) (
 		( ( char * ) pPrevious ) +

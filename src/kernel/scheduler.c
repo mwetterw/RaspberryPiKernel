@@ -1,82 +1,82 @@
-#define _C_KERNEL_SCHEDULER
+#define _C_SCHEDULER
 #include "scheduler.h"
 #include "bcm2835/systimer.h"
 
-kernel_pcb_t * kernel_pcb_running;
-static kernel_pcb_t kernel_pcb_idle;
+kernel_pcb_t * pcb_running;
+static kernel_pcb_t pcb_idle;
 
-kernel_pcb_turnstile_t kernel_turnstile_round_robin;
-kernel_pcb_turnstile_t kernel_turnstile_sleeping;
+kernel_pcb_turnstile_t turnstile_round_robin;
+kernel_pcb_turnstile_t turnstile_sleeping;
 
 static void scheduler_elect ( );
-static void __attribute__ ( ( noreturn ) ) kernel_idle_process ( );
+static void __attribute__ ( ( noreturn ) ) idle_process ( );
 
 extern void scheduler_ctxsw ( );
 
 
 void scheduler_init ( )
 {
-	kernel_pcb_idle.mpStack = 0;
-	kernel_pcb_idle.mpSP = ( void * ) 0x3000;
-	kernel_pcb_set_register ( &kernel_pcb_idle, pc, ( uintptr_t ) kernel_idle_process );
-	kernel_pcb_inherit_cpsr ( &kernel_pcb_idle );
-	kernel_pcb_enable_irq ( &kernel_pcb_idle );
+	pcb_idle.mpStack = 0;
+	pcb_idle.mpSP = ( void * ) 0x3000;
+	pcb_set_register ( &pcb_idle, pc, ( uintptr_t ) idle_process );
+	pcb_inherit_cpsr ( &pcb_idle );
+	pcb_enable_irq ( &pcb_idle );
 
-	kernel_pcb_turnstile_init ( &kernel_turnstile_round_robin );
-	kernel_pcb_turnstile_init ( &kernel_turnstile_sleeping );
+	pcb_turnstile_init ( &turnstile_round_robin );
+	pcb_turnstile_init ( &turnstile_sleeping );
 
-	kernel_pcb_running = 0;
+	pcb_running = 0;
 }
 
 void * scheduler_handler ( void * oldSP )
 {
-    kernel_pcb_running -> mpSP = oldSP;
+    pcb_running -> mpSP = oldSP;
 	scheduler_elect ( );
     systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
 
-    return kernel_pcb_running -> mpSP;
+    return pcb_running -> mpSP;
 }
 
 void scheduler_reschedule ( void * oldSP )
 {
     if ( oldSP )
     {
-        kernel_pcb_running -> mpSP = oldSP;
+        pcb_running -> mpSP = oldSP;
     }
 
 	scheduler_elect ( );
     systimer_update ( KERNEL_SCHEDULER_TIMER_PERIOD );
-    scheduler_ctxsw ( kernel_pcb_running -> mpSP );
+    scheduler_ctxsw ( pcb_running -> mpSP );
 }
 
 void scheduler_elect ( )
 {
 	// We wake up sleeping processes
-	if ( kernel_turnstile_sleeping.mpFirst )
+	if ( turnstile_sleeping.mpFirst )
 	{
 		if
 		(
-			kernel_turnstile_sleeping.mpFirst -> mWakeUpDate <=
+			turnstile_sleeping.mpFirst -> mWakeUpDate <=
 		    systimer_get_clock ( )
 		)
 		{
 			kernel_pcb_t * current;
-			current = kernel_pcb_turnstile_popfront ( &kernel_turnstile_sleeping );
-			kernel_pcb_turnstile_pushback ( current, &kernel_turnstile_round_robin );
+			current = pcb_turnstile_popfront ( &turnstile_sleeping );
+			pcb_turnstile_pushback ( current, &turnstile_round_robin );
 		}
 	}
 
-	if ( kernel_turnstile_round_robin.mpFirst )
+	if ( turnstile_round_robin.mpFirst )
 	{
-		kernel_pcb_running = kernel_turnstile_round_robin.mpFirst;
-		kernel_pcb_turnstile_rotate ( &kernel_turnstile_round_robin );
+		pcb_running = turnstile_round_robin.mpFirst;
+		pcb_turnstile_rotate ( &turnstile_round_robin );
 		return;
 	}
 
-	kernel_pcb_running = &kernel_pcb_idle;
+	pcb_running = &pcb_idle;
 }
 
-void kernel_idle_process ( )
+void idle_process ( )
 {
     for ( ; ; )
     {

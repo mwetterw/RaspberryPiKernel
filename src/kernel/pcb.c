@@ -5,44 +5,43 @@
 #include "scheduler.h"
 #include "bcm2835/systimer.h"
 
-static void
-kernel_pcb_bigbang ( void * ( * f ) ( void * ), void * args );
+static void pcb_bigbang ( void * ( * f ) ( void * ), void * args );
 
-kernel_pcb_t * kernel_pcb_create ( void * f, void * args )
+kernel_pcb_t * pcb_create ( void * f, void * args )
 {
-    kernel_pcb_t * pcb = kernel_memory_allocate ( sizeof ( kernel_pcb_t ) );
-    pcb -> mpStack = kernel_memory_allocate ( KERNEL_STACK_SIZE );
+    kernel_pcb_t * pcb = memory_allocate ( sizeof ( kernel_pcb_t ) );
+    pcb -> mpStack = memory_allocate ( KERNEL_STACK_SIZE );
     pcb -> mpSP = ( pcb -> mpStack ) + KERNEL_STACK_SIZE - 16;
-    kernel_pcb_inherit_cpsr ( pcb );
-    kernel_pcb_enable_irq ( pcb );
-    kernel_pcb_set_register ( pcb, pc, kernel_pcb_bigbang );
-    kernel_pcb_set_register ( pcb, r0, f );
-    kernel_pcb_set_register ( pcb, r1, args );
+    pcb_inherit_cpsr ( pcb );
+    pcb_enable_irq ( pcb );
+    pcb_set_register ( pcb, pc, pcb_bigbang );
+    pcb_set_register ( pcb, r0, f );
+    pcb_set_register ( pcb, r1, args );
 
-    kernel_pcb_turnstile_pushback ( pcb, &kernel_turnstile_round_robin );
+    pcb_turnstile_pushback ( pcb, &turnstile_round_robin );
 
     return pcb;
 }
 
-void kernel_pcb_bigbang ( void * ( * f ) ( void * ), void * args )
+void pcb_bigbang ( void * ( * f ) ( void * ), void * args )
 {
     f ( args );
 
-    kernel_arm_disable_irq ( );
-    kernel_pcb_turnstile_remove ( kernel_pcb_running, &kernel_turnstile_round_robin );
-    kernel_memory_deallocate ( kernel_pcb_running -> mpStack );
-    kernel_memory_deallocate ( kernel_pcb_running );
+    arm_disable_irq ( );
+    pcb_turnstile_remove ( pcb_running, &turnstile_round_robin );
+    memory_deallocate ( pcb_running -> mpStack );
+    memory_deallocate ( pcb_running );
 
     scheduler_reschedule ( 0 );
 }
 
-void kernel_pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration )
+void pcb_sleep ( kernel_pcb_t * pcb, uint32_t duration )
 {
-	kernel_pcb_turnstile_remove ( pcb, &kernel_turnstile_round_robin );
+	pcb_turnstile_remove ( pcb, &turnstile_round_robin );
 	pcb -> mWakeUpDate = systimer_get_clock ( ) + duration;
-	kernel_pcb_turnstile_sorted_insert ( pcb, &kernel_turnstile_sleeping );
+	pcb_turnstile_sorted_insert ( pcb, &turnstile_sleeping );
 
-	if ( pcb == kernel_pcb_running )
+	if ( pcb == pcb_running )
 	{
 		scheduler_yield ( );
 	}

@@ -12,7 +12,7 @@
 #define gpio_w32(reg,data) ( * gpio_reg ( reg ) = data )
 #define gpio_w32i(reg,offset,data) ( gpio_reg ( reg ) [ offset ] = data )
 
-void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel )
+void gpio_configure ( unsigned char gpioPin, unsigned char fsel )
 {
     uint32_t gpfselNumber = gpioPin / 10;
     uint32_t currentConfig = gpio_r32i ( GPFSEL0, gpfselNumber );
@@ -28,7 +28,7 @@ void kernel_gpio_configure ( unsigned char gpioPin, unsigned char fsel )
     gpio_w32i ( GPFSEL0, gpfselNumber, currentConfig );
 }
 
-void kernel_gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state )
+void gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state )
 {
     // Set desired state
     gpio_w32 ( GPPUD, state );
@@ -50,12 +50,12 @@ void kernel_gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char s
 
 }
 
-void kernel_gpio_output_set ( unsigned char gpioPin )
+void gpio_output_set ( unsigned char gpioPin )
 {
     gpio_w32i ( GPSET0, gpioPin >> 5, ( 1 << ( gpioPin & 31 ) ) );
 }
 
-void kernel_gpio_output_clear ( unsigned char gpioPin )
+void gpio_output_clear ( unsigned char gpioPin )
 {
     gpio_w32i ( GPCLR0, gpioPin >> 5, ( 1 << ( gpioPin & 31 ) ) );
 }
