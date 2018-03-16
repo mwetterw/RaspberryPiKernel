@@ -1,7 +1,7 @@
 #ifndef _H_USB_STD_DEVICE
 #define _H_USB_STD_DEVICE
 
-enum usbdev_state
+enum usb_device_state
 {
     USBDEV_STATE_ATTACHED,
     USBDEV_STATE_POWERED,
@@ -11,7 +11,8 @@ enum usbdev_state
     USBDEV_STATE_SUSPENDED,
 };
 
-struct usbdev_setup_req
+// Control Setup Request
+struct usb_setup_req
 {
     // Characteristics of the request
     union bmRequestType
@@ -34,13 +35,16 @@ struct usbdev_setup_req
     {
         uint16_t raw;
 
+        // When wIndex used to specify endpoint
         struct endp
         {
             uint16_t endpoint   : 4;
-            uint16_t reserved   : 3;
+            uint16_t reserved1  : 3;
             uint16_t direction  : 1;
+            uint16_t reserved2  : 8;
         };
 
+        // When wIndex used to specify interface
         struct intf
         {
             uint16_t interface  : 8;
@@ -50,23 +54,6 @@ struct usbdev_setup_req
 
     // Number of bytes to transfer if there is a data stage (second phase)
     uint16_t wLength;
-};
-
-enum bRequest
-{
-    REQUEST_GET_STATUS,
-    REQUEST_CLEAR_FEATURE,
-    REQUEST_RESERVED1,
-    REQUEST_SET_FEATURE,
-    REQUEST_RESERVED2,
-    REQUEST_SET_ADDRESS,
-    REQUEST_GET_DESCRIPTOR,
-    REQUEST_SET_DESCRIPTOR,
-    REQUEST_GET_CONFIGURATION,
-    REQUEST_SET_CONFIGURATION,
-    REQUEST_GET_INTERFACE,
-    REQUEST_SET_INTERFACE,
-    REQUEST_SYNCH_FRAME,
 };
 
 enum bmRequestType_direction
@@ -88,6 +75,24 @@ enum bmRequestType_recipient
     REQUEST_RECIPIENT_INTERFACE,
     REQUEST_RECIPIENT_ENDPOINT,
     REQUEST_RECIPIENT_OTHER,
+};
+
+// USB Standard Device Requests
+enum bRequest
+{
+    REQUEST_GET_STATUS,
+    REQUEST_CLEAR_FEATURE,
+    REQUEST_RESERVED1,
+    REQUEST_SET_FEATURE,
+    REQUEST_RESERVED2,
+    REQUEST_SET_ADDRESS,
+    REQUEST_GET_DESCRIPTOR,
+    REQUEST_SET_DESCRIPTOR,
+    REQUEST_GET_CONFIGURATION,
+    REQUEST_SET_CONFIGURATION,
+    REQUEST_GET_INTERFACE,
+    REQUEST_SET_INTERFACE,
+    REQUEST_SYNCH_FRAME,
 };
 
 enum wValue_descriptor // (high-byte. low-byte = index)
@@ -120,7 +125,8 @@ enum wIndex_test_selector // (high-byte. low byte = 0/intf/endp)
     TEST_SELECTOR_FORCE_ENABLE,
 };
 
-struct usbdev_descriptor
+// USB Device Descriptor
+struct usb_dev_descriptor
 {
     uint8_t bLength;            // Size of this descriptor in bytes
     uint8_t bDescriptorType;    // DEVICE Descriptor Type
@@ -136,6 +142,38 @@ struct usbdev_descriptor
     uint8_t iProduct;           // Index of string desc describing product
     uint8_t iSerialNumber;      // Index of string desc describing serial number
     uint8_t bNumConfigurations; // Number of possible configurations
+};
+
+// USB Configuration Descriptor
+struct usb_conf_descriptor
+{
+    uint8_t bLength;                // Size of this descriptor in bytes
+    uint8_t bDescriptorType;        // CONFIGURATION Descriptor Type
+    uint16_t wTotalLength;          // Total length of data returned for this conf
+    uint8_t bNumInterfaces;         // Number of interfaces supported by this conf
+    uint8_t bConfigurationValue;    // Value to use as arg to SetConf()
+    uint8_t iConfiguration;         // Index of string descriptor for this conf
+    uint8_t bmAttributes;           // Conf charac. (Self-powered/Remote WKP)
+    uint8_t bMaxPower;              // Max power consumption (in 2mA units)
+};
+
+// USB Interface Descriptor
+struct usb_intf_descriptor
+{
+    uint8_t bLength;                // Size of this descriptor in bytes
+    uint8_t bDescriptorType;        // INTERFACE Descriptor Type
+    uint8_t bInterfaceNumber;       // Number of this intf (index within conf)
+    uint8_t bAlternateSetting;      // Value used to select this altn setting
+    uint8_t bNumEndpoints;          // Number of endp in this intf (except EP0)
+    uint8_t bInterfaceClass;        // Class code (assigned by USB-IF)
+    uint8_t bInterfaceSubClass;     // Subclass code (assigned by USB-IF)
+    uint8_t bInterfaceProtocol;     // Protocol Code (assigned by USB-IF)
+    uint8_t iInterface;             // Index of string desc for this intf
+};
+
+// USB Endpoint Descriptor
+struct usb_endp_descriptor
+{
 };
 
 #endif
