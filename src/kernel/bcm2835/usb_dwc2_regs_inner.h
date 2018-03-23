@@ -181,4 +181,41 @@ union hcint
     };
 };
 
+// 0x00440 Host Port Control and Status Register
+/* XXX Writing this register back to itself will disable the root hub port...
+ * This is due to the bad design of this register (mixed bit types).
+ * Care must be taken when writing to this reg for all WC bits.
+ * WC = Write 1 to Clear */
+union hprt
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t prtconnsts     : 1; // Port Connect Status (RO)
+        uint32_t prtconndet     : 1; // Port Connect Detected (WC)
+
+        /* Is port enabled by the core?
+         * This is set only by the core itself after the port reset sequence.
+         * The core clears it when an overcurrent or disconnect condition occurs.
+         * The driver can also clear it by writing a 1 (XXX this disables port).
+         * The driver cannot enable the port using this bit. */
+        uint32_t prtena         : 1; // Port is Enabled by the Core (WC)
+        uint32_t prtenchng      : 1; // Port En/Dis Change (WC)
+
+        uint32_t prtovrcuract   : 1; // Port Overcurrent Active (RO)
+        uint32_t prtovrcurchng  : 1; // Port Overcurrent Change (WC)
+
+        uint32_t prtres         : 1; // Port Resume
+        uint32_t prtsusp        : 1; // Port Suspend
+
+        uint32_t prtrst         : 1; // Port Reset
+        uint32_t reserved1      : 1;
+        uint32_t prtlnsts       : 2; // Port Line Status, D+/D- status (RO)
+        uint32_t prtpwr         : 1; // Port Power (to enable/disable the port)
+        uint32_t prttstctl      : 4; // Port Test Control
+        uint32_t prtspd         : 2; // Port Speed {HS, FS, LS, Reserved} (RO)
+        uint32_t reserved2      : 13;
+    };
+};
+#define DWC2_HPRT_WC_MASK (0b101110)
 #endif

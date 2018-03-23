@@ -72,7 +72,7 @@ struct dwc2_regs_host
 
     unsigned char reserved2 [ 0x20 ];
 
-    uint32_t hprt;  // 0x00440 Host Port Control and Status Register
+    union hprt hprt;    // 0x00440 Host Port Control and Status Register
 
     unsigned char reserved3 [ 0xBC ];
 
