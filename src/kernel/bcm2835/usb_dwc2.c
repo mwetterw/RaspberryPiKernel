@@ -6,15 +6,82 @@
 #include "pic.h"
 #include "uart.h"
 #include "../../libc/math.h"
+#include "../arm.h"
 
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 static uint32_t CHANCOUNT;
 static int IS_BCM2708_INSTANCE;
 
+static void __attribute__ ( ( unused ) ) dwc2_root_hub_reset_port ( )
+{
+    // Read the Host Port Control & Status Register
+    union hprt hprt = regs -> host.hprt;
+
+    // Zero the "Write 1 to Clear" bits so that we don't accidentally clear them
+    hprt.raw &= ~DWC2_HPRT_WC_MASK;
+
+    // Assert reset on the port
+    hprt.prtrst = 1;
+    regs -> host.hprt = hprt;
+
+    // Wait the required delay
+    cdelay ( 350000 );
+
+    // De-assert reset on the port
+    hprt.prtrst = 0;
+    regs -> host.hprt = hprt;
+}
+
+static void __attribute__ ( ( unused ) ) dwc2_root_hub_power_on_port ( )
+{
+    // Read the Host Port Control & Status Register
+    union hprt hprt = regs -> host.hprt;
+
+    // Zero the "Write 1 to Clear" bits so that we don't accidentally clear them
+    hprt.raw &= ~DWC2_HPRT_WC_MASK;
+
+    // Power on port
+    hprt.prtpwr = 1;
+
+    // Commit
+    regs -> host.hprt = hprt;
+}
+
 void dwc2_interrupt ( )
 {
     printu ( "USB IRQ" );
+    union gint gint = regs -> core.gintsts;
+
+    // Handle host port interrupt
+    if ( gint.prtint )
+    {
+        printu ( " Port IRQ" );
+
+        union hprt hprt_r, hprt_w;
+        hprt_r = hprt_w = regs -> host.hprt;
+        hprt_w.raw &= DWC2_HPRT_WC_MASK;
+
+        if ( hprt_r.prtconndet )
+        {
+            printu ( "  Port Connection Detect IRQ" );
+            hprt_w.prtconndet = 1;
+        }
+
+        if ( hprt_r.prtenchng )
+        {
+            printu ( "  Port Enable Change IRQ" );
+            hprt_w.prtenchng = 1;
+        }
+
+        if ( hprt_r.prtovrcurchng )
+        {
+            printu ( "  Port Overcurrent Change IRQ" );
+            hprt_w.prtovrcurchng = 1;
+        }
+
+        regs -> host.hprt = hprt_w;
+    }
 }
 
 #define NB_FIFOS 3
