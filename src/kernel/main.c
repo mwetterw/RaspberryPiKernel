@@ -1,6 +1,7 @@
 #include "memory.h"
 #include "hardware.h"
 #include "semaphore.h"
+#include "mailbox.h"
 #include "scheduler.h"
 #include "pcb.h"
 #include "bcm2835/uart.h"
@@ -15,6 +16,7 @@ void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
     hardware_init ( );
 
     sem_init ( );
+    mailbox_init ( );
 
     printu ( "Initializing Scheduler" );
     scheduler_init ( );
