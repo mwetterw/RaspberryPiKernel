@@ -7,9 +7,10 @@ typedef int sem_t;
 
 void sem_init ( );
 
-sem_t sem_create ( uint8_t count );
+sem_t sem_create ( int count );
 void sem_destroy ( sem_t sem );
 
-void wait ( );
+int wait ( );
+int signal ( );
 
 #endif

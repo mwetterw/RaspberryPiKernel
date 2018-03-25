@@ -6,6 +6,11 @@ void pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile )
 	turnstile -> mpLast = 0;
 }
 
+int pcb_turnstile_empty ( kernel_pcb_turnstile_t * turnstile )
+{
+    return ( turnstile -> mpFirst == 0 );
+}
+
 void pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
 	pcb -> mpNext = 0;

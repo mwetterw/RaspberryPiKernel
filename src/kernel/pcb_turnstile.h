@@ -15,6 +15,9 @@ typedef struct kernel_pcb_turnstile_s
  */
 void pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile );
 
+// Return whether a turnstile is empty or not
+int pcb_turnstile_empty ( kernel_pcb_turnstile_t * turnstile );
+
 /*
  * Adds a PCB to the end of a turnstile.
  * @param PCB to add
