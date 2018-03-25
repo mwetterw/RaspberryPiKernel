@@ -10,6 +10,22 @@ arm_get_cpsr:
     mrs r0, cpsr
     bx lr
 
+.globl irq_enable
+irq_enable:
+    cpsie i
+    bx lr
+
+.globl irq_disable
+irq_disable:
+    mrs r0, cpsr
+    cpsid i
+    bx lr
+
+.globl irq_restore
+irq_restore:
+    msr cpsr_c, r0
+    bx lr
+
 .globl cdelay
 cdelay:
     subs r0, r0, #1

@@ -4,14 +4,14 @@
 
 void api_process_create ( void * f, void * args )
 {
-	arm_disable_irq ( );
+	irq_disable ( );
 	pcb_create ( f, args );
-	arm_enable_irq ( );
+	irq_enable ( );
 }
 
 void api_process_sleep ( uint32_t duration )
 {
-	arm_disable_irq ( );
+	irq_disable ( );
 	pcb_sleep ( pcb_running, duration );
-	arm_enable_irq ( );
+	irq_enable ( );
 }

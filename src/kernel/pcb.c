@@ -27,7 +27,7 @@ void pcb_bigbang ( void * ( * f ) ( void * ), void * args )
 {
     f ( args );
 
-    arm_disable_irq ( );
+    irq_disable ( );
     pcb_turnstile_remove ( pcb_running, &turnstile_round_robin );
     memory_deallocate ( pcb_running -> mpStack );
     memory_deallocate ( pcb_running );

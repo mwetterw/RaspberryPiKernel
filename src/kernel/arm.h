@@ -30,11 +30,14 @@ extern uint32_t arm_get_mode ( );
 // Get current CPSR (Status Register) value
 extern uint32_t arm_get_cpsr ( );
 
-// Enable IRQ in CPSR
-#define arm_enable_irq() __asm ( "cpsie i" )
+// Enable IRQ
+extern void irq_enable ( );
 
-// Disable IRQ in CPSR
-#define arm_disable_irq() __asm ( "cpsid i" )
+// Disable IRQ and returns cpsr prior to IRQ deactivation
+extern uint32_t irq_disable ( );
+
+// Restore a previously saved cpsr
+extern void irq_restore ( uint32_t cpsr );
 
 extern void dmb ( );
 
