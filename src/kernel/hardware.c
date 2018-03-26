@@ -5,6 +5,7 @@
 #include "bcm2835/systimer.h"
 #include "bcm2835/gpio.h"
 #include "usb_core.h"
+#include "pcb.h"
 
 static inline void hardware_led_init ( );
 
@@ -25,8 +26,8 @@ void hardware_init ( )
     printu ( "Configuring OK_LED" );
     hardware_led_init ( );
 
-    printu ( "Initializing USB Core" );
-    usb_init ( );
+    printu ( "Launching USB Core Init process" );
+    pcb_create ( usb_init, 0 );
 
     printu ( "Hardware initialization complete" );
 }

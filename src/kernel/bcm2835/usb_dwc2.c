@@ -12,12 +12,32 @@
 #include "../../api/process.h"
 #include "../../libc/math.h"
 
+#include "../../libc/string.h"
+
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 static uint32_t CHANCOUNT;
 static int IS_BCM2708_INSTANCE;
 
 static mailbox_t usb_requests_mbox;
+
+static const struct usb_dev_desc dwc2_root_hub_dev_desc =
+{
+    .bLength = sizeof ( struct usb_dev_desc ),
+    .bDescriptorType    = DESC_DEV,
+    .bcdUSB             = 0x0200,
+    .bDeviceClass       = 0,
+    .bDeviceSubClass    = 0,
+    .bDeviceProtocol    = 0,
+    .bMaxPacketSize0    = 64,
+    .idVendor           = 0x0405,
+    .idProduct          = 0,
+    .bcdDevice          = 0,
+    .iManufacturer      = 0,
+    .iProduct           = 0,
+    .iSerialNumber      = 0,
+    .bNumConfigurations = 1,
+};
 
 static void __attribute__ ( ( unused ) ) dwc2_root_hub_reset_port ( )
 {
@@ -52,6 +72,46 @@ static void __attribute__ ( ( unused ) ) dwc2_root_hub_power_on_port ( )
 
     // Commit
     regs -> host.hprt = hprt;
+}
+
+static int dwc2_root_hub_std_request ( struct usb_request * req )
+{
+    size_t size;
+
+    switch ( req -> setup_req.bRequest )
+    {
+        case REQ_GET_DESC:
+            switch ( req -> setup_req.wValue >> 8 )
+            {
+                case DESC_DEV:
+                    size = min ( req -> size, req -> dev -> dev_desc.bMaxPacketSize0 );
+                    memcpy ( req -> data, &dwc2_root_hub_dev_desc, size );
+                    return USB_REQ_STATUS_SUCCESS;
+                default:
+                return USB_REQ_STATUS_NOT_SUPPORTED;
+            }
+
+        default:
+            return USB_REQ_STATUS_NOT_SUPPORTED;
+    }
+}
+
+static int dwc2_root_hub_ctrl_req ( struct usb_request * req )
+{
+    switch ( req -> setup_req.bmRequestType.type )
+    {
+        case REQ_TYPE_STD:
+            return dwc2_root_hub_std_request ( req );
+        default:
+            return USB_REQ_STATUS_NOT_SUPPORTED;
+    }
+}
+
+static void dwc2_root_hub_request ( struct usb_request * req )
+{
+    printu ( "Processing Root Hub Request" );
+    req -> status = dwc2_root_hub_ctrl_req ( req );
+    usb_request_done ( req );
 }
 
 void dwc2_interrupt ( )
@@ -298,7 +358,14 @@ static void dwc2_usb_consumer_thread ( )
             ( void * ) ( long ) mailbox_recv ( usb_requests_mbox );
 
         printu ( "HCD recv!" );
-        printu_32h ( ( uintptr_t ) req );
+        if ( usb_dev_is_root ( req -> dev ) )
+        {
+            dwc2_root_hub_request ( req );
+        }
+        else
+        {
+            req -> status = USB_REQ_STATUS_NOT_SUPPORTED;
+        }
     }
 }
 

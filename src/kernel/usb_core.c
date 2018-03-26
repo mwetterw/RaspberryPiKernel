@@ -1,6 +1,7 @@
 #include "usb_hcdi.h"
 #include "memory.h"
 #include "semaphore.h"
+#include "arm.h"
 #include "bcm2835/uart.h"
 
 #define USB_MAX_DEV 32
@@ -12,6 +13,7 @@ static struct usb_device * usb_root;
 
 struct usb_device * usb_alloc_device ( struct usb_device * parent )
 {
+    uint32_t irqmask = irq_disable ( );
     for ( int i = 0 ; i < USB_MAX_DEV ; ++i )
     {
         if ( ! usb_devs [ i ].used )
@@ -20,10 +22,12 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
             dev -> used = 1;
             dev -> parent = parent;
 
+            irq_restore ( irqmask );
             return dev;
         }
     }
 
+    irq_restore ( irqmask );
     return 0;
 }
 
@@ -34,8 +38,10 @@ int usb_dev_is_root ( struct usb_device * dev )
 
 struct usb_request * usb_alloc_request ( int data_size )
 {
+    uint32_t irqmask = irq_disable ( );
     struct usb_request * req =
         memory_allocate ( sizeof ( struct usb_request ) + data_size );
+    irq_restore ( irqmask );
 
     if ( ! req )
     {
@@ -47,12 +53,16 @@ struct usb_request * usb_alloc_request ( int data_size )
     req -> data = req + 1;
     req -> size = data_size;
 
+    req -> status = USB_REQ_STATUS_UNPROCESSED;
+
     return req;
 }
 
 void usb_free_request ( struct usb_request * req )
 {
+    uint32_t irqmask = irq_disable ( );
     memory_deallocate ( req );
+    irq_restore ( irqmask );
 }
 
 int usb_submit_request ( struct usb_request * req )
@@ -62,12 +72,17 @@ int usb_submit_request ( struct usb_request * req )
     return 0;
 }
 
-void usb_ctrl_msg_callback ( struct usb_request * req )
+void usb_request_done ( struct usb_request * req )
+{
+    ( req -> callback ) ( req );
+}
+
+void usb_ctrl_req_callback ( struct usb_request * req )
 {
     signal ( req -> priv );
 }
 
-int usb_ctrl_msg ( struct usb_device * dev,
+int usb_ctrl_req ( struct usb_device * dev,
         uint8_t recipient, uint8_t type, uint8_t dir,
         uint8_t bRequest, uint16_t wValue, uint16_t wIndex,
         void * data, uint16_t wLength )
@@ -98,7 +113,7 @@ int usb_ctrl_msg ( struct usb_device * dev,
     req -> data = data;
     req -> dev = dev;
 
-    req -> callback = usb_ctrl_msg_callback;
+    req -> callback = usb_ctrl_req_callback;
     req -> priv = ( void * ) ( long ) sem;
 
     int res = usb_submit_request ( req );
@@ -112,7 +127,7 @@ int usb_ctrl_msg ( struct usb_device * dev,
 
 int usb_read_device_desc ( struct usb_device * dev, uint16_t maxsize )
 {
-    return usb_ctrl_msg ( dev,
+    return usb_ctrl_req ( dev,
             REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_IN,
             REQ_GET_DESC, DESC_DEV << 8, 0,
             & ( dev -> dev_desc ), maxsize );
@@ -128,11 +143,23 @@ int usb_attach_device ( struct usb_device * dev )
         return -1;
     }
 
+    ret = usb_read_device_desc ( dev, sizeof ( struct usb_dev_desc ) );
+    if ( ret )
+    {
+        printu ( "Error on full device descriptor reading" );
+        return -1;
+    }
+
     return 0;
 }
 
 void usb_init ( )
 {
+    for ( int i = 0 ; i < USB_MAX_DEV ; ++i )
+    {
+        usb_devs [ i ].used = 0;
+    }
+
     // Request our Host Controller to start up
     hcd_start ( );
 
@@ -142,4 +169,6 @@ void usb_init ( )
 
     // Attach the root hub
     usb_attach_device ( usb_root );
+
+    printu ( "USB Core Initialization complete" );
 }
