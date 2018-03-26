@@ -7,6 +7,7 @@ void usb_init ( );
 
 struct usb_device
 {
+    int used;
     struct usb_device * parent;
 };
 
