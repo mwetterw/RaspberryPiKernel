@@ -5,12 +5,17 @@
 
 void usb_init ( );
 
+struct usb_request;
+typedef void ( * usb_request_callback_t ) ( struct usb_request * req );
+
 struct usb_device
 {
     int used;
     struct usb_device * parent;
-};
 
+    // Device Descriptor
+    struct usb_dev_desc dev_desc;
+};
 
 enum usb_request_status
 {
@@ -29,6 +34,10 @@ struct usb_request
     int size;
 
     enum usb_request_status status;
+
+    usb_request_callback_t callback;
+
+    void * priv;
 };
 
 int usb_dev_is_root ( struct usb_device * dev );

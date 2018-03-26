@@ -60,8 +60,8 @@ struct usb_setup_req
 
 enum bmRequestType_direction
 {
-    REQUEST_DIR_OUT,
-    REQUEST_DIR_IN,
+    REQ_DIR_OUT,
+    REQ_DIR_IN,
 };
 
 enum bmRequestType_type
