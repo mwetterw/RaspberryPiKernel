@@ -11,8 +11,6 @@ struct usb_device
     struct usb_device * parent;
 };
 
-int usb_dev_is_root ( struct usb_device * dev );
-
 
 enum usb_request_status
 {
@@ -32,5 +30,10 @@ struct usb_request
 
     enum usb_request_status status;
 };
+
+int usb_dev_is_root ( struct usb_device * dev );
+
+struct usb_request * usb_alloc_request ( int data_size );
+int usb_submit_request ( struct usb_request * req );
 
 #endif

@@ -1,4 +1,5 @@
 #include "usb_hcdi.h"
+#include "memory.h"
 
 #define USB_MAX_DEV 32
 
@@ -19,6 +20,31 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
             return dev;
         }
     }
+
+    return 0;
+}
+
+struct usb_request * usb_alloc_request ( int data_size )
+{
+    struct usb_request * req =
+        memory_allocate ( sizeof ( struct usb_request ) + data_size );
+
+    if ( ! req )
+    {
+        return 0;
+    }
+
+    req -> dev = 0;
+    req -> setup_req = ( const struct usb_setup_req ) { 0 };
+    req -> data = req + 1;
+    req -> size = data_size;
+
+    return req;
+}
+
+int usb_submit_request ( struct usb_request * req )
+{
+    hcd_submit_request ( req );
 
     return 0;
 }
