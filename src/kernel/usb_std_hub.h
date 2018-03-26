@@ -21,7 +21,7 @@ enum usb_hub_intf_proto
 
 
 // USB 2.0 Section 11.23.2.1
-#define USB_HUB_DESC_HUB 0x29
+#define USB_HUB_DESC 0x29
 
 struct usb_hub_desc
 {
@@ -33,19 +33,34 @@ struct usb_hub_desc
         uint16_t raw;
         struct
         {
-            uint16_t power_sw_mode      : 2;
-            uint16_t compound_dev       : 1;
-            uint16_t ovrcur_protec_mode : 2;
-            uint16_t tt_think_time      : 2;
-            uint16_t port_indic_support : 1;
-            uint16_t reserved           : 8;
+            uint16_t power          : 2; // Power switching mode
+            uint16_t compound       : 1; // Compound device?
+            uint16_t ovrcur_protec  : 2; // Overcurrent Protection Mode
+            uint16_t tt_think_time  : 2;
+            uint16_t port_indic     : 1; // Port Indicator Support?
+            uint16_t reserved       : 8;
         };
     } wHubCharacteristics;
     uint8_t bPwrOn2PwrGood;     // Time (2ms intervals) from power-on until good
     uint8_t bHubContrCurrent;   // Max current req of the Hub Controller in mA
-    // DeviceRemovable          // Bitmap (8 to 256 bits), bit 0 reserved
-    // PortPwrCtrlMask          // Bitmap (8 to 256 bits), all bits set to 1
-};
+
+    uint8_t tail [ ];           // Usage of [ ] doesn't take any space in sizeof
+        // -> DeviceRemovable   // Bitmap (8 to 256 bits), bit 0 reserved
+        // -> PortPwrCtrlMask   // Bitmap (8 to 256 bits), all bits set to 1
+} __attribute__ ( ( packed ) );
+
+#define USB_HUB_MAX_PORTS 255
+
+#define usb_hub_desc_tail_field_size(nbports) ( nbports / 8 + 1 )
+#define usb_hub_desc_tail_size(nbports) \
+    ( usb_hub_desc_tail_field_size ( nbports ) * 2 )
+#define usb_hub_desc_bLength(nbports) ( sizeof ( struct usb_hub_desc ) + \
+    usb_hub_desc_tail_size ( nbports ) )
+
+#define USB_HUB_DESC_TAIL_MAXSIZE usb_hub_desc_tail_size ( USB_HUB_MAX_PORTS )
+#define USB_HUB_DESC_MAX_BLENGTH usb_hub_desc_bLength ( USB_HUB_MAX_PORTS )
+
+#define USB_HUB_PORT_PWR_CTRL_MASK 0xFF
 
 enum usb_hub_desc_power_sw_mode
 {
@@ -80,6 +95,12 @@ enum usb_hub_port_indic_support
 {
     USB_HUB_PORT_INDIC_NOT_SUPPORTED,
     USB_HUB_PORT_INDIC_SUPPORTED,
+};
+
+enum usb_hub_port_dev_removable
+{
+    USB_HUB_PORT_DEVICE_REMOVABLE,
+    USB_HUB_PORT_DEVICE_NON_REMOVABLE,
 };
 
 // USB 2.0 Section 11.24.2

@@ -8,6 +8,8 @@
 #include "../../libc/string.h"
 #include "../../libc/math.h"
 
+#define DWC2_ROOT_HUB_NB_PORTS 1
+
 // USB 2.0 Section 11.23.1
 // Faked device descriptor for our root hub
 static const struct usb_dev_desc dwc2_root_hub_dev_desc =
@@ -70,6 +72,28 @@ static struct
     .endp.wMaxPacketSize.raw     = 0,
     .endp.wMaxPacketSize.size    = 1,
     .endp.bInterval              = USB_HUB_STSCHG_ENDP_BINTERVAL,
+};
+
+static const struct usb_hub_desc dwc2_root_hub_hub_desc =
+{
+    .bLength                = usb_hub_desc_bLength ( DWC2_ROOT_HUB_NB_PORTS ),
+    .bDescriptorType        = USB_HUB_DESC,
+    .bNbrPorts              = DWC2_ROOT_HUB_NB_PORTS,
+    .wHubCharacteristics    =
+    {   .raw                = 0,
+        .power              = USB_HUB_DESC_POWER_GANGED,
+        .compound           = USB_HUB_DESC_COMPOUND_SIMPLE,
+        .ovrcur_protec      = USB_HUB_DESC_OVRCUR_GLOBAL,
+        .tt_think_time      = 0,
+        .port_indic         = USB_HUB_PORT_INDIC_NOT_SUPPORTED,
+    },
+    .bPwrOn2PwrGood         = 0,
+    .bHubContrCurrent       = 0,
+    .tail                   =
+    {
+        USB_HUB_PORT_DEVICE_NON_REMOVABLE << 1,
+        USB_HUB_PORT_PWR_CTRL_MASK,
+    },
 };
 
 static void __attribute__ ( ( unused ) )
@@ -139,12 +163,35 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
     }
 }
 
+static int dwc2_root_hub_class_request ( struct usb_request * req )
+{
+    size_t size;
+
+    switch ( req -> setup_req.bRequest )
+    {
+        case HUB_REQ_GET_DESC:
+            // Hubs only have one class specific descriptor
+            if ( req -> setup_req.wValue >> 8 != USB_HUB_DESC )
+            {
+                return USB_REQ_STATUS_ERROR;
+            }
+
+            size = min ( req -> size, dwc2_root_hub_hub_desc.bLength );
+            memcpy ( req -> data, &dwc2_root_hub_hub_desc, size );
+            return USB_REQ_STATUS_SUCCESS;
+        default:
+            return USB_REQ_STATUS_NOT_SUPPORTED;
+    }
+}
+
 static int dwc2_root_hub_ctrl_req ( struct usb_request * req )
 {
     switch ( req -> setup_req.bmRequestType.type )
     {
         case REQ_TYPE_STD:
             return dwc2_root_hub_std_request ( req );
+        case REQ_TYPE_CLASS:
+            return dwc2_root_hub_class_request ( req );
         default:
             return USB_REQ_STATUS_NOT_SUPPORTED;
     }
