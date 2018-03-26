@@ -13,16 +13,15 @@ void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
     ( void ) z; ( void ) mach; ( void ) atags;
 
     memory_init ( );
-    hardware_init ( );
 
     sem_init ( );
     mailbox_init ( );
 
-    printu ( "Initializing Scheduler" );
     scheduler_init ( );
 
-    pcb_create ( init, 0 );
+    hardware_init ( );
 
     printu ( "Bootup sequence complete! Yielding CPU to userspace..." );
+    pcb_create ( init, 0 );
     scheduler_reschedule ( 0 );
 }

@@ -1,6 +1,8 @@
 #ifndef _H_USB_STD_DEVICE
 #define _H_USB_STD_DEVICE
 
+#include <stdint.h>
+
 enum usb_device_state
 {
     USBDEV_STATE_ATTACHED,
@@ -15,7 +17,7 @@ enum usb_device_state
 struct usb_setup_req
 {
     // Characteristics of the request
-    union bmRequestType
+    union
     {
         uint8_t raw;
         struct
@@ -24,33 +26,33 @@ struct usb_setup_req
             uint8_t type        : 2;
             uint8_t dir         : 1;
         };
-    };
+    } bmRequestType;
 
     // Specific Request
     uint8_t bRequest;
 
     uint16_t wValue;
 
-    union wIndex
+    union
     {
         uint16_t raw;
 
         // When wIndex used to specify endpoint
-        struct endp
+        struct
         {
             uint16_t endp       : 4;
             uint16_t reserved1  : 3;
             uint16_t dir        : 1;
             uint16_t reserved2  : 8;
-        };
+        } endp;
 
         // When wIndex used to specify interface
-        struct intf
+        struct
         {
             uint16_t intf       : 8;
             uint16_t reserved   : 8;
-        };
-    };
+        } intf;
+    } wIndex;
 
     // Number of bytes to transfer if there is a data stage (second phase)
     uint16_t wLength;
@@ -197,7 +199,7 @@ struct usb_endp_desc
     uint8_t bLength;            // Size of this descriptor
     uint8_t bDescriptorType;    // DESC_ENDP
 
-    union bEndpointAddress      // Address of the endp described by this desc
+    union                       // Address of the endp described by this desc
     {
         uint8_t raw;
         struct
@@ -206,9 +208,9 @@ struct usb_endp_desc
             uint8_t reserved    : 3;
             uint8_t dir         : 1; // Direction (ignored for ctrl endp)
         };
-    };
+    } bEndpointAddress;
 
-    union bmAttributes          // Endpoint attributes
+    union                       // Endpoint attributes
     {
         uint8_t raw;
         struct
@@ -218,9 +220,9 @@ struct usb_endp_desc
             uint8_t usage       : 2; // Usage Type (0 if non-isoc)
             uint8_t reserved    : 2;
         };
-    };
+    } bmAttributes;
 
-    union wMaxPacketSize        // Max packet size this endp is capable of TX/RX
+    union                       // Max packet size this endp is capable of TX/RX
     {
         uint16_t raw;
         struct
@@ -229,7 +231,7 @@ struct usb_endp_desc
             uint16_t addi_transac   :  2; // Additional Transac. opportunities
             uint16_t reservec       :  3;
         };
-    };
+    } wMaxPacketSize;
 
     uint8_t bInterval;          // Interval for polling endp in F or uF
 };

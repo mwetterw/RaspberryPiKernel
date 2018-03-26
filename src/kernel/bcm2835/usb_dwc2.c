@@ -1,17 +1,23 @@
 #include "usb_dwc2_regs.h"
 
 #include "bcm2835.h"
-#include "../usb_hcdi.h"
 #include "power.h"
 #include "pic.h"
 #include "uart.h"
-#include "../../libc/math.h"
+
+#include "../usb_hcdi.h"
 #include "../arm.h"
+#include "../mailbox.h"
+
+#include "../../api/process.h"
+#include "../../libc/math.h"
 
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 static uint32_t CHANCOUNT;
 static int IS_BCM2708_INSTANCE;
+
+static mailbox_t usb_requests_mbox;
 
 static void __attribute__ ( ( unused ) ) dwc2_root_hub_reset_port ( )
 {
@@ -284,9 +290,34 @@ static void dwc2_parse_config ( )
     IS_BCM2708_INSTANCE = ( regs -> core.guid == 0x2708A000 );
 }
 
-void hcd_start ( )
+static void dwc2_usb_consumer_thread ( )
+{
+    for ( ; ; )
+    {
+        struct usb_request * req =
+            ( void * ) ( long ) mailbox_recv ( usb_requests_mbox );
+
+        printu ( "HCD recv!" );
+        printu_32h ( ( uintptr_t ) req );
+    }
+}
+
+static int dwc2_start_usb_consumer_thread ( )
+{
+    if ( ( usb_requests_mbox = mailbox_create ( 512 ) ) < 0 )
+    {
+        return -1;
+    }
+
+    api_process_create ( dwc2_usb_consumer_thread, 0 );
+
+    return 0;
+}
+
+int hcd_start ( )
 {
     printu ( "Starting up Synopsys Designware USB 2.0 OTG Controller" );
+
     // Ask the GPU to power the USB controller on
     power_device ( POWER_USB_HCD, POWER_ON );
 
@@ -299,4 +330,18 @@ void hcd_start ( )
     dwc2_setup_fifos ( );
     dwc2_enable_dma ( );
     dwc2_setup_interrupts ( );
+
+    // Start the USB consumer thread
+    int ret = dwc2_start_usb_consumer_thread ( );
+    if ( ret != 0 )
+    {
+        power_device ( POWER_USB_HCD, POWER_OFF );
+    }
+
+    return ret;
+}
+
+void hcd_submit_request ( struct usb_request * req )
+{
+    mailbox_send ( usb_requests_mbox, ( intptr_t ) req );
 }
