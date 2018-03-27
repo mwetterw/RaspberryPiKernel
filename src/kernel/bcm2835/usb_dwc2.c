@@ -37,15 +37,16 @@ static struct hwcfg
     int chancount;
 } hwcfg;
 
+// USB 2.0 Section 11.23.1
 static const struct usb_dev_desc dwc2_root_hub_dev_desc =
 {
     .bLength = sizeof ( struct usb_dev_desc ),
     .bDescriptorType    = DESC_DEV,
-    .bcdUSB             = 0x0200,
-    .bDeviceClass       = 0,
+    .bcdUSB             = USB_BCD_2_0,
+    .bDeviceClass       = USB_CLASS_HUB,
     .bDeviceSubClass    = 0,
     .bDeviceProtocol    = 0,
-    .bMaxPacketSize0    = 64,
+    .bMaxPacketSize0    = USB_HS_CTRL_DATALEN,
     .idVendor           = 0x0405,
     .idProduct          = 0,
     .bcdDevice          = 0,

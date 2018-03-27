@@ -3,6 +3,18 @@
 
 #include <stdint.h>
 
+// USB 2.0 Section 8.4.4
+#define USB_LS_MAX_DATALEN 8
+#define USB_FS_MAX_DATALEN 1023
+#define USB_HS_MAX_DATALEN 1024
+
+// USB 2.0 Section 5.5.3
+#define USB_LS_CTRL_DATALEN USB_LS_MAX_DATALEN      // LS only allow 8
+#define USB_FS_MAX_CTRL_DATALEN 64                  // FS allow 8,16,32,64
+#define USB_HS_CTRL_DATALEN USB_FS_MAX_CTRL_DATALEN // HS only allow 64
+
+#define USB_BCD_2_0 0x0200
+
 enum usb_device_state
 {
     USBDEV_STATE_ATTACHED,
@@ -11,6 +23,36 @@ enum usb_device_state
     USBDEV_STATE_ADDRESS,
     USBDEV_STATE_CONFIGURED,
     USBDEV_STATE_SUSPENDED,
+};
+
+// D = usable in Device Descriptor, I = usable in Interface Descriptor
+enum usb_class
+{
+    USB_CLASS_SEE_INTF_DESC,        // 0x00     D
+    USB_CLASS_AUDIO,                // 0x01      I
+    USB_CLASS_COM,                  // 0x02     DI
+    USB_CLASS_HID,                  // 0x03      I
+    USB_CLASS_RESERVED1,
+    USB_CLASS_PHYSICAL,             // 0x05      I
+    USB_CLASS_IMAGE,                // 0x06      I
+    USB_CLASS_PRINTER,              // 0x07      I
+    USB_CLASS_MASS_STORAGE,         // 0x08      I
+    USB_CLASS_HUB,                  // 0x09     D
+    USB_CLASS_CDC_DATA,             // 0x0A      I
+    USB_CLASS_SMART_CARD,           // 0x0B      I
+    USB_CLASS_RESERVED2,
+    USB_CLASS_CONTENT_SECURITY,     // 0x0D      I
+    USB_CLASS_VIDEO,                // 0x0E      I
+    USB_CLASS_PERSONAL_HEALTHCARE,  // 0x0F      I
+    USB_CLASS_AUDIO_VIDEO,          // 0x10      I
+    USB_CLASS_BILLBOARD,            // 0x11     D
+    USB_CLASS_USB_TYPE_C_BRIDGE,    // 0x12      I
+
+    USB_CLASS_DIAGNOSTIC            =  0xDC, // DI
+    USB_CLASS_WIRELESS              =  0xE0, //  I
+    USB_CLASS_MISC                  =  0xEF, // DI
+    USB_CLASS_APP_SPECIFIC          =  0xFE, //  I
+    USB_CLASS_VENDOR_SPECIFIC       =  0xFF, // DI
 };
 
 // Control Setup Request
@@ -238,10 +280,10 @@ struct usb_endp_desc
 
 enum usb_endp_desc_bmAttributes_transfer
 {
-    ENDP_TRANSFER_CONTROL,
-    ENDP_TRANSFER_ISOCHRONOUS,
-    ENDP_TRANSFER_BULK,
-    ENDP_TRANSFER_INTERRUPT,
+    ENDP_XFER_CONTROL,
+    ENDP_XFER_ISOCHRONOUS,
+    ENDP_XFER_BULK,
+    ENDP_XFER_INTERRUPT,
 };
 
 enum usb_endp_desc_bmAttributes_sync
