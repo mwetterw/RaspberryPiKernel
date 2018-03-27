@@ -8,6 +8,10 @@
 #define MAX_CHAN 16
 #define MAX_EP MAX_CHAN
 
+#define DWC2_PRODUCT_ID 0x4F54
+#define VERSION_2_80A 0x280A
+#define BCM2708_GUID 0x2708A000
+
 // Core Global CSRs
 struct dwc2_regs_core
 {
@@ -27,7 +31,7 @@ struct dwc2_regs_core
     uint32_t gpvndctl;          // 0x00034 PHY Vendor Control Register
     uint32_t ggpio;             // 0x00038 General Purpose Input/Output Register
     uint32_t guid;              // 0x0003C User ID Register
-    uint32_t gsnpsid;           // 0x00040 Synopsys ID Register
+    union gsnpsid gsnpsid;      // 0x00040 Synopsys ID Register
     uint32_t ghwcfg1;           // 0x00044 User Hardware Config1 Register
     union ghwcfg2 ghwcfg2;      // 0x00048 User Hardware Config2 Register
     union ghwcfg3 ghwcfg3;      // 0x0004C User Hardware Config3 Register

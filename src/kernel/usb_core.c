@@ -161,7 +161,11 @@ void usb_init ( )
     }
 
     // Request our Host Controller to start up
-    hcd_start ( );
+    if ( hcd_start ( ) != 0 )
+    {
+        printu ( "USB Core failed to initialize" );
+        return;
+    }
 
     // Create the root hub
     struct usb_device * root_hub = usb_alloc_device ( 0 );

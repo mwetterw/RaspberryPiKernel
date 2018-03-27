@@ -100,8 +100,8 @@ union grxf
     uint32_t raw;
     struct
     {
-        uint32_t siz        : 16;
-        uint32_t reserved   : 16;
+        uint16_t siz;
+        uint16_t reserved;
     };
 };
 
@@ -111,8 +111,19 @@ union txf
     uint32_t raw;
     struct
     {
-        uint32_t addr   : 16;
-        uint32_t siz    : 16;
+        uint16_t addr;
+        uint16_t siz;
+    };
+};
+
+// 0x00040 Synopsys ID Register
+union gsnpsid
+{
+    uint32_t raw;
+    struct
+    {
+        uint16_t version;
+        uint16_t product;
     };
 };
 

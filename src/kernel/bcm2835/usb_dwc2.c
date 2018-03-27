@@ -11,15 +11,31 @@
 
 #include "../../api/process.h"
 #include "../../libc/math.h"
-
 #include "../../libc/string.h"
 
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
-static uint32_t CHANCOUNT;
-static int IS_BCM2708_INSTANCE;
-
 static mailbox_t usb_requests_mbox;
+
+// This struct holds various Read-Only register values
+static struct hwcfg
+{
+    union gsnpsid gsnpsid;
+    uint32_t guid;
+
+    uint32_t ghwcfg1;
+    union ghwcfg2 ghwcfg2;
+    union ghwcfg3 ghwcfg3;
+    uint32_t ghwcfg4;
+
+    /* Following registers are not Read-Only, but their power-on values have to
+     * be memorized as they indicate the maximum individual FIFOs sizes. */
+    union grxf grxf;
+    union txf gnptxf;
+    union txf hptxf;
+
+    int chancount;
+} hwcfg;
 
 static const struct usb_dev_desc dwc2_root_hub_dev_desc =
 {
@@ -201,41 +217,37 @@ static void resize_fifos ( fifos_t fifos, uint32_t remaining_space )
 static void dwc2_setup_fifos ( )
 {
     // We can only resize the FIFOs if dynamic resizing is available
-    if ( ! ( regs -> core.ghwcfg2.dynfifosizing ) )
+    if ( ! hwcfg.ghwcfg2.dynfifosizing )
     {
         return;
     }
 
     // Fetch the total DFIFO size available to accommodate all 3 FIFOs
-    uint32_t dfifodepth = regs -> core.ghwcfg3.dfifodepth;
-
-    /* These power-on values represent the maximum size for each FIFO.
-     * They must never be exceeded (but we can set less). */
-    uint32_t max_grxfsiz =  regs -> core.grxf.siz;
-    uint32_t max_gnptxfsiz = regs -> core.gnptxf.siz;
-    uint32_t max_hptxfsiz = regs -> core.hptxf.siz;
+    uint32_t dfifodepth = hwcfg.ghwcfg3.dfifodepth;
 
     uint32_t grxfsiz = 0, gnptxfsiz = 0, hptxfsiz = 0;
 
     // FIFOs exceed DFIFO size. We need to resize them.
-    if ( dfifodepth <
-            ( uint32_t ) ( max_grxfsiz + max_gnptxfsiz + max_hptxfsiz ) )
+    if ( dfifodepth < ( uint32_t )
+            ( hwcfg.grxf.siz + hwcfg.gnptxf.siz + hwcfg.hptxf.siz ) )
     {
         printu ( "FIFOs don't fit into DFIFO. Resizing..." );
 
+        /* These power-on values (in hwcfg struct) represent the maximum size
+         * for each FIFO. They must never be exceeded (but we can set less). */
         fifos_t fifos = {
-            { & grxfsiz, max_grxfsiz },
-            { & gnptxfsiz, max_gnptxfsiz },
-            { & hptxfsiz, max_hptxfsiz },
+            { & grxfsiz, hwcfg.grxf.siz },
+            { & gnptxfsiz, hwcfg.gnptxf.siz },
+            { & hptxfsiz, hwcfg.hptxf.siz },
         };
         resize_fifos ( fifos, dfifodepth );
     }
     // Else, just use the maximum size for each of them because it will fit!
     else
     {
-        grxfsiz = max_grxfsiz;
-        gnptxfsiz = max_gnptxfsiz;
-        hptxfsiz = max_hptxfsiz;
+        grxfsiz = hwcfg.grxf.siz;
+        gnptxfsiz = hwcfg.gnptxf.siz;
+        hptxfsiz = hwcfg.hptxf.siz;
     }
 
     union grxf grxf;
@@ -262,17 +274,14 @@ static void dwc2_setup_fifos ( )
     regs -> core.grxf = grxf;
     regs -> core.gnptxf = gnptxf;
     regs -> core.hptxf = hptxf;
-
-    printu_32h ( regs -> core.grxf.raw );
-    printu_32h ( regs -> core.gnptxf.raw );
-    printu_32h ( regs -> core.hptxf.raw );
 }
 
 static void dwc2_enable_dma ( )
 {
     union gahbcfg gahbcfg = regs -> core.gahbcfg;
 
-    if ( IS_BCM2708_INSTANCE )
+    // Special case for the Broadcom 2708 instance of the core
+    if ( hwcfg.guid == BCM2708_GUID )
     {
         gahbcfg.hbstlen |= BCM2708_AXI_WAIT;
     }
@@ -286,7 +295,7 @@ static void dwc2_enable_dma ( )
 static void dwc2_setup_interrupts ( )
 {
     // Clear host channel specific interrupts
-    for ( uint32_t ch = 0 ; ch < CHANCOUNT ; ++ch )
+    for ( int ch = 0 ; ch < hwcfg.chancount ; ++ch )
     {
         regs -> host.hc [ ch ].hcintmsk.raw = 0;
         regs -> host.hc [ ch ].hcint.raw = ~0;
@@ -346,8 +355,21 @@ static void dwc2_reset ( )
 
 static void dwc2_parse_config ( )
 {
-    CHANCOUNT = ( regs -> core.ghwcfg2.numhstchnl ) + 1;
-    IS_BCM2708_INSTANCE = ( regs -> core.guid == 0x2708A000 );
+    hwcfg.gsnpsid = regs -> core.gsnpsid;
+    hwcfg.guid = regs -> core.guid;
+
+    hwcfg.ghwcfg1 = regs -> core.ghwcfg1;
+    hwcfg.ghwcfg2 = regs -> core.ghwcfg2;
+    hwcfg.ghwcfg3 = regs -> core.ghwcfg3;
+    hwcfg.ghwcfg4 = regs -> core.ghwcfg4;
+
+    /* These power-on values represent the maximum size for each FIFO.
+     * Will be useful to resize the FIFOs */
+    hwcfg.grxf = regs -> core.grxf;
+    hwcfg.gnptxf = regs -> core.gnptxf;
+    hwcfg.hptxf = regs -> core.hptxf;
+
+    hwcfg.chancount = ( hwcfg.ghwcfg2.numhstchnl ) + 1;
 }
 
 static void dwc2_usb_consumer_thread ( )
@@ -383,7 +405,7 @@ static int dwc2_start_usb_consumer_thread ( )
 
 int hcd_start ( )
 {
-    printu ( "Starting up Synopsys Designware USB 2.0 OTG Controller" );
+    printu ( "Starting up Synopsys DesignWare USB 2.0 OTG Controller" );
 
     // Ask the GPU to power the USB controller on
     power_device ( POWER_USB_HCD, POWER_ON );
@@ -393,6 +415,17 @@ int hcd_start ( )
 
     // Fetch the specific factory configuration of the chip
     dwc2_parse_config ( );
+
+    if ( hwcfg.gsnpsid.product != DWC2_PRODUCT_ID )
+    {
+        printu ( "This is not a Synopsys DWC2 USB 2.0 OTG Controller!" );
+        return -1;
+    }
+
+    if ( hwcfg.gsnpsid.version != VERSION_2_80A )
+    {
+        printu ( "Warning: This release of the core is untested." );
+    }
 
     dwc2_setup_fifos ( );
     dwc2_enable_dma ( );
