@@ -21,6 +21,7 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
             struct usb_device * dev = & usb_devs [ i ];
             dev -> used = 1;
             dev -> parent = parent;
+            dev -> addr = 0;
 
             irq_restore ( irqmask );
             return dev;
@@ -29,6 +30,16 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
 
     irq_restore ( irqmask );
     return 0;
+}
+
+void usb_free_device ( struct usb_device * dev )
+{
+    dev -> used = 0;
+}
+
+static uint8_t usb_alloc_addr ( struct usb_device * dev )
+{
+    return dev - usb_devs + 1;
 }
 
 int usb_dev_is_root ( struct usb_device * dev )
@@ -77,7 +88,7 @@ void usb_request_done ( struct usb_request * req )
     ( req -> callback ) ( req );
 }
 
-void usb_ctrl_req_callback ( struct usb_request * req )
+static void usb_ctrl_req_callback ( struct usb_request * req )
 {
     signal ( req -> priv );
 }
@@ -116,16 +127,18 @@ int usb_ctrl_req ( struct usb_device * dev,
     req -> callback = usb_ctrl_req_callback;
     req -> priv = ( void * ) ( long ) sem;
 
-    int res = usb_submit_request ( req );
+    usb_submit_request ( req );
     wait ( sem );
+
+    int status = req -> status;
 
     sem_destroy ( sem );
     usb_free_request ( req );
 
-    return res;
+    return status;
 }
 
-int usb_read_device_desc ( struct usb_device * dev, uint16_t maxsize )
+static int usb_read_device_desc ( struct usb_device * dev, uint16_t maxsize )
 {
     return usb_ctrl_req ( dev,
             REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_IN,
@@ -133,21 +146,58 @@ int usb_read_device_desc ( struct usb_device * dev, uint16_t maxsize )
             & ( dev -> dev_desc ), maxsize );
 }
 
+static int usb_set_device_addr ( struct usb_device * dev, uint8_t addr )
+{
+    int status = usb_ctrl_req ( dev,
+            REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_OUT,
+            REQ_SET_ADDR, addr, 0, 0, 0 );
+
+    if ( status == USB_REQ_STATUS_SUCCESS )
+    {
+        dev -> addr = addr;
+    }
+
+    return status;
+}
+
 int usb_attach_device ( struct usb_device * dev )
 {
-    dev -> dev_desc.bMaxPacketSize0 = 8;
-    int ret = usb_read_device_desc ( dev, 8 );
-    if ( ret )
+    int status;
+
+    // USB 2.0 Section 5.5.3
+    /* In order to determine the maximum packet size for the Default Control
+     * Pipe, the USB System Software reads the device descriptor. The host will
+     * read the first eight bytes of the device descriptor. The device always
+     * responds with at least these initial bytes in a single packet. After the
+     * host reads the initial part of the device descriptor, it is guaranteed
+     * to have read this default pipe's wMaxPacketSize field (byte 7 of the
+     * device descriptor). It will then allow the correct size for all
+     * subsequent transactions. */
+    dev -> dev_desc.bMaxPacketSize0 = USB_LS_CTRL_DATALEN;
+    status = usb_read_device_desc ( dev, USB_LS_CTRL_DATALEN );
+    if ( status != USB_REQ_STATUS_SUCCESS )
     {
         printu ( "Error on initial device descriptor reading" );
         return -1;
     }
 
-    ret = usb_read_device_desc ( dev, sizeof ( struct usb_dev_desc ) );
-    if ( ret )
+    // Set device address
+    status = usb_set_device_addr ( dev, usb_alloc_addr ( dev ) );
+    if ( status != USB_REQ_STATUS_SUCCESS )
     {
-        printu ( "Error on full device descriptor reading" );
+        printu ( "Error when setting device address" );
         return -1;
+    }
+
+    // Re-read the device descriptor only if bMaxPacketSize0 has increased
+    if ( dev -> dev_desc.bMaxPacketSize0 > USB_LS_CTRL_DATALEN )
+    {
+        status = usb_read_device_desc ( dev, sizeof ( struct usb_dev_desc ) );
+        if ( status != USB_REQ_STATUS_SUCCESS )
+        {
+            printu ( "Error on full device descriptor reading" );
+            return -1;
+        }
     }
 
     return 0;
@@ -163,16 +213,22 @@ void usb_init ( )
     // Request our Host Controller to start up
     if ( hcd_start ( ) != 0 )
     {
-        printu ( "USB Core failed to initialize" );
+        printu ( "USB Core failed to start the HCD" );
         return;
     }
 
     // Create the root hub
     struct usb_device * root_hub = usb_alloc_device ( 0 );
-    usb_root = root_hub;
 
     // Attach the root hub
-    usb_attach_device ( usb_root );
+    if ( usb_attach_device ( root_hub ) != 0 )
+    {
+        printu ( "USB Core failed to attach the root hub" );
+        usb_free_device ( root_hub );
+        return;
+    }
+
+    usb_root = root_hub;
 
     printu ( "USB Core Initialization complete" );
 }

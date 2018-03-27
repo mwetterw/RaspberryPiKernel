@@ -55,7 +55,7 @@ enum usb_class
     USB_CLASS_VENDOR_SPECIFIC       =  0xFF, // DI
 };
 
-// Control Setup Request
+// Control Setup Request (USB 2.0 Section 9.3)
 struct usb_setup_req
 {
     // Characteristics of the request
@@ -121,7 +121,7 @@ enum bmRequestType_recipient
     REQ_RECIPIENT_OTHER,
 };
 
-// USB Standard Device Requests
+// USB Standard Device Requests (USB 2.0 Section 9.4)
 enum bRequest
 {
     REQ_GET_STATUS,

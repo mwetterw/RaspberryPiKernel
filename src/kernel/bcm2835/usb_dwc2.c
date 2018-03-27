@@ -105,8 +105,11 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
                     memcpy ( req -> data, &dwc2_root_hub_dev_desc, size );
                     return USB_REQ_STATUS_SUCCESS;
                 default:
-                return USB_REQ_STATUS_NOT_SUPPORTED;
+                    return USB_REQ_STATUS_NOT_SUPPORTED;
             }
+
+        case REQ_SET_ADDR:
+            return USB_REQ_STATUS_SUCCESS;
 
         default:
             return USB_REQ_STATUS_NOT_SUPPORTED;

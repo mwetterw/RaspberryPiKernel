@@ -15,6 +15,8 @@ struct usb_device
 
     // Device Descriptor
     struct usb_dev_desc dev_desc;
+
+    uint8_t addr;
 };
 
 enum usb_request_status
