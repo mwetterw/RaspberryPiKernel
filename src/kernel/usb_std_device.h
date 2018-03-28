@@ -209,11 +209,21 @@ struct usb_conf_desc
 {
     uint8_t bLength;                // Size of this descriptor in bytes
     uint8_t bDescriptorType;        // DESC_CONF
-    uint16_t wTotalLength;          // Total length of data returned for this conf
-    uint8_t bNumInterfaces;         // Number of interfaces supported by this conf
+    uint16_t wTotalLength;          // Total length returned for this conf
+    uint8_t bNumInterfaces;         // Number of intfs supported by this conf
     uint8_t bConfigurationValue;    // Value to use as arg to SetConf()
     uint8_t iConfiguration;         // Index of string descriptor for this conf
-    uint8_t bmAttributes;           // Conf charac. (Self-powered/Remote WKP)
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t reserved    : 5;
+            uint8_t rmtwkp      : 1; // Whether this conf supports remote wakeup
+            uint8_t selfpwr     : 1; // Whether this conf makes dev self-powered
+            uint8_t one         : 1; // Must always be set to one
+        };
+    } bmAttributes;                 // Conf charac. (Self-powered/Remote WKP)
     uint8_t bMaxPower;              // Max power consumption (in 2mA units)
 };
 
@@ -269,9 +279,9 @@ struct usb_endp_desc
         uint16_t raw;
         struct
         {
-            uint16_t max_pkt_size   : 11; // Maximum Packet Size in bytes
+            uint16_t size           : 11; // Maximum Packet Size in bytes
             uint16_t addi_transac   :  2; // Additional Transac. opportunities
-            uint16_t reservec       :  3;
+            uint16_t reserved       :  3;
         };
     } wMaxPacketSize;
 

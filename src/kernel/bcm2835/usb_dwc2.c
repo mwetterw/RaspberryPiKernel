@@ -45,7 +45,7 @@ static const struct usb_dev_desc dwc2_root_hub_dev_desc =
     .bcdUSB             = USB_BCD_2_0,
     .bDeviceClass       = USB_CLASS_HUB,
     .bDeviceSubClass    = 0,
-    .bDeviceProtocol    = 0,
+    .bDeviceProtocol    = 0, // TODO: Single-TT
     .bMaxPacketSize0    = USB_HS_CTRL_DATALEN,
     .idVendor           = 0x0405,
     .idProduct          = 0,
@@ -54,6 +54,49 @@ static const struct usb_dev_desc dwc2_root_hub_dev_desc =
     .iProduct           = 0,
     .iSerialNumber      = 0,
     .bNumConfigurations = 1,
+};
+
+static struct
+{
+    struct usb_conf_desc conf;
+    struct usb_intf_desc intf;
+    struct usb_endp_desc endp;
+} __attribute__ ( ( packed ) ) dwc2_root_hub_conf_desc =
+{
+    .conf.bLength                = sizeof ( struct usb_conf_desc ),
+    .conf.bDescriptorType        = DESC_CONF,
+    .conf.wTotalLength           = sizeof ( dwc2_root_hub_conf_desc ),
+    .conf.bNumInterfaces         = 1,
+    .conf.bConfigurationValue    = 1,
+    .conf.iConfiguration         = 0,
+    .conf.bmAttributes.raw       = 0,
+    .conf.bmAttributes.one       = 1,
+    .conf.bmAttributes.selfpwr   = 1,
+    .conf.bmAttributes.rmtwkp    = 0,
+    .conf.bMaxPower              = 0,
+
+    .intf.bLength                = sizeof ( struct usb_intf_desc ),
+    .intf.bDescriptorType        = DESC_INTF,
+    .intf.bInterfaceNumber       = 0,
+    .intf.bAlternateSetting      = 0,
+    .intf.bNumEndpoints          = 1,
+    .intf.bInterfaceClass        = USB_CLASS_HUB,
+    .intf.bInterfaceSubClass     = 0,
+    .intf.bInterfaceProtocol     = 0,
+    .intf.iInterface             = 0,
+
+    .endp.bLength                = sizeof ( struct usb_endp_desc ),
+    .endp.bDescriptorType        = DESC_ENDP,
+    .endp.bEndpointAddress.raw   = 0,
+    .endp.bEndpointAddress.endp  = 1,
+    .endp.bEndpointAddress.dir   = REQ_DIR_IN,
+    .endp.bmAttributes.raw       = 0,
+    .endp.bmAttributes.transfer  = ENDP_XFER_INTERRUPT,
+    .endp.bmAttributes.sync      = ENDP_SYNC_NOSYNC,
+    .endp.bmAttributes.usage     = ENDP_USAGE_DATA,
+    .endp.wMaxPacketSize.raw     = 0,
+    .endp.wMaxPacketSize.size    = 1,
+    .endp.bInterval              = 0xFF,
 };
 
 static void __attribute__ ( ( unused ) ) dwc2_root_hub_reset_port ( )
