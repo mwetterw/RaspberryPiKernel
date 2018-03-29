@@ -3,6 +3,7 @@
 #include "semaphore.h"
 #include "arm.h"
 #include "bcm2835/uart.h"
+#include "../libc/string.h"
 
 #define USB_MAX_DEV 32
 static struct usb_device usb_devs [ USB_MAX_DEV ];
@@ -19,9 +20,9 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
         if ( ! usb_devs [ i ].used )
         {
             struct usb_device * dev = & usb_devs [ i ];
+            memset ( dev, 0, sizeof ( struct usb_device ) );
             dev -> used = 1;
             dev -> parent = parent;
-            dev -> addr = 0;
 
             irq_restore ( irqmask );
             return dev;
@@ -34,6 +35,12 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
 
 void usb_free_device ( struct usb_device * dev )
 {
+    if ( dev -> conf_desc )
+    {
+        uint32_t irqmask = irq_disable ( );
+        memory_deallocate ( dev -> conf_desc );
+        irq_restore ( irqmask );
+    }
     dev -> used = 0;
 }
 
@@ -122,6 +129,8 @@ int usb_ctrl_req ( struct usb_device * dev,
     req -> setup_req.wLength = wLength;
 
     req -> data = data;
+    req -> size = wLength;
+
     req -> dev = dev;
 
     req -> callback = usb_ctrl_req_callback;
@@ -158,6 +167,129 @@ static int usb_set_device_addr ( struct usb_device * dev, uint8_t addr )
     }
 
     return status;
+}
+
+static int usb_get_conf_desc ( struct usb_device * dev, uint8_t idx,
+        void * buf, uint16_t size )
+{
+    return usb_ctrl_req ( dev,
+            REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_IN,
+            REQ_GET_DESC, DESC_CONF << 8 | idx, 0,
+            buf, size );
+}
+
+static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
+{
+    struct usb_conf_desc conf;
+    int status;
+
+    struct usb_desc_hdr * hdr;
+    struct usb_intf_desc * intf;
+    struct usb_endp_desc * endp;
+
+    int intf_idx;
+    int endp_idx;
+
+    /* First, fetch only the configuration desc without intf & endp.
+     * That way we'll know the wTotalLength to allocate */
+    status = usb_get_conf_desc ( dev, idx, &conf, sizeof ( conf ) );
+    if ( status != USB_REQ_STATUS_SUCCESS )
+    {
+        return -1;
+    }
+
+    // Allocate the configuration descriptor
+    dev -> conf_desc = memory_allocate ( conf.wTotalLength );
+    if ( ! dev -> conf_desc )
+    {
+        printu ( "Error when allocating memory for configuration desc" );
+        return -1;
+    }
+
+    // Get the whole configuration desc with all intfs & endps
+    status = usb_get_conf_desc ( dev, idx, dev -> conf_desc, conf.wTotalLength );
+    if ( status != USB_REQ_STATUS_SUCCESS )
+    {
+        printu ( "Error when getting whole configuration desc" );
+    }
+
+    // Set the interface and endpoint pointers
+    intf_idx = -1;
+    endp_idx = -1;
+    for ( uint32_t i = 0 ;
+            i < dev -> conf_desc -> wTotalLength ; i += hdr -> bLength )
+    {
+        hdr = ( struct usb_desc_hdr * ) ( ( uint8_t * ) ( dev -> conf_desc ) + i );
+
+        if ( hdr -> bLength < sizeof ( struct usb_desc_hdr ) )
+        {
+            printu ( "Invalid bLength in configuration descriptor header" );
+            return -1;
+        }
+
+        switch ( hdr -> bDescriptorType )
+        {
+            case DESC_INTF:
+                intf = ( struct usb_intf_desc * ) hdr;
+
+                // TODO: Handle alternate settings
+                if ( intf -> bAlternateSetting != 0 )
+                {
+                    printu ( "Skipping alternate settings intf..." );
+                    break;
+                }
+
+                if ( ++intf_idx >= USB_MAX_INTF )
+                {
+                    printu ( "Too many interfaces" );
+                    return -1;
+                }
+                if ( intf_idx >= dev -> conf_desc -> bNumInterfaces )
+                {
+                    printu ( "bNumInterfaces mismatch" );
+                    return -1;
+                }
+
+                dev -> intf_desc [ intf_idx ] = intf;
+                endp_idx = -1;
+                break;
+
+            case DESC_ENDP:
+                if ( intf_idx < 0 )
+                {
+                    printu ( "Endpoint belonging to no Interface" );
+                    return -1;
+                }
+
+                // TODO: Handle alternate settings
+                if ( intf -> bAlternateSetting != 0 )
+                {
+                    printu ( "Skipping endp of alternate settings intf..." );
+                    break;
+                }
+
+                endp = ( struct usb_endp_desc * ) hdr;
+
+                if ( ++endp_idx >= USB_MAX_ENDP )
+                {
+                    printu ( "Too many endpoints" );
+                    return -1;
+                }
+                if ( endp_idx >= intf -> bNumEndpoints )
+                {
+                    printu ( "bNumEnpoints mismatch" );
+                    return -1;
+                }
+
+                dev -> endp_desc [ intf_idx ] [ endp_idx ] = endp;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return USB_REQ_STATUS_SUCCESS;
 }
 
 int usb_attach_device ( struct usb_device * dev )
@@ -198,6 +330,14 @@ int usb_attach_device ( struct usb_device * dev )
             printu ( "Error on full device descriptor reading" );
             return -1;
         }
+    }
+
+    // Read the first configuration descriptor
+    status = usb_read_conf_desc ( dev, 0 );
+    if ( status != USB_REQ_STATUS_SUCCESS )
+    {
+        printu ( "Error when reading configuration descriptor" );
+        return -1;
     }
 
     return 0;

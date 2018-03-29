@@ -169,6 +169,12 @@ enum wIndex_test_selector // (high-byte. low byte = 0/intf/endp)
     TESTSEL_FORCE_ENABLE,
 };
 
+struct usb_desc_hdr
+{
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+};
+
 // USB Device Descriptor
 struct usb_dev_desc
 {

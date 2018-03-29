@@ -144,8 +144,12 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
             switch ( req -> setup_req.wValue >> 8 )
             {
                 case DESC_DEV:
-                    size = min ( req -> size, req -> dev -> dev_desc.bMaxPacketSize0 );
+                    size = min ( req -> size, dwc2_root_hub_dev_desc.bLength );
                     memcpy ( req -> data, &dwc2_root_hub_dev_desc, size );
+                    return USB_REQ_STATUS_SUCCESS;
+                case DESC_CONF:
+                    size = min ( req -> size, dwc2_root_hub_conf_desc.conf.wTotalLength );
+                    memcpy ( req -> data, &dwc2_root_hub_conf_desc, size );
                     return USB_REQ_STATUS_SUCCESS;
                 default:
                     return USB_REQ_STATUS_NOT_SUPPORTED;

@@ -3,6 +3,9 @@
 
 #include "usb_std_device.h"
 
+#define USB_MAX_INTF 4
+#define USB_MAX_ENDP 4
+
 void usb_init ( );
 
 struct usb_request;
@@ -15,6 +18,11 @@ struct usb_device
 
     // Device Descriptor
     struct usb_dev_desc dev_desc;
+
+    // Configuration Descriptor
+    struct usb_conf_desc * conf_desc;
+    struct usb_intf_desc * intf_desc [ USB_MAX_INTF ];
+    struct usb_endp_desc * endp_desc [ USB_MAX_INTF ] [ USB_MAX_ENDP ];
 
     uint8_t addr;
 };
