@@ -156,6 +156,7 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
             }
 
         case REQ_SET_ADDR:
+        case REQ_SET_CONF:
             return USB_REQ_STATUS_SUCCESS;
 
         default:

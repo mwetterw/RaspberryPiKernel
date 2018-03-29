@@ -292,6 +292,13 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
     return USB_REQ_STATUS_SUCCESS;
 }
 
+int usb_set_configuration ( struct usb_device * dev, uint8_t conf )
+{
+    return usb_ctrl_req ( dev,
+            REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_OUT,
+            REQ_SET_CONF, conf, 0, 0, 0 );
+}
+
 int usb_attach_device ( struct usb_device * dev )
 {
     int status;
@@ -337,6 +344,15 @@ int usb_attach_device ( struct usb_device * dev )
     if ( status != USB_REQ_STATUS_SUCCESS )
     {
         printu ( "Error when reading configuration descriptor" );
+        return -1;
+    }
+
+    // Activate the first configuration
+    status = usb_set_configuration ( dev,
+            dev -> conf_desc -> bConfigurationValue );
+    if ( status != USB_REQ_STATUS_SUCCESS )
+    {
+        printu ( "Error when activating the first configuration" );
         return -1;
     }
 
