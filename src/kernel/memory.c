@@ -59,6 +59,9 @@ void * memory_allocate ( uint32_t size )
 		return 0;
 	}
 
+	// Maintain alignment
+	size = ( size + 3 ) & ~3;
+
 	kernel_heap_part_t * current = ( kernel_heap_part_t * ) kernel_memory_heap;
 	while ( current -> mpNext )
 	{
