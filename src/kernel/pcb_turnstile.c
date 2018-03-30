@@ -33,6 +33,7 @@ void pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * 
 	{
 		turnstile -> mpFirst = pcb;
 		turnstile -> mpLast = pcb;
+        pcb -> mpNext = 0;
 		return;
 	}
 
