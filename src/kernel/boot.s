@@ -83,6 +83,11 @@ bss_zero_loop:
     stmloia r3!, {r5-r8}
     blo bss_zero_loop
 
+    @ Set kernel heap start address just after BSS
+    ldr r3, =kernel_memory_heap
+    ldr r4, =_end
+    str r4, [r3]
+
     @ Launch our kernel!
     b kernel_main
 

@@ -19,21 +19,19 @@ typedef struct kernel_heap_part_s
 static kernel_heap_part_t *
 memory_private_allocate ( uint32_t size, kernel_heap_part_t * pPrevious );
 
-static char kernel_memory_heap [ KERNEL_HEAP_SIZE ];
+// This is filled by boot.s
+unsigned char * kernel_memory_heap;
 
-static const void *
-	KERNEL_HEAP_ADDR_MIN = kernel_memory_heap + 2 * sizeof ( kernel_heap_part_t );
-
-static const void *
-	KERNEL_HEAP_ADDR_MAX =
-		( void * ) kernel_memory_heap +
-		KERNEL_HEAP_SIZE -
-		sizeof ( kernel_heap_part_t );
+static void * KERNEL_HEAP_ADDR_MIN;
+static void * KERNEL_HEAP_ADDR_MAX;
 
 
 
 void memory_init ( )
 {
+	KERNEL_HEAP_ADDR_MIN = kernel_memory_heap + 2 * sizeof ( kernel_heap_part_t );
+    KERNEL_HEAP_ADDR_MAX = ( void * ) kernel_memory_heap + KERNEL_HEAP_SIZE - sizeof ( kernel_heap_part_t );
+
 	kernel_heap_part_t * pHead = ( kernel_heap_part_t * ) kernel_memory_heap;
 
 	kernel_heap_part_t * pFoot = ( kernel_heap_part_t * )(
