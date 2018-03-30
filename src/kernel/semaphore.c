@@ -141,8 +141,6 @@ int signal ( sem_t sem )
         kernel_pcb_turnstile_t * waitq = & ( sems [ sem ].waitqueue );
         kernel_pcb_t * pcb = pcb_turnstile_popfront ( waitq );
         pcb_turnstile_pushback ( pcb, &turnstile_round_robin );
-
-        scheduler_yield ( );
     }
     irq_restore ( irqmask );
 
