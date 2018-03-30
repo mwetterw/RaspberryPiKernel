@@ -25,3 +25,9 @@ void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
     pcb_create ( init, 0 );
     scheduler_reschedule ( 0 );
 }
+
+void crash ( )
+{
+    printu ( "CRASH" );
+    for ( ; ; );
+}

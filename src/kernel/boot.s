@@ -81,5 +81,3 @@ prefetch_handler:
 data_handler:
 unused_handler:
 fiq_handler: b crash
-
-crash: b .
