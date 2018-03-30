@@ -279,6 +279,40 @@ static void dwc2_parse_config ( )
     hwcfg.chancount = ( hwcfg.ghwcfg2.numhstchnl ) + 1;
 }
 
+static int dwc2_is_host_capable ( )
+{
+    return hwcfg.ghwcfg2.otgmode != OTGMODE_DEV_SRP &&
+            hwcfg.ghwcfg2.otgmode != OTGMODE_DEV_NO_SRP &&
+            hwcfg.ghwcfg2.otgmode < OTGMODE_RESERVED;
+}
+
+static int dwc2_probe ( )
+{
+    if ( hwcfg.gsnpsid.product != DWC2_PRODUCT_ID )
+    {
+        printu ( "This is not a Synopsys DWC2 USB 2.0 OTG Controller!" );
+        return 0;
+    }
+
+    if ( ! dwc2_is_host_capable ( ) )
+    {
+        printu ( "This release of the DWC2 is not host-capable." );
+        return 0;
+    }
+
+    if ( hwcfg.gsnpsid.version != VERSION_2_80A )
+    {
+        printu ( "Warning: This release of the DWC2 is untested." );
+    }
+
+    if ( hwcfg.guid != BCM2708_GUID )
+    {
+        printu ( "Warning: This instance (non-BCM2708) of the DWC2 is untested." );
+    }
+
+    return 1;
+}
+
 static void dwc2_usb_consumer_thread ( )
 {
     for ( ; ; )
@@ -323,15 +357,10 @@ int hcd_start ( )
     // Fetch the specific factory configuration of the chip
     dwc2_parse_config ( );
 
-    if ( hwcfg.gsnpsid.product != DWC2_PRODUCT_ID )
+    // Check whether we are able to drive this device
+    if ( ! dwc2_probe ( ) )
     {
-        printu ( "This is not a Synopsys DWC2 USB 2.0 OTG Controller!" );
         return -1;
-    }
-
-    if ( hwcfg.gsnpsid.version != VERSION_2_80A )
-    {
-        printu ( "Warning: This release of the core is untested." );
     }
 
     dwc2_setup_fifos ( );

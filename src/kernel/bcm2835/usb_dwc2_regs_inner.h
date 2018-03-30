@@ -150,6 +150,24 @@ union ghwcfg2
     };
 };
 
+enum ghwcfg2_otgmode
+{
+    // Dual-Role Device (Host & Device)
+    OTGMODE_DRD_HNP_SRP,
+    OTGMODE_DRD_SRP_ONLY,
+    OTGMODE_DRD_NO_HNP_NO_SRP,
+
+    // Device Only
+    OTGMODE_DEV_SRP,
+    OTGMODE_DEV_NO_SRP,
+
+    // Host Only
+    OTGMODE_HOST_SRP,
+    OTGMODE_HOST_NO_SRP,
+
+    OTGMODE_RESERVED,
+};
+
 // 0x0004C User Hardware Config3 Register
 union ghwcfg3
 {
