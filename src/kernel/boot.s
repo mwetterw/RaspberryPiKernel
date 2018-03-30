@@ -71,6 +71,18 @@ reset_handler:
     cps #0x13
     mov sp,#0x8000000
 
+    @ Zero whole BSS section
+    ldr r3, =_bss_start
+    ldr r4, =_bss_end
+    mov r5, #0
+    mov r6, #0
+    mov r7, #0
+    mov r8, #0
+bss_zero_loop:
+    cmp r3, r4
+    stmloia r3!, {r5-r8}
+    blo bss_zero_loop
+
     @ Launch our kernel!
     b kernel_main
 
