@@ -374,17 +374,20 @@ void usb_init ( )
     }
 
     // Create the root hub
-    struct usb_device * root_hub = usb_alloc_device ( 0 );
-
-    // Attach the root hub
-    if ( usb_attach_device ( root_hub ) != 0 )
+    if ( ! ( usb_root = usb_alloc_device ( 0 ) ) )
     {
-        printu ( "USB Core failed to attach the root hub" );
-        usb_free_device ( root_hub );
+        printu ( "USB Core failed to allocate the root hub" );
         return;
     }
 
-    usb_root = root_hub;
+    // Attach the root hub
+    if ( usb_attach_device ( usb_root ) != 0 )
+    {
+        printu ( "USB Core failed to attach the root hub" );
+        usb_free_device ( usb_root );
+        usb_root = 0;
+        return;
+    }
 
     printu ( "USB Core Initialization complete" );
 }
