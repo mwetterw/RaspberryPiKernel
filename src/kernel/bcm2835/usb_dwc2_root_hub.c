@@ -1,5 +1,7 @@
 #include "usb_dwc2_regs.h"
 #include "../usb_core.h"
+#include "../usb_std_hub.h"
+
 #include "../arm.h"
 #include "uart.h"
 
@@ -15,7 +17,7 @@ static const struct usb_dev_desc dwc2_root_hub_dev_desc =
     .bcdUSB             = USB_BCD_2_0,
     .bDeviceClass       = USB_CLASS_HUB,
     .bDeviceSubClass    = 0,
-    .bDeviceProtocol    = 0, // TODO: Single-TT
+    .bDeviceProtocol    = USB_HUB_DEV_PROTO_HS_STT,
     .bMaxPacketSize0    = USB_HS_CTRL_DATALEN,
     .idVendor           = 0x0405,
     .idProduct          = 0,
@@ -53,7 +55,7 @@ static struct
     .intf.bNumEndpoints          = 1,
     .intf.bInterfaceClass        = USB_CLASS_HUB,
     .intf.bInterfaceSubClass     = 0,
-    .intf.bInterfaceProtocol     = 0,
+    .intf.bInterfaceProtocol     = USB_HUB_INTF_PROTO_LSFS_HS_STT_ONLY,
     .intf.iInterface             = 0,
 
     .endp.bLength                = sizeof ( struct usb_endp_desc ),
@@ -67,7 +69,7 @@ static struct
     .endp.bmAttributes.usage     = ENDP_USAGE_DATA,
     .endp.wMaxPacketSize.raw     = 0,
     .endp.wMaxPacketSize.size    = 1,
-    .endp.bInterval              = 0xFF,
+    .endp.bInterval              = USB_HUB_STSCHG_ENDP_BINTERVAL,
 };
 
 static void __attribute__ ( ( unused ) )
