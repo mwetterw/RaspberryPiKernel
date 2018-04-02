@@ -13,7 +13,7 @@
 static const struct usb_dev_desc dwc2_root_hub_dev_desc =
 {
     .bLength = sizeof ( struct usb_dev_desc ),
-    .bDescriptorType    = DESC_DEV,
+    .bDescriptorType    = USB_DESC_DEV,
     .bcdUSB             = USB_BCD_2_0,
     .bDeviceClass       = USB_CLASS_HUB,
     .bDeviceSubClass    = 0,
@@ -37,7 +37,7 @@ static struct
 } __attribute__ ( ( packed ) ) dwc2_root_hub_conf_desc =
 {
     .conf.bLength                = sizeof ( struct usb_conf_desc ),
-    .conf.bDescriptorType        = DESC_CONF,
+    .conf.bDescriptorType        = USB_DESC_CONF,
     .conf.wTotalLength           = sizeof ( dwc2_root_hub_conf_desc ),
     .conf.bNumInterfaces         = 1,
     .conf.bConfigurationValue    = 1,
@@ -49,17 +49,17 @@ static struct
     .conf.bMaxPower              = 0,
 
     .intf.bLength                = sizeof ( struct usb_intf_desc ),
-    .intf.bDescriptorType        = DESC_INTF,
+    .intf.bDescriptorType        = USB_DESC_INTF,
     .intf.bInterfaceNumber       = 0,
     .intf.bAlternateSetting      = 0,
     .intf.bNumEndpoints          = 1,
     .intf.bInterfaceClass        = USB_CLASS_HUB,
     .intf.bInterfaceSubClass     = 0,
-    .intf.bInterfaceProtocol     = USB_HUB_INTF_PROTO_LSFS_HS_STT_ONLY,
+    .intf.bInterfaceProtocol     = USB_HUB_INTF_PROTO_NOTT_STT_ONLY,
     .intf.iInterface             = 0,
 
     .endp.bLength                = sizeof ( struct usb_endp_desc ),
-    .endp.bDescriptorType        = DESC_ENDP,
+    .endp.bDescriptorType        = USB_DESC_ENDP,
     .endp.bEndpointAddress.raw   = 0,
     .endp.bEndpointAddress.endp  = 1,
     .endp.bEndpointAddress.dir   = REQ_DIR_IN,
@@ -118,11 +118,11 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
         case REQ_GET_DESC:
             switch ( req -> setup_req.wValue >> 8 )
             {
-                case DESC_DEV:
+                case USB_DESC_DEV:
                     size = min ( req -> size, dwc2_root_hub_dev_desc.bLength );
                     memcpy ( req -> data, &dwc2_root_hub_dev_desc, size );
                     return USB_REQ_STATUS_SUCCESS;
-                case DESC_CONF:
+                case USB_DESC_CONF:
                     size = min ( req -> size, dwc2_root_hub_conf_desc.conf.wTotalLength );
                     memcpy ( req -> data, &dwc2_root_hub_conf_desc, size );
                     return USB_REQ_STATUS_SUCCESS;

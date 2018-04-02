@@ -141,15 +141,15 @@ enum bRequest
 
 enum wValue_descriptor // (high-byte. low-byte = index)
 {
-    DESC_RESERVED,
-    DESC_DEV,
-    DESC_CONF,
-    DESC_STRING,
-    DESC_INTF,
-    DESC_ENDP,
-    DESC_DEV_QUALIFIER,
-    DESC_OTHER_SPD_CONF,
-    DESC_INTF_POWER,
+    USB_DESC_RESERVED,
+    USB_DESC_DEV,
+    USB_DESC_CONF,
+    USB_DESC_STRING,
+    USB_DESC_INTF,
+    USB_DESC_ENDP,
+    USB_DESC_DEV_QUALIFIER,
+    USB_DESC_OTHER_SPD_CONF,
+    USB_DESC_INTF_POWER,
 };
 
 enum wValue_feature
@@ -179,7 +179,7 @@ struct usb_desc_hdr
 struct usb_dev_desc
 {
     uint8_t bLength;            // Size of this descriptor in bytes
-    uint8_t bDescriptorType;    // DESC_DEV
+    uint8_t bDescriptorType;    // USB_DESC_DEV
     uint16_t bcdUSB;            // USB Release Number, Binary-Coded Decimal
     uint8_t bDeviceClass;       // Class code
     uint8_t bDeviceSubClass;    // Subclass code
@@ -200,7 +200,7 @@ struct usb_dev_desc
 struct usb_dev_qualifier_desc
 {
     uint8_t bLength;            // Size of descriptor
-    uint8_t bDescriptorType;    // DESC_DEV_QUALIFIER
+    uint8_t bDescriptorType;    // USB_DESC_DEV_QUALIFIER
     uint16_t bcdUSB;            // USB spec. version number
     uint8_t bDeviceClass;       // Class code
     uint8_t bDeviceSubClass;    // SubClass code
@@ -214,7 +214,7 @@ struct usb_dev_qualifier_desc
 struct usb_conf_desc
 {
     uint8_t bLength;                // Size of this descriptor in bytes
-    uint8_t bDescriptorType;        // DESC_CONF
+    uint8_t bDescriptorType;        // USB_DESC_CONF
     uint16_t wTotalLength;          // Total length returned for this conf
     uint8_t bNumInterfaces;         // Number of intfs supported by this conf
     uint8_t bConfigurationValue;    // Value to use as arg to SetConf()
@@ -235,13 +235,13 @@ struct usb_conf_desc
 
 // USB Other Speed Configuration Descriptor
 /* Use same layout as struct usb_conf_descriptor
- * But bDescriptorType is set to DESC_OTHER_SPD_CONF */
+ * But bDescriptorType is set to USB_DESC_OTHER_SPD_CONF */
 
 // USB Interface Descriptor
 struct usb_intf_desc
 {
     uint8_t bLength;                // Size of this descriptor in bytes
-    uint8_t bDescriptorType;        // DESC_INTF
+    uint8_t bDescriptorType;        // USB_DESC_INTF
     uint8_t bInterfaceNumber;       // Number of this intf (index within conf)
     uint8_t bAlternateSetting;      // Value used to select this altn setting
     uint8_t bNumEndpoints;          // Number of endp in this intf (except EP0)
@@ -255,7 +255,7 @@ struct usb_intf_desc
 struct usb_endp_desc
 {
     uint8_t bLength;            // Size of this descriptor
-    uint8_t bDescriptorType;    // DESC_ENDP
+    uint8_t bDescriptorType;    // USB_DESC_ENDP
 
     union                       // Address of the endp described by this desc
     {

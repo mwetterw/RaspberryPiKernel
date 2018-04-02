@@ -12,7 +12,7 @@ enum usb_hub_dev_proto
 
 enum usb_hub_intf_proto
 {
-    USB_HUB_INTF_PROTO_LSFS_HS_STT_ONLY,   // No-TT (LSFS) or STT-Only hubs (HS)
+    USB_HUB_INTF_PROTO_NOTT_STT_ONLY,      // No-TT (LSFS) or STT-Only hubs (HS)
     USB_HUB_INTF_PROTO_HS_MTT_CAPABLE_STT, // STT Interface for MTT-capable hubs
     USB_HUB_INTF_PROTO_HS_MTT_CAPABLE_MTT, // MTT Interface for MTT-capable hubs
 };
@@ -26,7 +26,7 @@ enum usb_hub_intf_proto
 struct usb_hub_desc
 {
     uint8_t bLength;            // Number of bytes of this desc, incl. this byte
-    uint8_t bDescriptorType;    // DESC_HUB (0x29)
+    uint8_t bDescriptorType;    // USB_HUB_DESC_HUB (0x29)
     uint8_t bNbrPorts;          // Number of downstream facing ports
     union
     {

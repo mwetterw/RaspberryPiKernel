@@ -151,7 +151,7 @@ static int usb_read_device_desc ( struct usb_device * dev, uint16_t maxsize )
 {
     return usb_ctrl_req ( dev,
             REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_IN,
-            REQ_GET_DESC, DESC_DEV << 8, 0,
+            REQ_GET_DESC, USB_DESC_DEV << 8, 0,
             & ( dev -> dev_desc ), maxsize );
 }
 
@@ -174,7 +174,7 @@ static int usb_get_conf_desc ( struct usb_device * dev, uint8_t idx,
 {
     return usb_ctrl_req ( dev,
             REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_IN,
-            REQ_GET_DESC, DESC_CONF << 8 | idx, 0,
+            REQ_GET_DESC, USB_DESC_CONF << 8 | idx, 0,
             buf, size );
 }
 
@@ -229,7 +229,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
 
         switch ( hdr -> bDescriptorType )
         {
-            case DESC_INTF:
+            case USB_DESC_INTF:
                 intf = ( struct usb_intf_desc * ) hdr;
 
                 // TODO: Handle alternate settings
@@ -254,7 +254,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
                 endp_idx = -1;
                 break;
 
-            case DESC_ENDP:
+            case USB_DESC_ENDP:
                 if ( intf_idx < 0 )
                 {
                     printu ( "Endpoint belonging to no Interface" );
