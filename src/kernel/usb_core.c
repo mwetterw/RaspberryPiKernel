@@ -36,14 +36,41 @@ struct usb_device * usb_alloc_device ( struct usb_device * parent )
     return 0;
 }
 
+static int
+usb_bind_driver ( struct usb_device * dev, const struct usb_driver * driver )
+{
+    int status = driver -> probe ( dev );
+    if ( status == USB_STATUS_SUCCESS )
+    {
+        printu ( "Binding driver to device" );
+        dev -> driver = driver;
+    }
+    return status;
+}
+
+static void usb_unbind_driver ( struct usb_device * dev )
+{
+    if ( dev -> driver )
+    {
+        dev -> driver -> remove ( dev );
+        dev -> driver = 0;
+    }
+}
+
 void usb_free_device ( struct usb_device * dev )
 {
+    // Unbind driver
+    usb_unbind_driver ( dev );
+
+    // De-allocate configuration descriptor
     if ( dev -> conf_desc )
     {
         uint32_t irqmask = irq_disable ( );
         memory_deallocate ( dev -> conf_desc );
         irq_restore ( irqmask );
     }
+
+    // Release device
     dev -> used = 0;
 }
 
@@ -343,21 +370,41 @@ int usb_register_driver ( const struct usb_driver * driver_ )
 void usb_unregister_driver ( const struct usb_driver * driver )
 {
     uint32_t irqmask = irq_disable ( );
+
+    // Lookup driver
+    int driver_idx = -1;
     for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
     {
         if ( usb_drivers [ i ] == driver )
         {
-            // TODO: Unbind driver from devices
-
-            printu ( "Unregistering driver" );
-            usb_drivers [ i ] = 0;
+            driver_idx = i;
             break;
         }
     }
+
+    // Driver was not found
+    if ( driver_idx == -1 )
+    {
+        return;
+    }
+
+    printu ( "Unregistering driver" );
+
+    // Unbind driver from devices
+    for ( int i = 0 ; i < USB_MAX_DEV ; ++i )
+    {
+        if ( usb_devs [ i ].used && usb_devs [ i ].driver == driver )
+        {
+            usb_unbind_driver ( & usb_devs [ i ] );
+        }
+    }
+
+    // Unregister driver
+    usb_drivers [ driver_idx ] = 0;
     irq_restore ( irqmask );
 }
 
-int usb_probe ( struct usb_device * dev )
+int usb_find_driver_for_dev ( struct usb_device * dev )
 {
     for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
     {
@@ -369,7 +416,7 @@ int usb_probe ( struct usb_device * dev )
             continue;
         }
 
-        if ( driver -> probe ( dev ) == USB_STATUS_SUCCESS )
+        if ( usb_bind_driver ( dev, driver ) == USB_STATUS_SUCCESS )
         {
             return USB_STATUS_SUCCESS;
         }
@@ -436,7 +483,7 @@ int usb_attach_device ( struct usb_device * dev )
     }
 
     // Try to find a driver for our new attached device!
-    status = usb_probe ( dev );
+    status = usb_find_driver_for_dev ( dev );
     if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "No driver found for newly attached device." );

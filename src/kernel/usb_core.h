@@ -24,6 +24,8 @@ struct usb_device
     struct usb_intf_desc * intf_desc [ USB_MAX_INTF ];
     struct usb_endp_desc * endp_desc [ USB_MAX_INTF ] [ USB_MAX_ENDP ];
 
+    const struct usb_driver * driver;
+
     uint8_t addr;
 };
 
