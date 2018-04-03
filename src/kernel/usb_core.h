@@ -53,6 +53,16 @@ struct usb_request
     void * priv;
 };
 
+struct usb_driver
+{
+    int used;
+
+    int ( * probe ) ( struct usb_device * );
+    int ( * remove ) ( struct usb_device * );
+};
+
+int usb_register_driver ( const struct usb_driver * driver );
+
 int usb_dev_is_root ( struct usb_device * dev );
 
 struct usb_request * usb_alloc_request ( int data_size );

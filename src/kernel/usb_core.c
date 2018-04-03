@@ -1,4 +1,5 @@
 #include "usb_hcdi.h"
+#include "usb_hub.h"
 #include "memory.h"
 #include "semaphore.h"
 #include "arm.h"
@@ -6,7 +7,9 @@
 #include "../libc/string.h"
 
 #define USB_MAX_DEV 32
+#define USB_MAX_DRIVERS 32
 static struct usb_device usb_devs [ USB_MAX_DEV ];
+static struct usb_driver usb_drivers [ USB_MAX_DRIVERS ];
 
 static struct usb_device * usb_root;
 
@@ -299,6 +302,60 @@ int usb_set_configuration ( struct usb_device * dev, uint8_t conf )
             REQ_SET_CONF, conf, 0, 0, 0 );
 }
 
+static struct usb_driver * usb_alloc_driver ( )
+{
+    uint32_t irqmask = irq_disable ( );
+    for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
+    {
+        if ( ! usb_drivers [ i ].used )
+        {
+            struct usb_driver * driver = & usb_drivers [ i ];
+            driver -> used = 1;
+            irq_restore ( irqmask );
+            return driver;
+        }
+    }
+    irq_restore ( irqmask );
+    return 0;
+}
+
+int usb_register_driver ( const struct usb_driver * driver_ )
+{
+    struct usb_driver * driver;
+
+    driver = usb_alloc_driver ( );
+    if ( ! driver )
+    {
+        return -1;
+    }
+
+    driver -> probe = driver_ -> probe;
+    driver -> remove = driver_ -> remove;
+
+    return 0;
+}
+
+int usb_probe ( struct usb_device * dev )
+{
+    for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
+    {
+        struct usb_driver * driver = & usb_drivers [ i ];
+
+        // Skip non allocated / allocating drivers
+        if ( driver -> used == 0 || driver -> probe == 0 )
+        {
+            continue;
+        }
+
+        if ( driver -> probe ( dev ) == USB_REQ_STATUS_SUCCESS )
+        {
+            return USB_REQ_STATUS_SUCCESS;
+        }
+    }
+
+    return USB_REQ_STATUS_NOT_SUPPORTED;
+}
+
 int usb_attach_device ( struct usb_device * dev )
 {
     int status;
@@ -354,6 +411,14 @@ int usb_attach_device ( struct usb_device * dev )
     {
         printu ( "Error when activating the first configuration" );
         return -1;
+    }
+
+    // Try to find a driver for our new attached device!
+    status = usb_probe ( dev );
+    if ( status != USB_REQ_STATUS_SUCCESS )
+    {
+        printu ( "No driver found for newly attached device." );
+        // This is not an error as drivers can be registered at any time
     }
 
     return 0;
