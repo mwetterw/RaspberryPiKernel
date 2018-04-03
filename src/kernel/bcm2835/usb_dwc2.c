@@ -327,7 +327,7 @@ static void dwc2_usb_consumer_thread ( )
         }
         else
         {
-            req -> status = USB_REQ_STATUS_NOT_SUPPORTED;
+            req -> status = USB_STATUS_NOT_SUPPORTED;
         }
     }
 }

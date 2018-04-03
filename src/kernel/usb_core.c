@@ -74,7 +74,7 @@ struct usb_request * usb_alloc_request ( int data_size )
     req -> data = req + 1;
     req -> size = data_size;
 
-    req -> status = USB_REQ_STATUS_UNPROCESSED;
+    req -> status = USB_STATUS_UNPROCESSED;
 
     return req;
 }
@@ -164,7 +164,7 @@ static int usb_set_device_addr ( struct usb_device * dev, uint8_t addr )
             REQ_RECIPIENT_DEV, REQ_TYPE_STD, REQ_DIR_OUT,
             REQ_SET_ADDR, addr, 0, 0, 0 );
 
-    if ( status == USB_REQ_STATUS_SUCCESS )
+    if ( status == USB_STATUS_SUCCESS )
     {
         dev -> addr = addr;
     }
@@ -196,7 +196,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
     /* First, fetch only the configuration desc without intf & endp.
      * That way we'll know the wTotalLength to allocate */
     status = usb_get_conf_desc ( dev, idx, &conf, sizeof ( conf ) );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         return -1;
     }
@@ -211,7 +211,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
 
     // Get the whole configuration desc with all intfs & endps
     status = usb_get_conf_desc ( dev, idx, dev -> conf_desc, conf.wTotalLength );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "Error when getting whole configuration desc" );
     }
@@ -292,7 +292,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
         }
     }
 
-    return USB_REQ_STATUS_SUCCESS;
+    return USB_STATUS_SUCCESS;
 }
 
 int usb_set_configuration ( struct usb_device * dev, uint8_t conf )
@@ -347,13 +347,13 @@ int usb_probe ( struct usb_device * dev )
             continue;
         }
 
-        if ( driver -> probe ( dev ) == USB_REQ_STATUS_SUCCESS )
+        if ( driver -> probe ( dev ) == USB_STATUS_SUCCESS )
         {
-            return USB_REQ_STATUS_SUCCESS;
+            return USB_STATUS_SUCCESS;
         }
     }
 
-    return USB_REQ_STATUS_NOT_SUPPORTED;
+    return USB_STATUS_NOT_SUPPORTED;
 }
 
 int usb_attach_device ( struct usb_device * dev )
@@ -371,7 +371,7 @@ int usb_attach_device ( struct usb_device * dev )
      * subsequent transactions. */
     dev -> dev_desc.bMaxPacketSize0 = USB_LS_CTRL_DATALEN;
     status = usb_read_device_desc ( dev, USB_LS_CTRL_DATALEN );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "Error on initial device descriptor reading" );
         return -1;
@@ -379,7 +379,7 @@ int usb_attach_device ( struct usb_device * dev )
 
     // Set device address
     status = usb_set_device_addr ( dev, usb_alloc_addr ( dev ) );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "Error when setting device address" );
         return -1;
@@ -389,7 +389,7 @@ int usb_attach_device ( struct usb_device * dev )
     if ( dev -> dev_desc.bMaxPacketSize0 > USB_LS_CTRL_DATALEN )
     {
         status = usb_read_device_desc ( dev, sizeof ( struct usb_dev_desc ) );
-        if ( status != USB_REQ_STATUS_SUCCESS )
+        if ( status != USB_STATUS_SUCCESS )
         {
             printu ( "Error on full device descriptor reading" );
             return -1;
@@ -398,7 +398,7 @@ int usb_attach_device ( struct usb_device * dev )
 
     // Read the first configuration descriptor
     status = usb_read_conf_desc ( dev, 0 );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "Error when reading configuration descriptor" );
         return -1;
@@ -407,7 +407,7 @@ int usb_attach_device ( struct usb_device * dev )
     // Activate the first configuration
     status = usb_set_configuration ( dev,
             dev -> conf_desc -> bConfigurationValue );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "Error when activating the first configuration" );
         return -1;
@@ -415,7 +415,7 @@ int usb_attach_device ( struct usb_device * dev )
 
     // Try to find a driver for our new attached device!
     status = usb_probe ( dev );
-    if ( status != USB_REQ_STATUS_SUCCESS )
+    if ( status != USB_STATUS_SUCCESS )
     {
         printu ( "No driver found for newly attached device." );
         // This is not an error as drivers can be registered at any time

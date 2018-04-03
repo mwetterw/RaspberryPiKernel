@@ -145,21 +145,21 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
                 case USB_DESC_DEV:
                     size = min ( req -> size, dwc2_root_hub_dev_desc.bLength );
                     memcpy ( req -> data, &dwc2_root_hub_dev_desc, size );
-                    return USB_REQ_STATUS_SUCCESS;
+                    return USB_STATUS_SUCCESS;
                 case USB_DESC_CONF:
                     size = min ( req -> size, dwc2_root_hub_conf_desc.conf.wTotalLength );
                     memcpy ( req -> data, &dwc2_root_hub_conf_desc, size );
-                    return USB_REQ_STATUS_SUCCESS;
+                    return USB_STATUS_SUCCESS;
                 default:
-                    return USB_REQ_STATUS_NOT_SUPPORTED;
+                    return USB_STATUS_NOT_SUPPORTED;
             }
 
         case REQ_SET_ADDR:
         case REQ_SET_CONF:
-            return USB_REQ_STATUS_SUCCESS;
+            return USB_STATUS_SUCCESS;
 
         default:
-            return USB_REQ_STATUS_NOT_SUPPORTED;
+            return USB_STATUS_NOT_SUPPORTED;
     }
 }
 
@@ -173,14 +173,14 @@ static int dwc2_root_hub_class_request ( struct usb_request * req )
             // Hubs only have one class specific descriptor
             if ( req -> setup_req.wValue >> 8 != USB_HUB_DESC )
             {
-                return USB_REQ_STATUS_ERROR;
+                return USB_STATUS_ERROR;
             }
 
             size = min ( req -> size, dwc2_root_hub_hub_desc.bLength );
             memcpy ( req -> data, &dwc2_root_hub_hub_desc, size );
-            return USB_REQ_STATUS_SUCCESS;
+            return USB_STATUS_SUCCESS;
         default:
-            return USB_REQ_STATUS_NOT_SUPPORTED;
+            return USB_STATUS_NOT_SUPPORTED;
     }
 }
 
@@ -193,7 +193,7 @@ static int dwc2_root_hub_ctrl_req ( struct usb_request * req )
         case REQ_TYPE_CLASS:
             return dwc2_root_hub_class_request ( req );
         default:
-            return USB_REQ_STATUS_NOT_SUPPORTED;
+            return USB_STATUS_NOT_SUPPORTED;
     }
 }
 
