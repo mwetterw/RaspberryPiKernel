@@ -431,6 +431,13 @@ void usb_init ( )
         usb_devs [ i ].used = 0;
     }
 
+    // Register the hub driver
+    if ( usb_register_driver ( & usb_hub_driver ) != 0 )
+    {
+        printu ( "Unable to register vital USB Hub Driver" );
+        return;
+    }
+
     // Request our Host Controller to start up
     if ( hcd_start ( ) != 0 )
     {
@@ -455,4 +462,6 @@ void usb_init ( )
     }
 
     printu ( "USB Core Initialization complete" );
+
+    // XXX TODO unregister driver + hcd_stop if failure
 }

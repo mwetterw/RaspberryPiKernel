@@ -1,6 +1,8 @@
 #ifndef _H_USB_STD_HUB
 #define _H_USB_STD_HUB
 
+#include <stdint.h>
+
 // USB 2.0 Section 11.23.1
 // STT = Single-TT   MTT = Multi-TT
 enum usb_hub_dev_proto
