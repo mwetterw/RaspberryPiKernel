@@ -377,6 +377,11 @@ int hcd_start ( )
     return ret;
 }
 
+void hcd_stop ( )
+{
+    printu ( "HCD Stop" );
+}
+
 void hcd_submit_request ( struct usb_request * req )
 {
     mailbox_send ( usb_requests_mbox, ( intptr_t ) req );

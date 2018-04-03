@@ -4,6 +4,7 @@
 #include "usb_core.h"
 
 int hcd_start ( );
+void hcd_stop ( );
 
 void hcd_submit_request ( struct usb_request * req );
 

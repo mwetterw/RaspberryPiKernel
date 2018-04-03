@@ -9,7 +9,7 @@
 #define USB_MAX_DEV 32
 #define USB_MAX_DRIVERS 32
 static struct usb_device usb_devs [ USB_MAX_DEV ];
-static struct usb_driver usb_drivers [ USB_MAX_DRIVERS ];
+static const struct usb_driver * usb_drivers [ USB_MAX_DRIVERS ];
 
 static struct usb_device * usb_root;
 
@@ -302,47 +302,70 @@ int usb_set_configuration ( struct usb_device * dev, uint8_t conf )
             REQ_SET_CONF, conf, 0, 0, 0 );
 }
 
-static struct usb_driver * usb_alloc_driver ( )
+int usb_register_driver ( const struct usb_driver * driver_ )
 {
+    if ( driver_ -> probe == 0 )
+    {
+        printu ( "The probe function must be implemented" );
+        return -1;
+    }
+
     uint32_t irqmask = irq_disable ( );
+    int first_free = -1;
+
     for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
     {
-        if ( ! usb_drivers [ i ].used )
+        // Find the first free driver slot
+        if ( first_free == -1 && usb_drivers [ i ] == 0 )
         {
-            struct usb_driver * driver = & usb_drivers [ i ];
-            driver -> used = 1;
+            first_free = i;
+        }
+
+        // Find whether driver not already registered
+        if ( usb_drivers [ i ] == driver_ )
+        {
             irq_restore ( irqmask );
-            return driver;
+            return 0;
         }
     }
+
+    if ( first_free < 0 )
+    {
+        irq_restore ( irqmask );
+        return -1;
+    }
+
+    usb_drivers [ first_free ] = driver_;
+
     irq_restore ( irqmask );
     return 0;
 }
 
-int usb_register_driver ( const struct usb_driver * driver_ )
+void usb_unregister_driver ( const struct usb_driver * driver )
 {
-    struct usb_driver * driver;
-
-    driver = usb_alloc_driver ( );
-    if ( ! driver )
+    uint32_t irqmask = irq_disable ( );
+    for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
     {
-        return -1;
+        if ( usb_drivers [ i ] == driver )
+        {
+            // TODO: Unbind driver from devices
+
+            printu ( "Unregistering driver" );
+            usb_drivers [ i ] = 0;
+            break;
+        }
     }
-
-    driver -> probe = driver_ -> probe;
-    driver -> remove = driver_ -> remove;
-
-    return 0;
+    irq_restore ( irqmask );
 }
 
 int usb_probe ( struct usb_device * dev )
 {
     for ( int i = 0 ; i < USB_MAX_DRIVERS ; ++i )
     {
-        struct usb_driver * driver = & usb_drivers [ i ];
+        const struct usb_driver * driver = usb_drivers [ i ];
 
-        // Skip non allocated / allocating drivers
-        if ( driver -> used == 0 || driver -> probe == 0 )
+        // Skip non allocated drivers
+        if ( driver == 0 )
         {
             continue;
         }
@@ -442,26 +465,31 @@ void usb_init ( )
     if ( hcd_start ( ) != 0 )
     {
         printu ( "USB Core failed to start the HCD" );
-        return;
+        goto err_usb_unregister_hub_driver;
     }
 
     // Create the root hub
     if ( ! ( usb_root = usb_alloc_device ( 0 ) ) )
     {
         printu ( "USB Core failed to allocate the root hub" );
-        return;
+        goto err_hcd_stop;
     }
 
     // Attach the root hub
     if ( usb_attach_device ( usb_root ) != 0 )
     {
         printu ( "USB Core failed to attach the root hub" );
-        usb_free_device ( usb_root );
-        usb_root = 0;
-        return;
+        goto err_free_root_hub;
     }
 
     printu ( "USB Core Initialization complete" );
+    return;
 
-    // XXX TODO unregister driver + hcd_stop if failure
+err_free_root_hub:
+    usb_free_device ( usb_root );
+    usb_root = 0;
+err_hcd_stop:
+    hcd_stop ( );
+err_usb_unregister_hub_driver:
+    usb_unregister_driver ( & usb_hub_driver );
 }

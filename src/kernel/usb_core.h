@@ -55,8 +55,6 @@ struct usb_request
 
 struct usb_driver
 {
-    int used;
-
     int ( * probe ) ( struct usb_device * );
     int ( * remove ) ( struct usb_device * );
 };
