@@ -26,7 +26,6 @@ void sem_init ( )
     {
         pcb_turnstile_init ( & ( sems [ i ].waitqueue ) );
         sems [ i ].state = SEM_FREE;
-        sems [ i ].count = 0;
     }
 }
 
@@ -73,7 +72,6 @@ void sem_destroy ( sem_t sem )
 
     // Let's free the semaphore
     sems [ sem ].state = SEM_FREE;
-    sems [ sem ].count = 0;
 
     // Release waiting processes from the semaphore (if any)
     kernel_pcb_turnstile_t * waitq = & ( sems [ sem ].waitqueue );

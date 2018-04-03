@@ -32,10 +32,6 @@ void mailbox_init ( )
     for ( int i = 0 ; i < MAILBOX_NB ; ++i )
     {
         mailboxes [ i ].state = MAILBOX_FREE;
-        mailboxes [ i ].count = 0;
-        mailboxes [ i ].first = 0;
-        mailboxes [ i ].capacity = 0;
-        mailboxes [ i ].data = 0;
     }
 }
 
@@ -122,10 +118,6 @@ void mailbox_destroy ( mailbox_t mbox )
     sem_destroy ( pmbox -> recv_sem );
     sem_destroy ( pmbox -> send_sem );
 
-    pmbox -> count = 0;
-    pmbox -> first = 0;
-    pmbox -> capacity = 0;
-    pmbox -> data = 0;
     pmbox -> state = MAILBOX_FREE;
 
     irq_restore ( irqmask );

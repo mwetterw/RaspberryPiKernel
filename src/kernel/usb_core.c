@@ -60,8 +60,8 @@ int usb_dev_is_root ( struct usb_device * dev )
 struct usb_request * usb_alloc_request ( int data_size )
 {
     uint32_t irqmask = irq_disable ( );
-    struct usb_request * req =
-        memory_allocate ( sizeof ( struct usb_request ) + data_size );
+    size_t size = sizeof ( struct usb_request ) + data_size;
+    struct usb_request * req = memory_allocate ( size );
     irq_restore ( irqmask );
 
     if ( ! req )
@@ -69,8 +69,7 @@ struct usb_request * usb_alloc_request ( int data_size )
         return 0;
     }
 
-    req -> dev = 0;
-    req -> setup_req = ( const struct usb_setup_req ) { 0 };
+    memset ( req, 0, size );
     req -> data = req + 1;
     req -> size = data_size;
 
@@ -449,11 +448,6 @@ int usb_attach_device ( struct usb_device * dev )
 
 void usb_init ( )
 {
-    for ( int i = 0 ; i < USB_MAX_DEV ; ++i )
-    {
-        usb_devs [ i ].used = 0;
-    }
-
     // Register the hub driver
     if ( usb_register_driver ( & usb_hub_driver ) != 0 )
     {
