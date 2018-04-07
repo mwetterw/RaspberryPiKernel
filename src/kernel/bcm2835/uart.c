@@ -3,6 +3,8 @@
 #include "gpio.h"
 #include "bcm2835.h"
 #include "power.h"
+#include "pic.h"
+#include "watchdog.h"
 
 #include <stdint.h>
 
@@ -22,6 +24,19 @@ static void uart_set_baud_rate ( int brate )
     uart_w32 ( FBRD, baudiv_frac & FBRD_MASK );
 }
 
+void uart_interrupt ( )
+{
+    // Acknowledge interrupt
+    uart_w32 ( ICR, INT_RXI );
+
+    // Restart the system when pressing "R" key
+    if ( ( uart_r32 ( DR ) & DR_DATA ) == 'R' )
+    {
+        watchdog_start ( 1 );
+        for ( ; ; );
+    }
+}
+
 void uart_init ( )
 {
     // Power on UART
@@ -39,8 +54,13 @@ void uart_init ( )
     uart_set_baud_rate ( 115200 );
     uart_w32 ( LCRH, LCRH_WLEN_8BITS );
 
-    // Enable TX and enable the UART
-    uart_w32 ( CR, CR_TXE | CR_UARTEN );
+    // Setup interrupts
+    uart_w32 ( IMSC, INT_RXI );
+    interrupt_handlers [ IRQ_UART ] = uart_interrupt;
+    pic_enable_irq ( IRQ_UART );
+
+    // Enable TX, RX and enable the UART
+    uart_w32 ( CR, CR_TXE | CR_RXE | CR_UARTEN );
 }
 
 static void uart_write_char ( char c )
