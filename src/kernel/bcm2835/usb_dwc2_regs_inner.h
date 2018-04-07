@@ -246,5 +246,12 @@ union hprt
         uint32_t reserved2      : 13;
     };
 };
+enum hprt_prtspd
+{
+    HPRT_PRTSPD_HS,
+    HPRT_PRTSPD_FS,
+    HPRT_PRTSPD_LS,
+    HPRT_PRTSPD_RESERVED,
+};
 #define DWC2_HPRT_WC_MASK (0b101110)
 #endif

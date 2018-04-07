@@ -13,6 +13,8 @@
 
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
+struct usb_hub_port_status dwc2_root_hub_port_status;
+
 // USB 2.0 Section 11.23.1
 // Faked device descriptor for our root hub
 static const struct usb_dev_desc dwc2_root_hub_dev_desc =
@@ -98,6 +100,31 @@ static const struct usb_hub_desc dwc2_root_hub_hub_desc =
         USB_HUB_PORT_PWR_CTRL_MASK,
     },
 };
+
+void dwc2_root_hub_handle_port_interrupt ( )
+{
+    union hprt hprt = regs -> host.hprt;
+
+    // Update our port status for the USB Hub driver
+    dwc2_root_hub_port_status.connection        = hprt.prtconnsts;
+    dwc2_root_hub_port_status.enable            = hprt.prtena;
+    dwc2_root_hub_port_status.suspend           = hprt.prtsusp;
+    dwc2_root_hub_port_status.over_current      = hprt.prtovrcuract;
+    dwc2_root_hub_port_status.reset             = hprt.prtrst;
+    dwc2_root_hub_port_status.power             = hprt.prtpwr;
+    dwc2_root_hub_port_status.ls_dev            = hprt.prtspd == HPRT_PRTSPD_LS;
+    dwc2_root_hub_port_status.hs_dev            = hprt.prtspd == HPRT_PRTSPD_HS;
+
+    dwc2_root_hub_port_status.c_connection      = hprt.prtconndet;
+    dwc2_root_hub_port_status.c_enable          = hprt.prtenchng;
+    dwc2_root_hub_port_status.c_over_current    = hprt.prtovrcurchng;
+
+    /* Write back the register to itself to acknowledge interrupts
+     * This works because some bits are of type "WC" (Write 1 to Clear).
+     * But don't clear prtena as this would disable the root hub port. */
+    hprt.prtena = 0;
+    regs -> host.hprt = hprt;
+}
 
 static void __attribute__ ( ( unused ) )
 dwc2_root_hub_reset_port ( struct dwc2_regs * regs )

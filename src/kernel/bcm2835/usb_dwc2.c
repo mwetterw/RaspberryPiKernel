@@ -14,6 +14,7 @@
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 extern void dwc2_root_hub_request ( struct usb_request * req );
+extern void dwc2_root_hub_handle_port_interrupt ( );
 
 static mailbox_t usb_requests_mbox;
 
@@ -45,31 +46,7 @@ void dwc2_interrupt ( )
     // Handle host port interrupt
     if ( gint.prtint )
     {
-        printu ( " Port IRQ" );
-
-        union hprt hprt_r, hprt_w;
-        hprt_r = hprt_w = regs -> host.hprt;
-        hprt_w.raw &= DWC2_HPRT_WC_MASK;
-
-        if ( hprt_r.prtconndet )
-        {
-            printu ( "  Port Connection Detect IRQ" );
-            hprt_w.prtconndet = 1;
-        }
-
-        if ( hprt_r.prtenchng )
-        {
-            printu ( "  Port Enable Change IRQ" );
-            hprt_w.prtenchng = 1;
-        }
-
-        if ( hprt_r.prtovrcurchng )
-        {
-            printu ( "  Port Overcurrent Change IRQ" );
-            hprt_w.prtovrcurchng = 1;
-        }
-
-        regs -> host.hprt = hprt_w;
+        dwc2_root_hub_handle_port_interrupt ( );
     }
 }
 

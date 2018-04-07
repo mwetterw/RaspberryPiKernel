@@ -188,37 +188,33 @@ struct usb_hub_port_status
 {
     union
     {
-        uint16_t raw;
-        struct
-        {
-            uint16_t connection     : 1; // Device is present (RO)
-            uint16_t enable         : 1; // After reset (RO for enabling)
-            uint16_t suspend        : 1;
-            uint16_t over_current   : 1; // (RO)
-            uint16_t reset          : 1; // (RO for deassert?)
-            uint16_t reserved1      : 3;
-            uint16_t power          : 1; // (only if indiv)
-            uint16_t ls_dev         : 1; // (RO)
-            uint16_t hs_dev         : 1; // (RO)
-            uint16_t test_mode      : 1; // (RO for disabling)
-            uint16_t indic_control  : 1;
-            uint16_t reserved2      : 3;
-        };
-    } wPortStatus;
+        uint32_t raw;
 
-    union
-    {
-        uint16_t raw;
         struct
         {
-            uint16_t c_connection   :  1; // Attach or deattach event
-            uint16_t c_enable       :  1; // Set on port error condition
-            uint16_t c_suspend      :  1; // Set when resume is complete
-            uint16_t c_over_current :  1;
-            uint16_t c_reset        :  1; // Set when reset is complete
-            uint16_t reserved       : 11;
+            // wPortStatus
+            uint32_t connection     : 1; // Device is present (RO)
+            uint32_t enable         : 1; // After reset (RO for enabling)
+            uint32_t suspend        : 1;
+            uint32_t over_current   : 1; // (RO)
+            uint32_t reset          : 1; // (RO for deassert?)
+            uint32_t reserved1      : 3;
+            uint32_t power          : 1; // (only if indiv)
+            uint32_t ls_dev         : 1; // (RO)
+            uint32_t hs_dev         : 1; // (RO)
+            uint32_t test_mode      : 1; // (RO for disabling)
+            uint32_t indic_control  : 1;
+            uint32_t reserved2      : 3;
+
+            // wPortChange
+            uint32_t c_connection   :  1; // Attach or deattach event
+            uint32_t c_enable       :  1; // Set on port error condition
+            uint32_t c_suspend      :  1; // Set when resume is complete
+            uint32_t c_over_current :  1;
+            uint32_t c_reset        :  1; // Set when reset is complete
+            uint32_t reserved       : 11;
         };
-    } wPortChange;
+    };
 };
 
 enum usb_hub_port_indic_sel
