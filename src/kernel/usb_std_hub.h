@@ -60,6 +60,7 @@ struct usb_hub_desc
     usb_hub_desc_tail_size ( nbports ) )
 
 #define USB_HUB_DESC_TAIL_MAXSIZE usb_hub_desc_tail_size ( USB_HUB_MAX_PORTS )
+#define USB_HUB_DESC_MIN_BLENGTH usb_hub_desc_bLength ( 1 )
 #define USB_HUB_DESC_MAX_BLENGTH usb_hub_desc_bLength ( USB_HUB_MAX_PORTS )
 
 #define USB_HUB_PORT_PWR_CTRL_MASK 0xFF

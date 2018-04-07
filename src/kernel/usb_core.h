@@ -16,6 +16,8 @@ struct usb_device
     int used;
     struct usb_device * parent;
 
+    struct usb_hub * hub;
+
     // Device Descriptor
     struct usb_dev_desc dev_desc;
 
@@ -69,5 +71,10 @@ struct usb_request * usb_alloc_request ( int data_size );
 int usb_submit_request ( struct usb_request * req );
 
 void usb_request_done ( struct usb_request * req );
+
+int usb_ctrl_req ( struct usb_device * dev,
+        uint8_t recipient, uint8_t type, uint8_t dir,
+        uint8_t bRequest, uint16_t wValue, uint16_t wIndex,
+        void * data, uint16_t wLength );
 
 #endif
