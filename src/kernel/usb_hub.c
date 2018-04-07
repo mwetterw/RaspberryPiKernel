@@ -85,6 +85,15 @@ static int usb_hub_read_hub_desc ( struct usb_hub * hub )
     return 0;
 }
 
+static int
+usb_hub_set_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature )
+{
+    return usb_ctrl_req ( hub -> dev,
+        REQ_RECIPIENT_OTHER, REQ_TYPE_CLASS, REQ_DIR_OUT,
+        HUB_REQ_SET_FEATURE, feature, port,
+        0, 0 );
+}
+
 int usb_hub_probe ( struct usb_device * dev )
 {
     // Device Descriptor Check
@@ -150,6 +159,16 @@ int usb_hub_probe ( struct usb_device * dev )
         goto err_free_hub;
     }
     memset ( dev -> hub -> ports, 0, nbports * sizeof ( struct usb_hub_port ) );
+
+    for ( uint8_t port = 1 ; port <= nbports ; ++port )
+    {
+        int status =
+            usb_hub_set_port_feature ( dev -> hub, port, HUB_FEATURE_PORT_POWER );
+        if ( status != USB_STATUS_SUCCESS )
+        {
+            printu ( "Ignoring port power-on failure" );
+        }
+    }
 
     return USB_STATUS_SUCCESS;
 

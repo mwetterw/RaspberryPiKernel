@@ -1,4 +1,5 @@
 #include "usb_dwc2_regs.h"
+#include "bcm2835.h"
 #include "../usb_core.h"
 #include "../usb_std_hub.h"
 
@@ -9,6 +10,8 @@
 #include "../../libc/math.h"
 
 #define DWC2_ROOT_HUB_NB_PORTS 1
+
+static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 // USB 2.0 Section 11.23.1
 // Faked device descriptor for our root hub
@@ -117,8 +120,7 @@ dwc2_root_hub_reset_port ( struct dwc2_regs * regs )
     regs -> host.hprt = hprt;
 }
 
-static void __attribute__ ( ( unused ) )
-dwc2_root_hub_power_on_port ( struct dwc2_regs * regs )
+static void dwc2_root_hub_power_on_port ( )
 {
     // Read the Host Port Control & Status Register
     union hprt hprt = regs -> host.hprt;
@@ -163,15 +165,29 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
     }
 }
 
+static int dwc2_root_hub_set_port_feature ( uint16_t feature )
+{
+    switch ( feature )
+    {
+        case HUB_FEATURE_PORT_POWER:
+            dwc2_root_hub_power_on_port ( );
+            return USB_STATUS_SUCCESS;
+
+        default:
+            return USB_STATUS_NOT_SUPPORTED;
+    }
+}
+
 static int dwc2_root_hub_class_request ( struct usb_request * req )
 {
     size_t size;
+    struct usb_setup_req * setup = & ( req -> setup_req );
 
-    switch ( req -> setup_req.bRequest )
+    switch ( setup -> bRequest )
     {
         case HUB_REQ_GET_DESC:
             // Hubs only have one class specific descriptor
-            if ( req -> setup_req.wValue >> 8 != USB_HUB_DESC )
+            if ( setup -> wValue >> 8 != USB_HUB_DESC )
             {
                 return USB_STATUS_ERROR;
             }
@@ -179,6 +195,16 @@ static int dwc2_root_hub_class_request ( struct usb_request * req )
             size = min ( req -> size, dwc2_root_hub_hub_desc.bLength );
             memcpy ( req -> data, &dwc2_root_hub_hub_desc, size );
             return USB_STATUS_SUCCESS;
+
+        case HUB_REQ_SET_FEATURE:
+            switch ( setup -> bmRequestType.recipient )
+            {
+                case REQ_RECIPIENT_OTHER:
+                    return dwc2_root_hub_set_port_feature ( setup -> wValue );
+                default:
+                    return USB_STATUS_NOT_SUPPORTED;
+            }
+
         default:
             return USB_STATUS_NOT_SUPPORTED;
     }
