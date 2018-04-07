@@ -1,5 +1,6 @@
 #include "memory.h"
 #include "config.h"
+#include "arm.h"
 
 /*
  * @infos: Kernel heap structure
@@ -60,6 +61,7 @@ void * memory_allocate ( uint32_t size )
 	// Maintain alignment
 	size = ( size + 3 ) & ~3;
 
+    uint32_t irqmask = irq_disable ( );
 	kernel_heap_part_t * current = ( kernel_heap_part_t * ) kernel_memory_heap;
 	while ( current -> mpNext )
 	{
@@ -78,6 +80,7 @@ void * memory_allocate ( uint32_t size )
 		)
 		{
 			kernel_heap_part_t * new = memory_private_allocate ( size, current );
+            irq_restore ( irqmask );
 			return new + 1;
 		}
 
@@ -85,6 +88,7 @@ void * memory_allocate ( uint32_t size )
 	}
 
 	// We didn't find any space :'(
+    irq_restore ( irqmask );
 	return 0;
 }
 
@@ -95,6 +99,8 @@ void memory_deallocate ( void * address )
 	{
 		for ( ; ; );
 	}
+
+    uint32_t irqmask = irq_disable ( );
 
 	// We get the kernel memory header pointer
 	kernel_heap_part_t * heap_part_head = &( ( ( kernel_heap_part_t * ) address ) [ -1 ] );
@@ -110,6 +116,8 @@ void memory_deallocate ( void * address )
     // User gave us valid address. We can start deallocate!
 	heap_part_head -> mpPrevious -> mpNext = heap_part_head -> mpNext;
 	heap_part_head -> mpNext -> mpPrevious = heap_part_head -> mpPrevious;
+
+    irq_restore ( irqmask );
 }
 
 // ASSERT

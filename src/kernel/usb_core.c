@@ -65,9 +65,7 @@ void usb_free_device ( struct usb_device * dev )
     // De-allocate configuration descriptor
     if ( dev -> conf_desc )
     {
-        uint32_t irqmask = irq_disable ( );
         memory_deallocate ( dev -> conf_desc );
-        irq_restore ( irqmask );
     }
 
     // Release device
@@ -86,10 +84,8 @@ int usb_dev_is_root ( struct usb_device * dev )
 
 struct usb_request * usb_alloc_request ( int data_size )
 {
-    uint32_t irqmask = irq_disable ( );
     size_t size = sizeof ( struct usb_request ) + data_size;
     struct usb_request * req = memory_allocate ( size );
-    irq_restore ( irqmask );
 
     if ( ! req )
     {
@@ -107,9 +103,7 @@ struct usb_request * usb_alloc_request ( int data_size )
 
 void usb_free_request ( struct usb_request * req )
 {
-    uint32_t irqmask = irq_disable ( );
     memory_deallocate ( req );
-    irq_restore ( irqmask );
 }
 
 int usb_submit_request ( struct usb_request * req )
