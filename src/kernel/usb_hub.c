@@ -21,6 +21,23 @@ struct usb_hub_port
     struct usb_device * child;
 };
 
+static int usb_hub_allocate ( struct usb_device * dev )
+{
+    struct usb_hub * hub;
+
+    hub = memory_allocate ( sizeof ( struct usb_hub ) );
+    if ( ! hub )
+    {
+        return -1;
+    }
+    memset ( hub, 0, sizeof ( struct usb_hub ) );
+    hub -> dev = dev;
+
+    dev -> hub = hub;
+
+    return 0;
+}
+
 static int usb_hub_get_hub_desc ( struct usb_hub * hub, void * buf, uint16_t size )
 {
     return usb_ctrl_req ( hub -> dev,
@@ -107,23 +124,39 @@ int usb_hub_probe ( struct usb_device * dev )
     }
 
     // Allocate a hub
-    dev -> hub = memory_allocate ( sizeof ( struct usb_hub ) );
-    if ( ! dev -> hub )
+    if ( usb_hub_allocate ( dev ) != 0 )
     {
         return -1;
     }
-    memset ( dev -> hub, 0, sizeof ( struct usb_hub ) );
-    dev -> hub -> dev = dev;
 
     // Read Hub Descriptor
     if ( usb_hub_read_hub_desc ( dev -> hub ) != 0 )
     {
-        memory_deallocate ( dev -> hub );
-        dev -> hub = 0;
-        return -1;
+        goto err_free_hub;
     }
 
+    uint8_t nbports = dev -> hub -> hub_desc -> bNbrPorts;
+    if ( nbports < 1 )
+    {
+        printu ( "Hub reports having no downstream port" );
+        goto err_free_hub;
+    }
+
+    // Allocate ports
+    dev -> hub -> ports =
+        memory_allocate ( nbports * sizeof ( struct usb_hub_port ) );
+    if ( ! dev -> hub -> ports )
+    {
+        goto err_free_hub;
+    }
+    memset ( dev -> hub -> ports, 0, nbports * sizeof ( struct usb_hub_port ) );
+
     return USB_STATUS_SUCCESS;
+
+err_free_hub:
+    memory_deallocate ( dev -> hub );
+    dev -> hub = 0;
+    return -1;
 }
 
 int usb_hub_remove ( struct usb_device * dev )
