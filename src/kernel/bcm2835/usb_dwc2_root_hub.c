@@ -14,6 +14,10 @@
 static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HCD_BASE;
 
 struct usb_hub_port_status dwc2_root_hub_port_status;
+struct usb_request * dwc2_root_hub_pending_req;
+
+static void dwc2_root_hub_interrupt_req ( );
+
 
 // USB 2.0 Section 11.23.1
 // Faked device descriptor for our root hub
@@ -118,6 +122,8 @@ void dwc2_root_hub_handle_port_interrupt ( )
     dwc2_root_hub_port_status.c_connection      = hprt.prtconndet;
     dwc2_root_hub_port_status.c_enable          = hprt.prtenchng;
     dwc2_root_hub_port_status.c_over_current    = hprt.prtovrcurchng;
+
+    dwc2_root_hub_interrupt_req ( );
 
     /* Write back the register to itself to acknowledge interrupts
      * This works because some bits are of type "WC" (Write 1 to Clear).
@@ -250,9 +256,39 @@ static int dwc2_root_hub_ctrl_req ( struct usb_request * req )
     }
 }
 
+static void dwc2_root_hub_interrupt_req ( )
+{
+    uint32_t irqmask = irq_disable ( );
+    struct usb_request * req = dwc2_root_hub_pending_req;
+    if ( ! req )
+    {
+        return;
+    }
+    dwc2_root_hub_pending_req = 0;
+    irq_restore ( irqmask );
+
+    * ( uint8_t * ) ( req -> data ) = 0x2;
+    req -> status = USB_STATUS_SUCCESS;
+    usb_request_done ( req );
+}
+
 void dwc2_root_hub_request ( struct usb_request * req )
 {
-    printu ( "Processing Root Hub Request" );
-    req -> status = dwc2_root_hub_ctrl_req ( req );
-    usb_request_done ( req );
+    // Interrupt Request
+    if ( req -> endp )
+    {
+        printu ( "Processing Root Hub Interrupt Request" );
+        dwc2_root_hub_pending_req = req;
+        if ( dwc2_root_hub_port_status.wPortChange != 0 )
+        {
+            dwc2_root_hub_interrupt_req ( );
+        }
+    }
+    // Control Request
+    else
+    {
+        printu ( "Processing Root Hub Control Request" );
+        req -> status = dwc2_root_hub_ctrl_req ( req );
+        usb_request_done ( req );
+    }
 }

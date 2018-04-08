@@ -44,6 +44,9 @@ struct usb_request
 {
     struct usb_device * dev;
 
+    // Destination endpoint (null for Default Control Pipe)
+    struct usb_endp_desc * endp;
+
     // Used for control requests
     struct usb_setup_req setup_req;
 
@@ -68,8 +71,9 @@ int usb_register_driver ( const struct usb_driver * driver );
 int usb_dev_is_root ( struct usb_device * dev );
 
 struct usb_request * usb_alloc_request ( int data_size );
-int usb_submit_request ( struct usb_request * req );
+void usb_free_request ( struct usb_request * req );
 
+int usb_submit_request ( struct usb_request * req );
 void usb_request_done ( struct usb_request * req );
 
 int usb_ctrl_req ( struct usb_device * dev,

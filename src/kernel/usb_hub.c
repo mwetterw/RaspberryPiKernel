@@ -12,6 +12,8 @@ struct usb_hub
     struct usb_device * dev;
     struct usb_hub_desc * hub_desc;
 
+    struct usb_request * status_changed_req;
+
     struct usb_hub_port * ports;
 };
 
@@ -36,6 +38,27 @@ static int usb_hub_allocate ( struct usb_device * dev )
     dev -> hub = hub;
 
     return 0;
+}
+
+static void usb_hub_free ( struct usb_hub * hub )
+{
+    if ( hub -> ports )
+    {
+        memory_deallocate ( hub -> ports );
+    }
+
+    if ( hub -> status_changed_req )
+    {
+        usb_free_request ( hub -> status_changed_req );
+    }
+
+    if ( hub -> hub_desc )
+    {
+        memory_deallocate ( hub -> hub_desc );
+    }
+
+    hub -> dev -> hub = 0;
+    memory_deallocate ( hub );
 }
 
 static int usb_hub_get_hub_desc ( struct usb_hub * hub, void * buf, uint16_t size )
@@ -92,6 +115,12 @@ usb_hub_set_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature 
         REQ_RECIPIENT_OTHER, REQ_TYPE_CLASS, REQ_DIR_OUT,
         HUB_REQ_SET_FEATURE, feature, port,
         0, 0 );
+}
+
+void usb_hub_status_changed_done ( struct usb_request * req )
+{
+    ( void ) req;
+    printu ( "USB Hub Status Changed DONE" );
 }
 
 int usb_hub_probe ( struct usb_device * dev )
@@ -151,6 +180,14 @@ int usb_hub_probe ( struct usb_device * dev )
         goto err_free_hub;
     }
 
+    // Allocate Interrupt IN Status Changed request
+    dev -> hub -> status_changed_req =
+        usb_alloc_request ( usb_hub_desc_tail_field_size ( nbports ) );
+    if ( ! dev -> hub -> status_changed_req )
+    {
+        goto err_free_hub;
+    }
+
     // Allocate ports
     dev -> hub -> ports =
         memory_allocate ( nbports * sizeof ( struct usb_hub_port ) );
@@ -170,11 +207,21 @@ int usb_hub_probe ( struct usb_device * dev )
         }
     }
 
+    // Send USB Interrupt IN Request to USB Core
+    struct usb_request * req = dev -> hub -> status_changed_req;
+    req -> dev = dev;
+    req -> endp = dev -> endp_desc [ 0 ] [ 0 ];
+    req -> callback = usb_hub_status_changed_done;
+
+    if ( usb_submit_request ( req ) != 0 )
+    {
+        return USB_STATUS_ERROR;
+    }
+
     return USB_STATUS_SUCCESS;
 
 err_free_hub:
-    memory_deallocate ( dev -> hub );
-    dev -> hub = 0;
+    usb_hub_free ( dev -> hub );
     return -1;
 }
 
