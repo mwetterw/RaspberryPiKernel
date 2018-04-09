@@ -232,9 +232,29 @@ static int dwc2_root_hub_class_request ( struct usb_request * req )
             req -> xfer_size = size;
             return USB_STATUS_SUCCESS;
 
+        case HUB_REQ_GET_STATUS:
+            switch ( setup -> bmRequestType.recipient )
+            {
+                // GetPortStatus
+                case REQ_RECIPIENT_OTHER:
+                    if ( setup -> wIndex.raw != 1 )
+                    {
+                        return USB_STATUS_ERROR;
+                    }
+                    size = min ( req -> size,
+                            sizeof ( dwc2_root_hub_port_status ) );
+                    memcpy ( req -> data, &dwc2_root_hub_port_status, size );
+                    req -> xfer_size = size;
+                    return USB_STATUS_SUCCESS;
+                default:
+                    return USB_STATUS_NOT_SUPPORTED;
+
+            }
+
         case HUB_REQ_SET_FEATURE:
             switch ( setup -> bmRequestType.recipient )
             {
+                // SetPortFeature
                 case REQ_RECIPIENT_OTHER:
                     return dwc2_root_hub_set_port_feature ( setup -> wValue );
                 default:
