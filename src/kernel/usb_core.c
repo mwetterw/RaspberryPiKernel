@@ -82,7 +82,7 @@ int usb_dev_is_root ( struct usb_device * dev )
     return dev -> parent == 0;
 }
 
-struct usb_request * usb_alloc_request ( int data_size )
+struct usb_request * usb_alloc_request ( size_t data_size )
 {
     size_t size = sizeof ( struct usb_request ) + data_size;
     struct usb_request * req = memory_allocate ( size );

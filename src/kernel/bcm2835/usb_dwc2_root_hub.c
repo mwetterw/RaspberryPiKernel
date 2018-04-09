@@ -180,10 +180,12 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
                 case USB_DESC_DEV:
                     size = min ( req -> size, dwc2_root_hub_dev_desc.bLength );
                     memcpy ( req -> data, &dwc2_root_hub_dev_desc, size );
+                    req -> xfer_size = size;
                     return USB_STATUS_SUCCESS;
                 case USB_DESC_CONF:
                     size = min ( req -> size, dwc2_root_hub_conf_desc.conf.wTotalLength );
                     memcpy ( req -> data, &dwc2_root_hub_conf_desc, size );
+                    req -> xfer_size = size;
                     return USB_STATUS_SUCCESS;
                 default:
                     return USB_STATUS_NOT_SUPPORTED;
@@ -227,6 +229,7 @@ static int dwc2_root_hub_class_request ( struct usb_request * req )
 
             size = min ( req -> size, dwc2_root_hub_hub_desc.bLength );
             memcpy ( req -> data, &dwc2_root_hub_hub_desc, size );
+            req -> xfer_size = size;
             return USB_STATUS_SUCCESS;
 
         case HUB_REQ_SET_FEATURE:
@@ -267,7 +270,8 @@ static void dwc2_root_hub_interrupt_req ( )
     dwc2_root_hub_pending_req = 0;
     irq_restore ( irqmask );
 
-    * ( uint8_t * ) ( req -> data ) = 0x2;
+    * ( ( uint8_t * ) ( req -> data ) ) = 0x2;
+    req -> xfer_size = usb_hub_desc_tail_field_size ( DWC2_ROOT_HUB_NB_PORTS );
     req -> status = USB_STATUS_SUCCESS;
     usb_request_done ( req );
 }

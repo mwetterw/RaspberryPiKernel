@@ -2,6 +2,7 @@
 #define _H_USB_CORE
 
 #include "usb_std_device.h"
+#include <stddef.h>
 
 #define USB_MAX_INTF 4
 #define USB_MAX_ENDP 4
@@ -51,7 +52,8 @@ struct usb_request
     struct usb_setup_req setup_req;
 
     void * data;
-    int size;
+    size_t size;
+    size_t xfer_size;
 
     enum usb_request_status status;
 
@@ -70,7 +72,7 @@ int usb_register_driver ( const struct usb_driver * driver );
 
 int usb_dev_is_root ( struct usb_device * dev );
 
-struct usb_request * usb_alloc_request ( int data_size );
+struct usb_request * usb_alloc_request ( size_t data_size );
 void usb_free_request ( struct usb_request * req );
 
 int usb_submit_request ( struct usb_request * req );
