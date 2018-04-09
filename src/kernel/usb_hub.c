@@ -15,6 +15,8 @@ struct usb_hub
     struct usb_request * status_changed_req;
 
     struct usb_hub_port * ports;
+
+    uint8_t status_maxsize;
 };
 
 struct usb_hub_port
@@ -117,10 +119,63 @@ usb_hub_set_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature 
         0, 0 );
 }
 
-void usb_hub_status_changed_done ( struct usb_request * req )
+static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
 {
-    ( void ) req;
-    printu ( "USB Hub Status Changed DONE" );
+    ( void ) hub;
+    printu ( "Processing Hub Port Change..." );
+    printu_32h ( port );
+}
+
+static void usb_hub_hub_changed ( struct usb_hub * hub )
+{
+    ( void ) hub;
+    printu ( "Processing Hub Change..." );
+}
+
+void usb_hub_status_changed_request_done ( struct usb_request * req )
+{
+    struct usb_hub * hub;
+    uint8_t status_byte;
+    uint16_t port;
+    size_t s;
+
+    if ( req -> status != USB_STATUS_SUCCESS )
+    {
+        printu ( "USB Hub Status Changed request failed" );
+        return;
+    }
+
+    hub = req -> dev -> hub;
+
+    // Process each status byte
+    for ( s = 0 ; s < req -> xfer_size && s < hub -> status_maxsize; ++s )
+    {
+        status_byte = ( ( uint8_t * ) ( req -> data ) ) [ s ];
+        if ( ! status_byte )
+        {
+            continue;
+        }
+
+        // Process bits within the byte
+        while ( status_byte )
+        {
+            // Get the port number and process the change
+            port = 31 - __builtin_clz ( status_byte );
+            status_byte ^= ( 1 << port );
+            port += s * 8;
+
+            if ( port )
+            {
+                usb_hub_port_changed ( hub, port );
+            }
+
+            // Port "0" represents the whole hub
+            else
+            {
+                usb_hub_hub_changed ( hub );
+            }
+        }
+    }
 }
 
 int usb_hub_probe ( struct usb_device * dev )
@@ -180,6 +235,8 @@ int usb_hub_probe ( struct usb_device * dev )
         goto err_free_hub;
     }
 
+    dev -> hub -> status_maxsize = usb_hub_desc_tail_field_size ( nbports );
+
     // Allocate Interrupt IN Status Changed request
     dev -> hub -> status_changed_req =
         usb_alloc_request ( usb_hub_desc_tail_field_size ( nbports ) );
@@ -211,7 +268,7 @@ int usb_hub_probe ( struct usb_device * dev )
     struct usb_request * req = dev -> hub -> status_changed_req;
     req -> dev = dev;
     req -> endp = dev -> endp_desc [ 0 ] [ 0 ];
-    req -> callback = usb_hub_status_changed_done;
+    req -> callback = usb_hub_status_changed_request_done;
 
     if ( usb_submit_request ( req ) != 0 )
     {
