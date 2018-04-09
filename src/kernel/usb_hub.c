@@ -2,10 +2,19 @@
 #include "usb_std_hub.h"
 #include "usb_core.h"
 
+#include "semaphore.h"
+#include "../api/process.h"
+
 #include "memory.h"
 #include <string.h>
 
+#include "../libc/math.h"
+
 #include "bcm2835/uart.h"
+
+static sem_t usb_hub_sem;
+
+extern struct usb_device * usb_root;
 
 struct usb_hub
 {
@@ -16,7 +25,9 @@ struct usb_hub
 
     struct usb_hub_port * ports;
 
-    uint8_t status_maxsize;
+
+    uint8_t changed_size;
+    uint8_t * changed;
 };
 
 struct usb_hub_port
@@ -57,6 +68,11 @@ static void usb_hub_free ( struct usb_hub * hub )
     if ( hub -> hub_desc )
     {
         memory_deallocate ( hub -> hub_desc );
+    }
+
+    if ( hub -> changed )
+    {
+        memory_deallocate ( hub -> changed );
     }
 
     hub -> dev -> hub = 0;
@@ -111,6 +127,15 @@ static int usb_hub_read_hub_desc ( struct usb_hub * hub )
 }
 
 static int
+usb_hub_read_port_status ( struct usb_hub * hub, uint16_t port )
+{
+    return usb_ctrl_req ( hub -> dev,
+        REQ_RECIPIENT_OTHER, REQ_TYPE_CLASS, REQ_DIR_IN,
+        HUB_REQ_GET_STATUS, 0, port,
+        & ( hub -> ports [ port ].status ), sizeof ( struct usb_hub_port_status ) );
+}
+
+static int
 usb_hub_set_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature )
 {
     return usb_ctrl_req ( hub -> dev,
@@ -121,9 +146,42 @@ usb_hub_set_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature 
 
 static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
 {
-    ( void ) hub;
+    int status;
+
     printu ( "Processing Hub Port Change..." );
     printu_32h ( port );
+
+    status = usb_hub_read_port_status ( hub, port );
+    if ( status != USB_STATUS_SUCCESS )
+    {
+        printu ( "Error when retrieving USB Hub Port Status" );
+        return;
+    }
+
+    if ( hub -> ports [ port ].status.c_connection )
+    {
+        printu ( "Port connection changed" );
+    }
+
+    if ( hub -> ports [ port ].status.c_enable )
+    {
+        printu ( "Port enable changed" );
+    }
+
+    if ( hub -> ports [ port ].status.c_suspend )
+    {
+        printu ( "Port suspend changed" );
+    }
+
+    if ( hub -> ports [ port ].status.c_over_current )
+    {
+        printu ( "Port overcurrent changed" );
+    }
+
+    if ( hub -> ports [ port ].status.c_reset )
+    {
+        printu ( "Port reset changed" );
+    }
 }
 
 static void usb_hub_hub_changed ( struct usb_hub * hub )
@@ -132,54 +190,126 @@ static void usb_hub_hub_changed ( struct usb_hub * hub )
     printu ( "Processing Hub Change..." );
 }
 
+static void usb_hub_status_changed_worker ( )
+{
+    void f ( struct usb_device * dev )
+    {
+        struct usb_hub * hub;
+        uint8_t status_byte;
+        uint16_t port;
+        size_t s;
+
+        hub = dev -> hub;
+
+        // Process each status byte
+        for ( s = 0 ; s < hub -> changed_size; ++s )
+        {
+            status_byte = ( hub -> changed ) [ s ];
+            if ( ! status_byte )
+            {
+                continue;
+            }
+
+            // Process bits within the byte
+            while ( status_byte )
+            {
+                // Get the port number and process the change
+                port = 31 - __builtin_clz ( status_byte );
+                status_byte ^= ( 1 << port );
+                port += s * 8;
+
+                if ( port )
+                {
+                    usb_hub_port_changed ( hub, port );
+                }
+
+                // Port "0" represents the whole hub
+                else
+                {
+                    usb_hub_hub_changed ( hub );
+                }
+            }
+        }
+    }
+
+    for ( ; ; )
+    {
+        wait ( usb_hub_sem );
+        usb_foreach ( usb_root, f );
+    }
+}
+
 void usb_hub_status_changed_request_done ( struct usb_request * req )
 {
-    struct usb_hub * hub;
-    uint8_t status_byte;
-    uint16_t port;
-    size_t s;
-
     if ( req -> status != USB_STATUS_SUCCESS )
     {
         printu ( "USB Hub Status Changed request failed" );
         return;
     }
 
-    hub = req -> dev -> hub;
+    struct usb_hub * hub = req -> dev -> hub;
 
-    // Process each status byte
-    for ( s = 0 ; s < req -> xfer_size && s < hub -> status_maxsize; ++s )
+    size_t size = min ( req -> xfer_size, hub -> changed_size );
+    memcpy ( hub -> changed, req -> data, size );
+
+    if ( req -> xfer_size < hub -> changed_size )
     {
-        status_byte = ( ( uint8_t * ) ( req -> data ) ) [ s ];
-        if ( ! status_byte )
+        memset ( hub -> changed + req -> xfer_size, 0,
+                    hub -> changed_size - req -> xfer_size );
+    }
+
+    signal ( usb_hub_sem );
+}
+
+static int usb_hub_driver_init ( )
+{
+    sem_t sem = sem_create ( 0 );
+    if ( ! sem )
+    {
+        return -1;
+    }
+
+    usb_hub_sem = sem;
+    api_process_create ( usb_hub_status_changed_worker, 0 );
+
+    return 0;
+}
+
+void usb_foreach ( struct usb_device * dev, usb_foreach_func_t f )
+{
+    if ( ! dev )
+    {
+        return;
+    }
+
+    f ( dev );
+
+    // Leaf. Don't stack up and stop there
+    if ( ! dev -> hub )
+    {
+        return;
+    }
+
+    // This is a hub (root or middle node). Let's stack up!
+    for ( int i = 0 ; i < dev -> hub -> hub_desc -> bNbrPorts ; ++i )
+    {
+        if ( dev -> hub -> ports [ i ].child )
         {
-            continue;
-        }
-
-        // Process bits within the byte
-        while ( status_byte )
-        {
-            // Get the port number and process the change
-            port = 31 - __builtin_clz ( status_byte );
-            status_byte ^= ( 1 << port );
-            port += s * 8;
-
-            if ( port )
-            {
-                usb_hub_port_changed ( hub, port );
-            }
-
-            // Port "0" represents the whole hub
-            else
-            {
-                usb_hub_hub_changed ( hub );
-            }
+            usb_foreach ( dev -> hub -> ports [ i ].child, f );
         }
     }
 }
 
 int usb_hub_probe ( struct usb_device * dev )
 {
+    if ( ! usb_hub_sem )
+    {
+        if ( usb_hub_driver_init ( ) != 0 )
+        {
+            return -1;
+        }
+    }
+
     // Device Descriptor Check
     struct usb_dev_desc * dev_desc = & ( dev -> dev_desc );
     if ( dev_desc -> bDeviceClass != USB_CLASS_HUB ||
@@ -235,7 +365,14 @@ int usb_hub_probe ( struct usb_device * dev )
         goto err_free_hub;
     }
 
-    dev -> hub -> status_maxsize = usb_hub_desc_tail_field_size ( nbports );
+    // Allocate changed
+    dev -> hub -> changed_size = usb_hub_desc_tail_field_size ( nbports );
+    dev -> hub -> changed = memory_allocate ( dev -> hub -> changed_size );
+    if ( ! dev -> hub -> changed )
+    {
+        goto err_free_hub;
+    }
+    memset ( dev -> hub -> changed, 0, dev -> hub -> changed_size );
 
     // Allocate Interrupt IN Status Changed request
     dev -> hub -> status_changed_req =

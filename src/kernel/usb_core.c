@@ -11,7 +11,7 @@
 static struct usb_device usb_devs [ USB_MAX_DEV ];
 static const struct usb_driver * usb_drivers [ USB_MAX_DRIVERS ];
 
-static struct usb_device * usb_root;
+struct usb_device * usb_root;
 
 
 
