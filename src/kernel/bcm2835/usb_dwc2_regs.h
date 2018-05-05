@@ -65,7 +65,7 @@ struct dwc2_regs_host_hc
 // Host Mode CSRs
 struct dwc2_regs_host
 {
-    uint32_t hcfg;      // 0x00400 Host Configuration Register
+    union hcfg hcfg;    // 0x00400 Host Configuration Register
     uint32_t hfir;      // 0x00404 Host Frame Interval Register
     uint32_t hfnum;     // 0x00408 Host Frame Number / Frame Time Remaining Register
     uint32_t reserved1; // 0x0040C

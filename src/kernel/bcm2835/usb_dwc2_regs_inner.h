@@ -210,6 +210,26 @@ union hcint
     };
 };
 
+// 0x00400 Host Configuration Register (hcfg)
+union hcfg
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t fslspclksel    : 2; // FS/LS PHY Clock Select
+        uint32_t fslssupp       : 1; // FS- and LS-only Support
+        uint32_t reserved1      : 4;
+        uint32_t ena32khzs      : 1; // Enable 32 Khz Suspend Mode
+        uint32_t resvalid       : 8; // Resume Validation Period
+        uint32_t reserved2      : 7;
+        uint32_t descdma        : 1; // Enable Scatter/Gather DMA
+        uint32_t frlisten       : 2; // Frame List Entries
+        uint32_t perschedena    : 1; // Periodic Scheduling Enable
+        uint32_t reserved3      : 4;
+        uint32_t modechtimen    : 1; // Mode Change Ready Timer Enable
+    };
+};
+
 // 0x00440 Host Port Control and Status Register
 /* XXX Writing this register back to itself will disable the root hub port...
  * This is due to the bad design of this register (mixed bit types).
