@@ -39,6 +39,7 @@ enum usb_request_status
     USB_STATUS_PENDING,
     USB_STATUS_NOT_SUPPORTED,
     USB_STATUS_ERROR,
+    USB_STATUS_TIMEOUT,
 };
 
 struct usb_request

@@ -2,6 +2,7 @@
 #include "usb_std_hub.h"
 #include "usb_core.h"
 
+#include "arm.h"
 #include "semaphore.h"
 #include "../api/process.h"
 
@@ -15,6 +16,9 @@
 static sem_t usb_hub_sem;
 
 extern struct usb_device * usb_root;
+
+#define USB_HUB_RST_TIMEOUT 800
+#define USB_HUB_RST_DELAY 10
 
 struct usb_hub
 {
@@ -147,6 +151,59 @@ usb_hub_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature, int
         0, 0 );
 }
 
+static int usb_hub_port_reset ( struct usb_hub * hub, uint16_t port )
+{
+    int status;
+
+    // Ask the port to reset
+    status = usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_RESET, 1 );
+    if ( status != USB_STATUS_SUCCESS )
+    {
+        printu ( "Error when sending the request to reset the port" );
+        return status;
+    }
+
+    // Wait until hub reports the reset is complete
+    int delay = 0;
+    for ( ; hub -> ports [ port ].status.reset ; delay += USB_HUB_RST_DELAY )
+    {
+        printu ( "USB Hub Port Reset wait" );
+        cdelay ( USB_HUB_RST_DELAY * 1000 * 7 );
+
+        // Refresh the port status
+        status = usb_hub_read_port_status ( hub, port );
+        if ( status != USB_STATUS_SUCCESS )
+        {
+            printu ( "Error when retrieving USB Hub Port Status during reset" );
+            return status;
+        }
+
+        if ( delay >= USB_HUB_RST_TIMEOUT )
+        {
+            printu ( "Hub port reset timed out" );
+            return USB_STATUS_TIMEOUT;
+        }
+    }
+
+    // Allow for the recovery interval
+    // The USB spec requires 10ms at least. Here, we wait 3 times this interval.
+    cdelay ( 3 * USB_HUB_RST_RECOVERY_INTERVAL * 1000 * 7 );
+    return USB_STATUS_SUCCESS;
+}
+
+static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
+{
+    int status;
+
+    printu ( "New device plugged in. Resetting the port..." );
+    status = usb_hub_port_reset ( hub, port );
+    if ( status != USB_STATUS_SUCCESS )
+    {
+        printu ( "Error when trying to reset the hub port" );
+        return;
+    }
+}
+
 static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
 {
     int status;
@@ -164,12 +221,21 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     if ( hub -> ports [ port ].status.c_connection )
     {
         printu ( "Port connection changed" );
+        // Acknowledge the fact that the port connection has changed
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_CONNECTION, 0 );
+
+        // A new USB device has been detected. Let's attach it!
+        if ( hub -> ports [ port ].status.connection )
+        {
+            usb_hub_port_attach ( hub, port );
+        }
     }
 
     if ( hub -> ports [ port ].status.c_enable )
     {
         printu ( "Port enable changed" );
+        // Acknowledge the fact that the port enable status has changed
+        usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_ENABLE, 0 );
     }
 
     if ( hub -> ports [ port ].status.c_suspend )

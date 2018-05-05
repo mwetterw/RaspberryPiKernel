@@ -21,6 +21,7 @@ enum usb_hub_intf_proto
 
 #define USB_HUB_STSCHG_ENDP_BINTERVAL 0xFF
 
+#define USB_HUB_RST_RECOVERY_INTERVAL 10
 
 // USB 2.0 Section 11.23.2.1
 #define USB_HUB_DESC 0x29

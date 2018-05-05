@@ -132,8 +132,7 @@ void dwc2_root_hub_handle_port_interrupt ( )
     regs -> host.hprt = hprt;
 }
 
-static void __attribute__ ( ( unused ) )
-dwc2_root_hub_reset_port ( struct dwc2_regs * regs )
+static void dwc2_root_hub_reset_port ( )
 {
     // Read the Host Port Control & Status Register
     union hprt hprt = regs -> host.hprt;
@@ -146,7 +145,7 @@ dwc2_root_hub_reset_port ( struct dwc2_regs * regs )
     regs -> host.hprt = hprt;
 
     // Wait the required delay
-    cdelay ( 350000 );
+    cdelay ( 50 * 1000 * 7 );
 
     // De-assert reset on the port
     hprt.prtrst = 0;
@@ -208,8 +207,20 @@ static int dwc2_root_hub_port_feature ( uint16_t feature, int set )
             dwc2_root_hub_power_port ( set );
             return USB_STATUS_SUCCESS;
 
+        case HUB_FEATURE_PORT_RESET:
+            if ( set )
+            {
+                dwc2_root_hub_reset_port ( );
+                return USB_STATUS_SUCCESS;
+            }
+            return USB_STATUS_ERROR;
+
         case HUB_FEATURE_C_PORT_CONNECTION:
             dwc2_root_hub_port_status.c_connection = set;
+            return USB_STATUS_SUCCESS;
+
+        case HUB_FEATURE_C_PORT_ENABLE:
+            dwc2_root_hub_port_status.c_enable = set;
             return USB_STATUS_SUCCESS;
 
         default:
