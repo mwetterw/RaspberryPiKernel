@@ -153,7 +153,7 @@ dwc2_root_hub_reset_port ( struct dwc2_regs * regs )
     regs -> host.hprt = hprt;
 }
 
-static void dwc2_root_hub_power_on_port ( )
+static void dwc2_root_hub_power_port ( int power )
 {
     // Read the Host Port Control & Status Register
     union hprt hprt = regs -> host.hprt;
@@ -161,8 +161,8 @@ static void dwc2_root_hub_power_on_port ( )
     // Zero the "Write 1 to Clear" bits so that we don't accidentally clear them
     hprt.raw &= ~DWC2_HPRT_WC_MASK;
 
-    // Power on port
-    hprt.prtpwr = 1;
+    // Power on or off the port
+    hprt.prtpwr = power;
 
     // Commit
     regs -> host.hprt = hprt;
@@ -200,12 +200,16 @@ static int dwc2_root_hub_std_request ( struct usb_request * req )
     }
 }
 
-static int dwc2_root_hub_set_port_feature ( uint16_t feature )
+static int dwc2_root_hub_port_feature ( uint16_t feature, int set )
 {
     switch ( feature )
     {
         case HUB_FEATURE_PORT_POWER:
-            dwc2_root_hub_power_on_port ( );
+            dwc2_root_hub_power_port ( set );
+            return USB_STATUS_SUCCESS;
+
+        case HUB_FEATURE_C_PORT_CONNECTION:
+            dwc2_root_hub_port_status.c_connection = set;
             return USB_STATUS_SUCCESS;
 
         default:
@@ -216,6 +220,7 @@ static int dwc2_root_hub_set_port_feature ( uint16_t feature )
 static int dwc2_root_hub_class_request ( struct usb_request * req )
 {
     size_t size;
+    int set;
     struct usb_setup_req * setup = & ( req -> setup_req );
 
     switch ( setup -> bRequest )
@@ -252,11 +257,13 @@ static int dwc2_root_hub_class_request ( struct usb_request * req )
             }
 
         case HUB_REQ_SET_FEATURE:
+        case HUB_REQ_CLEAR_FEATURE:
+            set = ( setup -> bRequest == HUB_REQ_SET_FEATURE );
             switch ( setup -> bmRequestType.recipient )
             {
-                // SetPortFeature
+                // SetPortFeature / ClearPortFeature
                 case REQ_RECIPIENT_OTHER:
-                    return dwc2_root_hub_set_port_feature ( setup -> wValue );
+                    return dwc2_root_hub_port_feature ( setup -> wValue, set );
                 default:
                     return USB_STATUS_NOT_SUPPORTED;
             }

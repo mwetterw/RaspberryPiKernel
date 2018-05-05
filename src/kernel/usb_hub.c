@@ -136,11 +136,14 @@ usb_hub_read_port_status ( struct usb_hub * hub, uint16_t port )
 }
 
 static int
-usb_hub_set_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature )
+usb_hub_port_feature ( struct usb_hub * hub, uint8_t port, uint16_t feature, int set )
 {
+    enum usb_hub_bRequest req_code;
+    req_code = ( set ) ? HUB_REQ_SET_FEATURE : HUB_REQ_CLEAR_FEATURE;
+
     return usb_ctrl_req ( hub -> dev,
         REQ_RECIPIENT_OTHER, REQ_TYPE_CLASS, REQ_DIR_OUT,
-        HUB_REQ_SET_FEATURE, feature, port,
+        req_code, feature, port,
         0, 0 );
 }
 
@@ -161,6 +164,7 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     if ( hub -> ports [ port ].status.c_connection )
     {
         printu ( "Port connection changed" );
+        usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_CONNECTION, 0 );
     }
 
     if ( hub -> ports [ port ].status.c_enable )
@@ -199,6 +203,8 @@ static void usb_hub_status_changed_worker ( )
         uint16_t port;
         size_t s;
 
+        int hub_changed = 0;
+
         // Skip non-hub device
         if ( ! ( hub = dev -> hub ) )
         {
@@ -209,9 +215,9 @@ static void usb_hub_status_changed_worker ( )
         for ( s = 0 ; s < hub -> changed_size; ++s )
         {
             status_byte = ( hub -> changed ) [ s ];
-            if ( ! status_byte )
+            if ( status_byte )
             {
-                continue;
+                hub_changed = 1;
             }
 
             // Process bits within the byte
@@ -233,6 +239,12 @@ static void usb_hub_status_changed_worker ( )
                     usb_hub_hub_changed ( hub );
                 }
             }
+        }
+
+        // Re-submit USB Hub IRQ request
+        if ( hub_changed )
+        {
+            usb_submit_request ( hub -> status_changed_req );
         }
     }
 
@@ -398,7 +410,7 @@ int usb_hub_probe ( struct usb_device * dev )
     for ( uint8_t port = 1 ; port <= nbports ; ++port )
     {
         int status =
-            usb_hub_set_port_feature ( dev -> hub, port, HUB_FEATURE_PORT_POWER );
+            usb_hub_port_feature ( dev -> hub, port, HUB_FEATURE_PORT_POWER, 1 );
         if ( status != USB_STATUS_SUCCESS )
         {
             printu ( "Ignoring port power-on failure" );
