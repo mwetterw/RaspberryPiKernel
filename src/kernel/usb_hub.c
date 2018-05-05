@@ -202,6 +202,28 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
         printu ( "Error when trying to reset the hub port" );
         return;
     }
+
+    // Refresh the port status to get the attached device speed
+    status = usb_hub_read_port_status ( hub, port );
+    if ( status != USB_STATUS_SUCCESS )
+    {
+        printu ( "Error upon post-reset USB Hub Port Status retrieval" );
+        usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
+        return;
+    }
+
+    if ( hub -> ports [ port ].status.ls_dev )
+    {
+        printu ( "Newly attached device is Low-Speed" );
+    }
+    else if ( hub -> ports [ port ].status.hs_dev )
+    {
+        printu ( "Newly attached device is High-Speed" );
+    }
+    else
+    {
+        printu ( "Newly attached device is Full-Speed" );
+    }
 }
 
 static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
@@ -218,10 +240,11 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
         return;
     }
 
+    // Connection changed
     if ( hub -> ports [ port ].status.c_connection )
     {
         printu ( "Port connection changed" );
-        // Acknowledge the fact that the port connection has changed
+        // Acknowledge the event
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_CONNECTION, 0 );
 
         // A new USB device has been detected. Let's attach it!
@@ -231,26 +254,32 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
         }
     }
 
+    // Reset changed
+    if ( hub -> ports [ port ].status.c_reset )
+    {
+        printu ( "Port reset changed" );
+        // Acknowledge the event
+        usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_RESET, 0 );
+    }
+
+    // Enable changed (spec says only when enable -> disable)
     if ( hub -> ports [ port ].status.c_enable )
     {
         printu ( "Port enable changed" );
-        // Acknowledge the fact that the port enable status has changed
+        // Acknowledge the event
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_ENABLE, 0 );
     }
 
-    if ( hub -> ports [ port ].status.c_suspend )
-    {
-        printu ( "Port suspend changed" );
-    }
-
+    // Over-current changed
     if ( hub -> ports [ port ].status.c_over_current )
     {
         printu ( "Port overcurrent changed" );
     }
 
-    if ( hub -> ports [ port ].status.c_reset )
+    // Suspend changed
+    if ( hub -> ports [ port ].status.c_suspend )
     {
-        printu ( "Port reset changed" );
+        printu ( "Port suspend changed" );
     }
 }
 

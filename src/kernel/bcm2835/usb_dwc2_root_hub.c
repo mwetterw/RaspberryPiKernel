@@ -132,6 +132,19 @@ void dwc2_root_hub_handle_port_interrupt ( )
     regs -> host.hprt = hprt;
 }
 
+static void dwc2_root_hub_disable_port ( )
+{
+    // Read the Host Port Control & Status Register
+    union hprt hprt = regs -> host.hprt;
+
+    // Zero the "Write 1 to Clear" bits so that we don't accidentally clear them
+    hprt.raw &= ~DWC2_HPRT_WC_MASK;
+
+    // But write 1 to this one to clear it (will disable the port)
+    hprt.prtena = 1;
+    regs -> host.hprt = hprt;
+}
+
 static void dwc2_root_hub_reset_port ( )
 {
     // Read the Host Port Control & Status Register
@@ -211,12 +224,27 @@ static int dwc2_root_hub_port_feature ( uint16_t feature, int set )
             if ( set )
             {
                 dwc2_root_hub_reset_port ( );
+                // The real hardware doesn't implement c_reset
+                // Trigger the event manually to tell software reset is complete
+                dwc2_root_hub_port_status.c_reset = 1;
+                return USB_STATUS_SUCCESS;
+            }
+            return USB_STATUS_ERROR;
+
+        case HUB_FEATURE_PORT_ENABLE:
+            if ( ! set )
+            {
+                dwc2_root_hub_disable_port ( );
                 return USB_STATUS_SUCCESS;
             }
             return USB_STATUS_ERROR;
 
         case HUB_FEATURE_C_PORT_CONNECTION:
             dwc2_root_hub_port_status.c_connection = set;
+            return USB_STATUS_SUCCESS;
+
+        case HUB_FEATURE_C_PORT_RESET:
+            dwc2_root_hub_port_status.c_reset = set;
             return USB_STATUS_SUCCESS;
 
         case HUB_FEATURE_C_PORT_ENABLE:
