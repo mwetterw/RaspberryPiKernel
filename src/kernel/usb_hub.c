@@ -199,7 +199,11 @@ static void usb_hub_status_changed_worker ( )
         uint16_t port;
         size_t s;
 
-        hub = dev -> hub;
+        // Skip non-hub device
+        if ( ! ( hub = dev -> hub ) )
+        {
+            return;
+        }
 
         // Process each status byte
         for ( s = 0 ; s < hub -> changed_size; ++s )
@@ -264,7 +268,7 @@ void usb_hub_status_changed_request_done ( struct usb_request * req )
 static int usb_hub_driver_init ( )
 {
     sem_t sem = sem_create ( 0 );
-    if ( ! sem )
+    if ( sem < 0 )
     {
         return -1;
     }
