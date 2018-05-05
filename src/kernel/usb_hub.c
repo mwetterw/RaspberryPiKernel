@@ -411,7 +411,7 @@ int usb_hub_probe ( struct usb_device * dev )
     req -> endp = dev -> endp_desc [ 0 ] [ 0 ];
     req -> callback = usb_hub_status_changed_request_done;
 
-    if ( usb_submit_request ( req ) != 0 )
+    if ( usb_submit_request ( req ) != USB_STATUS_SUCCESS )
     {
         return USB_STATUS_ERROR;
     }

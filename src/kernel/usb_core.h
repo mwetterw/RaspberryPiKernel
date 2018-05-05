@@ -34,11 +34,11 @@ struct usb_device
 
 enum usb_request_status
 {
+    USB_STATUS_SUCCESS,
     USB_STATUS_UNPROCESSED,
     USB_STATUS_PENDING,
     USB_STATUS_NOT_SUPPORTED,
     USB_STATUS_ERROR,
-    USB_STATUS_SUCCESS,
 };
 
 struct usb_request

@@ -110,7 +110,7 @@ int usb_submit_request ( struct usb_request * req )
 {
     hcd_submit_request ( req );
 
-    return 0;
+    return USB_STATUS_SUCCESS;
 }
 
 void usb_request_done ( struct usb_request * req )
