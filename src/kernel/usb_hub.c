@@ -495,7 +495,7 @@ int usb_hub_probe ( struct usb_device * dev )
 
     // Allocate ports
     dev -> hub -> ports =
-        memory_allocate ( nbports * sizeof ( struct usb_hub_port ) );
+        memory_allocate ( ( nbports + 1 ) * sizeof ( struct usb_hub_port ) );
     if ( ! dev -> hub -> ports )
     {
         goto err_free_hub;
