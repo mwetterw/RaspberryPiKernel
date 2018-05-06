@@ -290,6 +290,13 @@ static int dwc2_probe ( )
     return 1;
 }
 
+static void dwc2_real_request ( struct usb_request * req )
+{
+    printu ( "Processing real USB Request" );
+    req -> status = USB_STATUS_NOT_SUPPORTED;
+    usb_request_done ( req );
+}
+
 static void dwc2_usb_consumer_thread ( )
 {
     for ( ; ; )
@@ -304,7 +311,7 @@ static void dwc2_usb_consumer_thread ( )
         }
         else
         {
-            req -> status = USB_STATUS_NOT_SUPPORTED;
+            dwc2_real_request ( req );
         }
     }
 }

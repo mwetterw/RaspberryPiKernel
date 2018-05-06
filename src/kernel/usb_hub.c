@@ -194,6 +194,7 @@ static int usb_hub_port_reset ( struct usb_hub * hub, uint16_t port )
 static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
 {
     int status;
+    struct usb_device * new_dev;
 
     printu ( "New device plugged in. Resetting the port..." );
     status = usb_hub_port_reset ( hub, port );
@@ -223,6 +224,25 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
     else
     {
         printu ( "Newly attached device is Full-Speed" );
+    }
+
+    // Allocate new device
+    if ( ! ( new_dev = usb_alloc_device ( hub -> dev ) ) )
+    {
+        printu ( "Error when trying to allocate device for new dev" );
+        usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
+        return;
+    }
+
+    hub -> ports [ port ].child = new_dev;
+
+    // Ask the USB Core to attach the device !
+    if ( usb_attach_device ( new_dev ) != 0 )
+    {
+        printu ( "Error during attachment of new device" );
+        hub -> ports [ port ].child = 0;
+        usb_free_device ( new_dev );
+        usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
     }
 }
 

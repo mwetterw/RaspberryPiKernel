@@ -71,6 +71,9 @@ struct usb_driver
 
 int usb_register_driver ( const struct usb_driver * driver );
 
+struct usb_device * usb_alloc_device ( struct usb_device * parent );
+void usb_free_device ( struct usb_device * dev );
+int usb_attach_device ( struct usb_device * dev );
 int usb_dev_is_root ( struct usb_device * dev );
 
 struct usb_request * usb_alloc_request ( size_t data_size );
