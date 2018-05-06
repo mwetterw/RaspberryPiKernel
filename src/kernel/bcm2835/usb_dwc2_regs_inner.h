@@ -189,27 +189,6 @@ union ghwcfg3
     };
 };
 
-// Host Channel-Specific Interrupts (hcint and hcintmsk)
-union hcint
-{
-    uint32_t raw;
-    struct
-    {
-        uint32_t xfercompl      : 1;
-        uint32_t chhltd         : 1;
-        uint32_t ahberr         : 1;
-        uint32_t stall          : 1;
-        uint32_t nak            : 1;
-        uint32_t ack            : 1;
-        uint32_t nyet           : 1;
-        uint32_t xacterr        : 1;
-        uint32_t bblerr         : 1;
-        uint32_t frmovrun       : 1;
-        uint32_t datatglerr     : 1;
-        uint32_t reserved       : 21;
-    };
-};
-
 // 0x00400 Host Configuration Register (hcfg)
 union hcfg
 {
@@ -274,4 +253,80 @@ enum hprt_prtspd
     HPRT_PRTSPD_RESERVED,
 };
 #define DWC2_HPRT_WC_MASK (0b101110)
+
+// 0x00500 Host Channel Characteristics Register
+union hcchar
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t mps            : 11; // Maximum Packet Size
+        uint32_t epnum          :  4; // Endpoint Number
+        uint32_t epdir          :  1; // Endpoint Direction (IN/OUT)
+        uint32_t reserved       :  1;
+        uint32_t lspddev        :  1; // Low-Speed Device
+        uint32_t eptype         :  2; // Endpoint Type
+        uint32_t mcec           :  2; // Multi Count / Error Count
+        uint32_t devaddr        :  7; // Device Address
+        uint32_t oddfrm         :  1; // Odd Frame
+        uint32_t chdis          :  1; // Channel Disable (WS SC SS)
+        uint32_t chena          :  1; // Channel Enable (WS SC)
+    };
+};
+enum hcchar_epdir
+{
+    HCCHAR_EPDIR_OUT,
+    HCCHAR_EPDIR_IN,
+};
+enum hcchar_eptype
+{
+    HCCHAR_EPTYPE_CTRL,
+    HCCHAR_EPTYPE_ISOC,
+    HCCHAR_EPTYPE_BLK,
+    HCCHAR_EPTYPE_IRQ,
+};
+
+// 0x00508 Host Channel Interrupt and 0x0050C Interrupt Mask Register
+union hcint
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t xfercompl      :  1; // Transfer Completed
+        uint32_t chhltd         :  1; // Channel Halted
+        uint32_t ahberr         :  1; // AHB Error
+        uint32_t stall          :  1; // STALL Response Received
+        uint32_t nak            :  1; // NAK Response Received
+        uint32_t ack            :  1; // ACK Response Received
+        uint32_t nyet           :  1; // NYET Reponse Received
+        uint32_t xacterr        :  1; // Transaction Error
+        uint32_t bblerr         :  1; // Babble Error
+        uint32_t frmovrun       :  1; // Frame Overrun
+        uint32_t datatglerr     :  1; // Data Toggle Error
+        uint32_t bna            :  1; // Buffer Not Available
+        uint32_t xcsxacterr     :  1; // Excessive Transaction Error
+        uint32_t desclstroll    :  1; // Descriptor Rollover
+        uint32_t reserved       : 18;
+    };
+};
+
+// 0x00510 Host Channel Transfer Size Register
+union hctsiz
+{
+    uint32_t raw;
+    struct
+    {
+        uint32_t xfersize       : 19; // Transfer Size
+        uint32_t pktcnt         : 10; // Packet Count
+        uint32_t pid            :  2; // PID (Packet ID)
+        uint32_t dopng          :  1; // Do Ping
+    };
+};
+enum hctsiz_pid
+{
+    HCTSIZ_PID_DATA0,
+    HCTSIZ_PID_DATA2,
+    HCTSIZ_PID_DATA1,
+    HCTSIZ_PID_MDATA_SETUP,
+};
 #endif

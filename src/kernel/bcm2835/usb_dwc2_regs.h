@@ -52,11 +52,11 @@ struct dwc2_regs_core
 // Host Channel-Specific Registers
 struct dwc2_regs_host_hc
 {
-    uint32_t hcchar;        // Host Channel Characteristics Register
+    union hcchar hcchar;    // Host Channel Characteristics Register
     uint32_t hcsplt;        // Host Channel Split Control Register
     union hcint hcint;      // Host Channel Interrupt Register
     union hcint hcintmsk;   // Host Channel Interrupt Mask Register
-    uint32_t hcsiz;         // Host Channel Transfer Size Register
+    union hctsiz hctsiz;    // Host Channel Transfer Size Register
     uint32_t hcdma;         // Host Channel DMA Address Register
     uint32_t reserved1;     // Is this just after hcdmab?
     uint32_t hcdmab;        // Host Channel DMA Buffer Address Register
