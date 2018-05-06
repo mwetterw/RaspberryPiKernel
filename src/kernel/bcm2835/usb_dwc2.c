@@ -7,6 +7,8 @@
 
 #include "../usb_hcdi.h"
 #include "../mailbox.h"
+#include "../semaphore.h"
+#include "../arm.h"
 
 #include "../../api/process.h"
 #include "../../libc/math.h"
@@ -17,6 +19,12 @@ extern void dwc2_root_hub_request ( struct usb_request * req );
 extern void dwc2_root_hub_handle_port_interrupt ( );
 
 static mailbox_t usb_requests_mbox;
+
+// Keep track of the number of free channels
+static sem_t dwc2_free_chan_sem;
+
+// Free channels bitmap
+static uint16_t dwc2_free_chans;
 
 // This struct holds various Read-Only register values
 static struct hwcfg
@@ -48,6 +56,42 @@ void dwc2_interrupt ( )
     {
         dwc2_root_hub_handle_port_interrupt ( );
     }
+}
+
+static uint32_t dwc2_get_free_chan ( )
+{
+    uint32_t chan;
+    uint32_t irqmask;
+
+    irqmask = irq_disable ( );
+    wait ( dwc2_free_chan_sem );
+    chan = 31 - __builtin_clz ( dwc2_free_chans );
+    dwc2_free_chans ^= ( 1 << chan );
+    irq_restore ( irqmask );
+
+    return chan;
+}
+
+static void __attribute__ ( ( unused ) ) dwc2_release_chan ( uint32_t chan )
+{
+    uint32_t irqmask = irq_disable ( );
+    dwc2_free_chans ^= ( 1 << chan );
+    signal ( dwc2_free_chan_sem );
+    irq_restore ( irqmask );
+}
+
+static void dwc2_real_request ( struct usb_request * req )
+{
+    uint32_t chan;
+
+    printu ( "Processing real USB Request" );
+
+    chan = dwc2_get_free_chan ( );
+    printu ( "Free chan is" );
+    printu_32h ( chan );
+
+    req -> status = USB_STATUS_NOT_SUPPORTED;
+    usb_request_done ( req );
 }
 
 #define NB_FIFOS 3
@@ -290,13 +334,6 @@ static int dwc2_probe ( )
     return 1;
 }
 
-static void dwc2_real_request ( struct usb_request * req )
-{
-    printu ( "Processing real USB Request" );
-    req -> status = USB_STATUS_NOT_SUPPORTED;
-    usb_request_done ( req );
-}
-
 static void dwc2_usb_consumer_thread ( )
 {
     for ( ; ; )
@@ -322,6 +359,14 @@ static int dwc2_start_usb_consumer_thread ( )
     {
         return -1;
     }
+
+    if ( ( dwc2_free_chan_sem = sem_create ( hwcfg.chancount ) ) < 0 )
+    {
+        mailbox_destroy ( usb_requests_mbox );
+        return -1;
+    }
+
+    dwc2_free_chans = ( 1 << hwcfg.chancount ) - 1;
 
     api_process_create ( dwc2_usb_consumer_thread, 0 );
 
