@@ -266,9 +266,18 @@ union hcchar
         uint32_t reserved       :  1;
         uint32_t lspddev        :  1; // Low-Speed Device
         uint32_t eptype         :  2; // Endpoint Type
+        /* When not in a split transaction (Multi Count)
+         *      -> Periodic
+         *          Number of transactions to execute per uframe for this EP
+         *      -> Non-Periodic (used only in DMA Mode)
+         *          Number of packets to be fetched for this channel before
+         *          internal DMA changes arbitration
+         * When in a split transaction (Error Count)
+         *      Number of immediate retries for a periodic split transaction
+         */
         uint32_t mcec           :  2; // Multi Count / Error Count
         uint32_t devaddr        :  7; // Device Address
-        uint32_t oddfrm         :  1; // Odd Frame
+        uint32_t oddfrm         :  1; // Odd Frame (Periodic only)
         uint32_t chdis          :  1; // Channel Disable (WS SC SS)
         uint32_t chena          :  1; // Channel Enable (WS SC)
     };
@@ -316,10 +325,13 @@ union hctsiz
     uint32_t raw;
     struct
     {
+        /* OUT: Data bytes to send / IN: App buffer size.
+         * Should be an integer multiple of the max pkt size for IN */
         uint32_t xfersize       : 19; // Transfer Size
+        /* Expected number of packets to be TX (OUT) or RX (IN) */
         uint32_t pktcnt         : 10; // Packet Count
         uint32_t pid            :  2; // PID (Packet ID)
-        uint32_t dopng          :  1; // Do Ping
+        uint32_t dopng          :  1; // Do Ping (only for OUT)
     };
 };
 enum hctsiz_pid
