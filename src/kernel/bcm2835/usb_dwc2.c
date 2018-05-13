@@ -237,10 +237,6 @@ static void dwc2_prepare_channel ( uint32_t chan )
     // Fetch the request associated to the channel
     req = dwc2_chan_requests [ chan ];
 
-    // Set endpoint-independant settings of the channel
-    hcchar.lspddev = 0;
-    hcchar.devaddr = req -> dev -> addr;
-
     // An endpoint has been specified (not EP0)
     if ( req -> endp )
     {
@@ -255,12 +251,6 @@ static void dwc2_prepare_channel ( uint32_t chan )
         hcchar.epnum = 0;
         hcchar.mps = req -> dev -> dev_desc.bMaxPacketSize0;
     }
-
-    hcchar.mcec = 1;
-    hcchar.oddfrm = 0; // To be set only for periodic transfers
-
-    hctsiz.pktcnt = 1; // XXX  roundup ( size / mps ), needs to be capped to 1
-    hctsiz.dopng = 0;
 
     switch ( hcchar.eptype )
     {
@@ -322,6 +312,29 @@ static void dwc2_prepare_channel ( uint32_t chan )
             return;
     }
 
+    // Set device address
+    hcchar.devaddr = req -> dev -> addr;
+
+    // To be set only when communicating with a LS device through a FS-hub
+    hcchar.lspddev = 0;
+
+    hcchar.mcec = 1;
+
+    hctsiz.dopng = 0;
+
+    /* This field is programmed by the application with the expected number of
+     * packets to be TX (OUT) or RX (IN). The host decrements this count on
+     * every succesful transmission or reception of an OUT/IN packet. Once this
+     * count reaches zero, the application is interrupted to indicate normal
+     * completion. */
+    // (x + y - 1)/y <=> ceil(x/y) for positive integers (WARNING overflow)
+    hctsiz.pktcnt = ( hctsiz.xfersize + hcchar.mps - 1 ) / hcchar.mps;
+    // We need to cap pktcnt to a minimum of 1, even for ZLPs
+    if ( hctsiz.pktcnt == 0 )
+    {
+        hctsiz.pktcnt = 1;
+    }
+
     // Program the channel
     regs -> host.hc [ chan ].hcsplt = hcsplt;
     regs -> host.hc [ chan ].hcchar = hcchar;
@@ -336,6 +349,9 @@ static void dwc2_start_channel ( uint32_t chan )
 {
     union hcchar hcchar;
     hcchar = regs -> host.hc [ chan ].hcchar;
+
+    // To be set only for periodic transfers
+    hcchar.oddfrm = 0;
 
     // Start xfer!
     hcchar.chena = 1;
