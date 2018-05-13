@@ -250,8 +250,11 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
 {
     int status;
 
-    printu ( "Processing Hub Port Change #" );
+    printu ( "Processing Hub #");
+    printu_32h ( hub -> dev -> addr );
+    printu ( " Port #" );
     printu_32h ( port );
+    printu ( " change");
     printuln ( 0 );
 
     status = usb_hub_read_port_status ( hub, port );
@@ -423,7 +426,7 @@ void usb_foreach ( struct usb_device * dev, usb_foreach_func_t f )
     }
 
     // This is a hub (root or middle node). Let's stack up!
-    for ( int i = 0 ; i < dev -> hub -> hub_desc -> bNbrPorts ; ++i )
+    for ( int i = 1 ; i <= dev -> hub -> hub_desc -> bNbrPorts ; ++i )
     {
         if ( dev -> hub -> ports [ i ].child )
         {
@@ -522,7 +525,7 @@ int usb_hub_probe ( struct usb_device * dev )
     {
         goto err_free_hub;
     }
-    memset ( dev -> hub -> ports, 0, nbports * sizeof ( struct usb_hub_port ) );
+    memset ( dev -> hub -> ports, 0, ( nbports + 1 ) * sizeof ( struct usb_hub_port ) );
 
     for ( uint8_t port = 1 ; port <= nbports ; ++port )
     {
