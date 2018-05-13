@@ -18,8 +18,9 @@ static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HC
 extern void dwc2_root_hub_request ( struct usb_request * req );
 extern void dwc2_root_hub_handle_port_interrupt ( );
 
+static void dwc2_channel_interrupt ( uint32_t chan );
 static void dwc2_prepare_channel ( uint32_t chan );
-static void dwc2_release_chan ( uint32_t chan );
+static void dwc2_start_channel ( uint32_t chan );
 
 static mailbox_t usb_requests_mbox;
 
@@ -52,6 +53,52 @@ static struct hwcfg
     int chancount;
 } hwcfg;
 
+
+static uint32_t dwc2_get_free_chan ( )
+{
+    uint32_t chan;
+    uint32_t irqmask;
+
+    irqmask = irq_disable ( );
+    wait ( dwc2_free_chan_sem );
+    chan = 31 - __builtin_clz ( dwc2_free_chans );
+    dwc2_free_chans ^= ( 1 << chan );
+    irq_restore ( irqmask );
+
+    return chan;
+}
+
+static void dwc2_release_chan ( uint32_t chan )
+{
+    uint32_t irqmask = irq_disable ( );
+    dwc2_free_chans ^= ( 1 << chan );
+    signal ( dwc2_free_chan_sem );
+    irq_restore ( irqmask );
+}
+
+void dwc2_interrupt ( )
+{
+    union gint gint = regs -> core.gintsts;
+
+    // Handle host port interrupt
+    if ( gint.prtint )
+    {
+        dwc2_root_hub_handle_port_interrupt ( );
+    }
+
+    // Channel Interrupt
+    if ( gint.hchint )
+    {
+        uint32_t chans = regs -> host.haint;
+        uint32_t chan;
+        while ( chans )
+        {
+            chan = 31 - __builtin_clz ( chans );
+            chans ^= ( 1 << chan );
+            dwc2_channel_interrupt ( chan );
+        }
+    }
+}
 
 static void dwc2_channel_interrupt ( uint32_t chan )
 {
@@ -161,66 +208,6 @@ static void dwc2_channel_interrupt ( uint32_t chan )
     }
 }
 
-void dwc2_interrupt ( )
-{
-    union gint gint = regs -> core.gintsts;
-
-    // Handle host port interrupt
-    if ( gint.prtint )
-    {
-        dwc2_root_hub_handle_port_interrupt ( );
-    }
-
-    // Channel Interrupt
-    if ( gint.hchint )
-    {
-        uint32_t chans = regs -> host.haint;
-        uint32_t chan;
-        while ( chans )
-        {
-            chan = 31 - __builtin_clz ( chans );
-            chans ^= ( 1 << chan );
-            dwc2_channel_interrupt ( chan );
-        }
-    }
-}
-
-static uint32_t dwc2_get_free_chan ( )
-{
-    uint32_t chan;
-    uint32_t irqmask;
-
-    irqmask = irq_disable ( );
-    wait ( dwc2_free_chan_sem );
-    chan = 31 - __builtin_clz ( dwc2_free_chans );
-    dwc2_free_chans ^= ( 1 << chan );
-    irq_restore ( irqmask );
-
-    return chan;
-}
-
-static void dwc2_release_chan ( uint32_t chan )
-{
-    uint32_t irqmask = irq_disable ( );
-    dwc2_free_chans ^= ( 1 << chan );
-    signal ( dwc2_free_chan_sem );
-    irq_restore ( irqmask );
-}
-
-static void dwc2_start_channel ( uint32_t chan )
-{
-    union hcchar hcchar;
-
-    hcchar = regs -> host.hc [ chan ].hcchar;
-
-    // Enable interrupt for the current channel
-    regs -> host.haintmsk |= ( 1 << chan );
-
-    // Start xfer!
-    hcchar.chena = 1;
-    regs -> host.hc [ chan ].hcchar = hcchar;
-}
-
 static void dwc2_prepare_channel ( uint32_t chan )
 {
     struct usb_request * req;
@@ -288,6 +275,16 @@ static void dwc2_prepare_channel ( uint32_t chan )
     regs -> host.hc [ chan ].hcdma = ( uintptr_t ) hcdma;
 
     dwc2_start_channel ( chan );
+}
+
+static void dwc2_start_channel ( uint32_t chan )
+{
+    union hcchar hcchar;
+    hcchar = regs -> host.hc [ chan ].hcchar;
+
+    // Start xfer!
+    hcchar.chena = 1;
+    regs -> host.hc [ chan ].hcchar = hcchar;
 }
 
 static void dwc2_real_request ( struct usb_request * req )
@@ -455,8 +452,8 @@ static void dwc2_setup_interrupts ( )
         haint = regs -> host.haint;
         regs -> host.haint = haint;
 
-        // Clear Mask
-        regs -> host.haintmsk = 0;
+        // Enable interrupt for all channels
+        regs -> host.haintmsk = ( 1 << hwcfg.chancount ) - 1;
     }
 
     // Core interrupts
@@ -624,13 +621,7 @@ int hcd_start ( )
     dwc2_setup_interrupts ( );
 
     // Start the USB consumer thread
-    int ret = dwc2_start_usb_consumer_thread ( );
-    if ( ret != 0 )
-    {
-        power_device ( POWER_USB_HCD, POWER_OFF );
-    }
-
-    return ret;
+    return dwc2_start_usb_consumer_thread ( );
 }
 
 void hcd_stop ( )
