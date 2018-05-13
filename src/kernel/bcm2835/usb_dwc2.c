@@ -111,8 +111,10 @@ void dwc2_interrupt ( )
 static void dwc2_channel_interrupt ( uint32_t chan )
 {
     union hcint hcint = regs -> host.hc [ chan ].hcint;
+    union hcchar hcchar = regs -> host.hc [ chan ].hcchar;
     struct usb_request * req = dwc2_chan_requests [ chan ];
 
+    // Acknowledge interrupts for this channel
     regs -> host.hc [ chan ].hcint = hcint;
 
     printu ( "Interrupt on channel: " );
@@ -184,34 +186,38 @@ static void dwc2_channel_interrupt ( uint32_t chan )
         return;
     }
 
-    if ( req -> endp && req -> endp -> bmAttributes.transfer != ENDP_XFER_CONTROL )
+    switch ( hcchar.eptype )
     {
-        dwc2_complete_request ( chan, USB_STATUS_NOT_SUPPORTED );
-        return;
-    }
+        case HCCHAR_EPTYPE_CTRL:
+            if ( hcint.ack )
+            {
+                // Complete the request when status stage has completed
+                if ( req -> ctrl_stage == USB_CTRL_STAGE_STATUS )
+                {
+                    dwc2_complete_request ( chan, USB_STATUS_SUCCESS );
+                    return;
+                }
 
-    // Control Request
-    if ( hcint.ack )
-    {
-        // Complete the request when status stage has completed
-        if ( req -> ctrl_stage == USB_CTRL_STAGE_STATUS )
-        {
-            dwc2_complete_request ( chan, USB_STATUS_SUCCESS );
-            return;
-        }
+                // Go on to the next stage
+                req -> ctrl_stage++;
 
-        // Go on to the next stage
-        req -> ctrl_stage++;
+                // Skip DATA stage if there is no data to send/receive
+                if ( req -> setup_req.wLength == 0 )
+                {
+                    req -> ctrl_stage++;
+                }
 
-        // Skip DATA stage if there is no data to send/receive
-        if ( req -> setup_req.wLength == 0 )
-        {
-            req -> ctrl_stage++;
-        }
+                // Start the new transaction
+                dwc2_prepare_channel ( chan );
+                return;
+            }
+            break;
 
-        // Start the new transaction
-        dwc2_prepare_channel ( chan );
-        return;
+        case HCCHAR_EPTYPE_ISOC:
+        case HCCHAR_EPTYPE_BLK:
+        case HCCHAR_EPTYPE_IRQ:
+            dwc2_complete_request ( chan, USB_STATUS_NOT_SUPPORTED );
+            break;
     }
 }
 
