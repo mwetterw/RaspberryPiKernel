@@ -67,7 +67,7 @@ struct dwc2_regs_host
 {
     union hcfg hcfg;    // 0x00400 Host Configuration Register
     uint32_t hfir;      // 0x00404 Host Frame Interval Register
-    uint32_t hfnum;     // 0x00408 Host Frame Number / Frame Time Remaining Register
+    union hfnum hfnum;  // 0x00408 Host Frame Number / Frame Time Remaining Register
     uint32_t reserved1; // 0x0040C
     uint32_t hptxsts;   // 0x00410 Host Periodic Transmit FIFO / Queue Status Register
     uint32_t haint;     // 0x00414 Host All Channels Interrupt Register

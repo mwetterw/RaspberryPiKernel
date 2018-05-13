@@ -209,6 +209,17 @@ union hcfg
     };
 };
 
+// 0x00408 Host Frame Number / Frame Time Remaining Register (hfnum)
+union hfnum
+{
+    uint32_t raw;
+    struct
+    {
+        uint16_t frnum; // Frame Number
+        uint16_t frrem; // Frame Time Remaining
+    };
+};
+
 // 0x00440 Host Port Control and Status Register
 /* XXX Writing this register back to itself will disable the root hub port...
  * This is due to the bad design of this register (mixed bit types).
