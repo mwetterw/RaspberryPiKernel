@@ -53,7 +53,6 @@ static struct hwcfg
     int chancount;
 } hwcfg;
 
-
 static uint32_t dwc2_get_free_chan ( )
 {
     uint32_t chan;
@@ -74,6 +73,15 @@ static void dwc2_release_chan ( uint32_t chan )
     dwc2_free_chans ^= ( 1 << chan );
     signal ( dwc2_free_chan_sem );
     irq_restore ( irqmask );
+}
+
+static void dwc2_complete_request ( uint32_t chan, enum usb_request_status status )
+{
+    struct usb_request * req = dwc2_chan_requests [ chan ];
+
+    dwc2_release_chan ( chan );
+    req -> status = status;
+    usb_request_done ( req );
 }
 
 void dwc2_interrupt ( )
@@ -172,14 +180,14 @@ static void dwc2_channel_interrupt ( uint32_t chan )
             hcint.frmovrun || hcint.datatglerr )
     {
         printuln ( "An error occurred" );
-        req -> status = USB_STATUS_ERROR;
-        goto req_done;
+        dwc2_complete_request ( chan, USB_STATUS_ERROR );
+        return;
     }
 
     if ( req -> endp && req -> endp -> bmAttributes.transfer != ENDP_XFER_CONTROL )
     {
-        req -> status = USB_STATUS_NOT_SUPPORTED;
-        goto req_done;
+        dwc2_complete_request ( chan, USB_STATUS_NOT_SUPPORTED );
+        return;
     }
 
     // Control Request
@@ -188,8 +196,8 @@ static void dwc2_channel_interrupt ( uint32_t chan )
         // Complete the request when status stage has completed
         if ( req -> ctrl_stage == USB_CTRL_STAGE_STATUS )
         {
-            req -> status = USB_STATUS_SUCCESS;
-            goto req_done;
+            dwc2_complete_request ( chan, USB_STATUS_SUCCESS );
+            return;
         }
 
         // Go on to the next stage
@@ -205,10 +213,6 @@ static void dwc2_channel_interrupt ( uint32_t chan )
         dwc2_prepare_channel ( chan );
         return;
     }
-
-req_done:
-    dwc2_release_chan ( chan );
-    usb_request_done ( req );
 }
 
 static void dwc2_prepare_channel ( uint32_t chan )
@@ -308,9 +312,7 @@ static void dwc2_prepare_channel ( uint32_t chan )
             break;
 
         default:
-            dwc2_release_chan ( chan );
-            req -> status = USB_STATUS_NOT_SUPPORTED;
-            usb_request_done ( req );
+            dwc2_complete_request ( chan, USB_STATUS_NOT_SUPPORTED );
             return;
     }
 
