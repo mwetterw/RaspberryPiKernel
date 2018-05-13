@@ -350,8 +350,15 @@ static void dwc2_start_channel ( uint32_t chan )
     union hcchar hcchar;
     hcchar = regs -> host.hc [ chan ].hcchar;
 
-    // To be set only for periodic transfers
-    hcchar.oddfrm = 0;
+    // oddfrm should only be set for periodic transfers
+    if ( hcchar.eptype == HCCHAR_EPTYPE_ISOC || hcchar.eptype == HCCHAR_EPTYPE_IRQ )
+    {
+        hcchar.oddfrm = ( regs -> host.hfnum.frnum + 1 ) & 1;
+    }
+    else
+    {
+        hcchar.oddfrm = 0;
+    }
 
     // Start xfer!
     hcchar.chena = 1;
