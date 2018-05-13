@@ -18,6 +18,9 @@ static struct dwc2_regs volatile * regs = ( struct dwc2_regs volatile * ) USB_HC
 extern void dwc2_root_hub_request ( struct usb_request * req );
 extern void dwc2_root_hub_handle_port_interrupt ( );
 
+static void dwc2_prepare_channel ( uint32_t chan );
+static void dwc2_release_chan ( uint32_t chan );
+
 static mailbox_t usb_requests_mbox;
 
 // Keep track of the number of free channels
@@ -25,6 +28,9 @@ static sem_t dwc2_free_chan_sem;
 
 // Free channels bitmap
 static uint16_t dwc2_free_chans;
+
+// Keep track of USB req for each channel
+static struct usb_request * dwc2_chan_requests [ MAX_CHAN ];
 
 // This struct holds various Read-Only register values
 static struct hwcfg
@@ -46,6 +52,115 @@ static struct hwcfg
     int chancount;
 } hwcfg;
 
+
+static void dwc2_channel_interrupt ( uint32_t chan )
+{
+    union hcint hcint = regs -> host.hc [ chan ].hcint;
+    struct usb_request * req = dwc2_chan_requests [ chan ];
+
+    regs -> host.hc [ chan ].hcint = hcint;
+
+    printu ( "Interrupt on channel: " );
+    printu_32h ( chan );
+
+    if ( hcint.xfercompl )
+    {
+        printu ( " xfercompl" );
+    }
+
+    if ( hcint.chhltd )
+    {
+        printu ( " chhltd" );
+    }
+
+    if ( hcint.ahberr )
+    {
+        printu ( " ahberr" );
+    }
+
+    if ( hcint.stall )
+    {
+        printu ( " STALL" );
+    }
+
+    if ( hcint.nak )
+    {
+        printu ( " NAK" );
+    }
+
+    if ( hcint.ack )
+    {
+        printu ( " ACK" );
+    }
+
+    if ( hcint.nyet )
+    {
+        printu ( " NYET" );
+    }
+
+    if ( hcint.xacterr )
+    {
+        printu ( " xacterr" );
+    }
+
+    if ( hcint.bblerr )
+    {
+        printu ( " bblerr" );
+    }
+
+    if ( hcint.frmovrun )
+    {
+        printu ( " frmovrun" );
+    }
+
+    if ( hcint.datatglerr )
+    {
+        printu ( " datatglerr" );
+    }
+
+    printuln ( 0 );
+
+    // Error
+    if ( hcint.ahberr || hcint.stall || hcint.xacterr || hcint.bblerr ||
+            hcint.frmovrun || hcint.datatglerr )
+    {
+        printuln ( "An error occurred" );
+        return;
+    }
+
+    // No error
+
+    // Non default endpoint transfer
+    if ( req -> endp )
+    {
+        return;
+    }
+
+    // Control Request on default endpoint
+    if ( hcint.ack )
+    {
+        if ( req -> ctrl_stage >= USB_CTRL_STAGE_STATUS )
+        {
+            dwc2_release_chan ( chan );
+            req -> status = USB_STATUS_SUCCESS;
+            usb_request_done ( req );
+            return;
+        }
+
+        // Go on to the next stage
+        req -> ctrl_stage++;
+
+        // Skip DATA stage if there is no data to send/receive
+        if ( req -> setup_req.wLength == 0 )
+        {
+            req -> ctrl_stage++;
+        }
+
+        dwc2_prepare_channel ( chan );
+        return;
+    }
+}
+
 void dwc2_interrupt ( )
 {
     union gint gint = regs -> core.gintsts;
@@ -54,6 +169,19 @@ void dwc2_interrupt ( )
     if ( gint.prtint )
     {
         dwc2_root_hub_handle_port_interrupt ( );
+    }
+
+    // Channel Interrupt
+    if ( gint.hchint )
+    {
+        uint32_t chans = regs -> host.haint;
+        uint32_t chan;
+        while ( chans )
+        {
+            chan = 31 - __builtin_clz ( chans );
+            chans ^= ( 1 << chan );
+            dwc2_channel_interrupt ( chan );
+        }
     }
 }
 
@@ -71,7 +199,7 @@ static uint32_t dwc2_get_free_chan ( )
     return chan;
 }
 
-static void __attribute__ ( ( unused ) ) dwc2_release_chan ( uint32_t chan )
+static void dwc2_release_chan ( uint32_t chan )
 {
     uint32_t irqmask = irq_disable ( );
     dwc2_free_chans ^= ( 1 << chan );
@@ -79,10 +207,92 @@ static void __attribute__ ( ( unused ) ) dwc2_release_chan ( uint32_t chan )
     irq_restore ( irqmask );
 }
 
+static void dwc2_start_channel ( uint32_t chan )
+{
+    union hcchar hcchar;
+
+    hcchar = regs -> host.hc [ chan ].hcchar;
+
+    // Enable interrupt for the current channel
+    regs -> host.haintmsk |= ( 1 << chan );
+
+    // Start xfer!
+    hcchar.chena = 1;
+    regs -> host.hc [ chan ].hcchar = hcchar;
+}
+
+static void dwc2_prepare_channel ( uint32_t chan )
+{
+    struct usb_request * req;
+    union hcchar hcchar;
+    uint32_t hcsplt;
+    union hctsiz hctsiz;
+    void * hcdma;
+
+    req = dwc2_chan_requests [ chan ];
+
+    hcchar.raw = 0;
+    hcsplt = 0;
+    hctsiz.raw = 0;
+
+    if ( req -> endp )
+    {
+        req -> status = USB_STATUS_NOT_SUPPORTED;
+        usb_request_done ( req );
+        return;
+    }
+
+    // Control Request on EP0
+
+    hcchar.mps = req -> dev -> dev_desc.bMaxPacketSize0;
+    hcchar.epnum = 0;
+    hcchar.lspddev = 0;
+    hcchar.eptype = HCCHAR_EPTYPE_CTRL;
+    hcchar.mcec = 1;
+    hcchar.devaddr = req -> dev -> addr;
+    hcchar.oddfrm = 0; // To be set only for periodic transfers
+
+    hctsiz.pktcnt = 1; // XXX  roundup ( size / mps ), needs to be capped to 1
+    hctsiz.dopng = 0;
+
+    switch ( req -> ctrl_stage )
+    {
+        case USB_CTRL_STAGE_SETUP:
+            hcchar.epdir = HCCHAR_EPDIR_OUT;
+            hctsiz.pid = HCTSIZ_PID_MDATA_SETUP;
+            hctsiz.xfersize = sizeof ( req -> setup_req );
+            hcdma = &( req -> setup_req );
+            break;
+
+        case USB_CTRL_STAGE_DATA:
+            hcchar.epdir = req -> setup_req.bmRequestType.dir;
+            hctsiz.pid = HCTSIZ_PID_DATA1;
+            hctsiz.xfersize = req -> size;
+            hcdma = req -> data;
+            break;
+
+        case USB_CTRL_STAGE_STATUS:
+            /* USB 2.0 Section 8.5.3
+             * "A Status stage is delineated by a change in direction of data
+             * flow from the previous stage and always uses a DATA1 PID." */
+            hcchar.epdir = ! ( req -> setup_req.bmRequestType.dir );
+            hctsiz.pid = HCTSIZ_PID_DATA1;
+            hctsiz.xfersize = 0;
+            hcdma = 0;
+            break;
+    }
+
+    regs -> host.hc [ chan ].hcsplt = hcsplt;
+    regs -> host.hc [ chan ].hcchar = hcchar;
+    regs -> host.hc [ chan ].hctsiz = hctsiz;
+    regs -> host.hc [ chan ].hcdma = ( uintptr_t ) hcdma;
+
+    dwc2_start_channel ( chan );
+}
+
 static void dwc2_real_request ( struct usb_request * req )
 {
     uint32_t chan;
-
 
     chan = dwc2_get_free_chan ( );
     printu ( "Processing real USB Request" );
@@ -90,8 +300,8 @@ static void dwc2_real_request ( struct usb_request * req )
     printu_32h ( chan );
     printuln ( 0 );
 
-    req -> status = USB_STATUS_NOT_SUPPORTED;
-    usb_request_done ( req );
+    dwc2_chan_requests [ chan ] = req;
+    dwc2_prepare_channel ( chan );
 }
 
 #define NB_FIFOS 3

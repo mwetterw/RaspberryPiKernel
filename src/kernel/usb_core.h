@@ -42,6 +42,13 @@ enum usb_request_status
     USB_STATUS_TIMEOUT,
 };
 
+enum usb_ctrl_stage
+{
+    USB_CTRL_STAGE_SETUP,
+    USB_CTRL_STAGE_DATA,
+    USB_CTRL_STAGE_STATUS,
+};
+
 struct usb_request
 {
     struct usb_device * dev;
@@ -61,6 +68,10 @@ struct usb_request
     usb_request_callback_t callback;
 
     void * priv;
+
+
+    // For the Host Controller
+    enum usb_ctrl_stage ctrl_stage;
 };
 
 struct usb_driver
