@@ -222,25 +222,42 @@ static void dwc2_enable_dma ( )
 
 static void dwc2_setup_interrupts ( )
 {
-    // Clear host channel specific interrupts
+    union hcint hcint;
+
+    // Host channel specific interrupts
     for ( int ch = 0 ; ch < hwcfg.chancount ; ++ch )
     {
-        regs -> host.hc [ ch ].hcintmsk.raw = 0;
-        regs -> host.hc [ ch ].hcint.raw = ~0;
+        // Clear interrupts
+        hcint = regs -> host.hc [ ch ].hcint;
+        regs -> host.hc [ ch ].hcint = hcint;
+
+        // Setup mask
+        hcint.raw = 0;
+        hcint.chhltd = 1;
+        regs -> host.hc [ ch ].hcintmsk = hcint;
     }
 
-    // Clear global host channels interrupts
-    regs -> host.haintmsk = 0;
-    regs -> host.haint = ( ~0 );
+    // Global host channels interrupts
+    {
+        uint32_t haint;
 
-    // Clear core interrupts
-    regs -> core.gintmsk.raw = 0;
-    regs -> core.gintsts.raw = ~0;
+        // Clear interrupts
+        haint = regs -> host.haint;
+        regs -> host.haint = haint;
 
+        // Clear Mask
+        regs -> host.haintmsk = 0;
+    }
 
-    // Enable core interrupts
+    // Core interrupts
     {
         union gint gint;
+
+        // Clear interrupts
+        gint = regs -> core.gintsts;
+        regs -> core.gintsts = gint;
+
+        // Setup mask
         gint.raw = 0;
         gint.hchint = 1;
         gint.prtint = 1;
@@ -365,6 +382,7 @@ static int dwc2_start_usb_consumer_thread ( )
         return -1;
     }
 
+    // Mark all channels as free
     dwc2_free_chans = ( 1 << hwcfg.chancount ) - 1;
 
     api_process_create ( dwc2_usb_consumer_thread, 0 );
