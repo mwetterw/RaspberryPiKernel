@@ -75,6 +75,14 @@ void printu ( const char * str )
     {
         uart_write_char ( str [ i ] );
     }
+}
+
+void printuln ( const char * str )
+{
+    if ( str )
+    {
+        printu ( str );
+    }
     uart_write_char ( '\r' );
     uart_write_char ( '\n' );
 }
@@ -97,6 +105,4 @@ void printu_32h ( uint32_t val )
             uart_write_char ( 'a' + cur - 0xa );
         }
     }
-    uart_write_char ( '\r' );
-    uart_write_char ( '\n' );
 }

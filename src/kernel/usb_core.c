@@ -42,7 +42,7 @@ usb_bind_driver ( struct usb_device * dev, const struct usb_driver * driver )
     int status = driver -> probe ( dev );
     if ( status == USB_STATUS_SUCCESS )
     {
-        printu ( "Binding driver to device" );
+        printuln ( "Binding driver to device" );
         dev -> driver = driver;
     }
     return status;
@@ -225,7 +225,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
     dev -> conf_desc = memory_allocate ( conf.wTotalLength );
     if ( ! dev -> conf_desc )
     {
-        printu ( "Error when allocating memory for configuration desc" );
+        printuln ( "Error when allocating memory for configuration desc" );
         return -1;
     }
 
@@ -233,7 +233,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
     status = usb_get_conf_desc ( dev, idx, dev -> conf_desc, conf.wTotalLength );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when getting whole configuration desc" );
+        printuln ( "Error when getting whole configuration desc" );
     }
 
     // Set the interface and endpoint pointers
@@ -246,7 +246,7 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
 
         if ( hdr -> bLength < sizeof ( struct usb_desc_hdr ) )
         {
-            printu ( "Invalid bLength in configuration descriptor header" );
+            printuln ( "Invalid bLength in configuration descriptor header" );
             return -1;
         }
 
@@ -258,18 +258,18 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
                 // TODO: Handle alternate settings
                 if ( intf -> bAlternateSetting != 0 )
                 {
-                    printu ( "Skipping alternate settings intf..." );
+                    printuln ( "Skipping alternate settings intf..." );
                     break;
                 }
 
                 if ( ++intf_idx >= USB_MAX_INTF )
                 {
-                    printu ( "Too many interfaces" );
+                    printuln ( "Too many interfaces" );
                     return -1;
                 }
                 if ( intf_idx >= dev -> conf_desc -> bNumInterfaces )
                 {
-                    printu ( "bNumInterfaces mismatch" );
+                    printuln ( "bNumInterfaces mismatch" );
                     return -1;
                 }
 
@@ -280,14 +280,14 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
             case USB_DESC_ENDP:
                 if ( intf_idx < 0 )
                 {
-                    printu ( "Endpoint belonging to no Interface" );
+                    printuln ( "Endpoint belonging to no Interface" );
                     return -1;
                 }
 
                 // TODO: Handle alternate settings
                 if ( intf -> bAlternateSetting != 0 )
                 {
-                    printu ( "Skipping endp of alternate settings intf..." );
+                    printuln ( "Skipping endp of alternate settings intf..." );
                     break;
                 }
 
@@ -295,12 +295,12 @@ static int usb_read_conf_desc ( struct usb_device * dev, uint8_t idx )
 
                 if ( ++endp_idx >= USB_MAX_ENDP )
                 {
-                    printu ( "Too many endpoints" );
+                    printuln ( "Too many endpoints" );
                     return -1;
                 }
                 if ( endp_idx >= intf -> bNumEndpoints )
                 {
-                    printu ( "bNumEnpoints mismatch" );
+                    printuln ( "bNumEnpoints mismatch" );
                     return -1;
                 }
 
@@ -326,7 +326,7 @@ int usb_register_driver ( const struct usb_driver * driver_ )
 {
     if ( driver_ -> probe == 0 )
     {
-        printu ( "The probe function must be implemented" );
+        printuln ( "The probe function must be implemented" );
         return -1;
     }
 
@@ -382,7 +382,7 @@ void usb_unregister_driver ( const struct usb_driver * driver )
         return;
     }
 
-    printu ( "Unregistering driver" );
+    printuln ( "Unregistering driver" );
 
     // Unbind driver from devices
     for ( int i = 0 ; i < USB_MAX_DEV ; ++i )
@@ -432,55 +432,61 @@ int usb_attach_device ( struct usb_device * dev )
      * to have read this default pipe's wMaxPacketSize field (byte 7 of the
      * device descriptor). It will then allow the correct size for all
      * subsequent transactions. */
+    printuln ( "Initial read of the device descriptor" );
     dev -> dev_desc.bMaxPacketSize0 = USB_LS_CTRL_DATALEN;
     status = usb_read_device_desc ( dev, USB_LS_CTRL_DATALEN );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error on initial device descriptor reading" );
+        printuln ( "Error on initial device descriptor reading" );
         return -1;
     }
 
     // Set device address
+    printuln ( "Setting address" );
     status = usb_set_device_addr ( dev, usb_alloc_addr ( dev ) );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when setting device address" );
+        printuln ( "Error when setting device address" );
         return -1;
     }
 
     // Re-read the device descriptor only if bMaxPacketSize0 has increased
+    printuln ( "Re-read of device descriptor" );
     if ( dev -> dev_desc.bMaxPacketSize0 > USB_LS_CTRL_DATALEN )
     {
         status = usb_read_device_desc ( dev, sizeof ( struct usb_dev_desc ) );
         if ( status != USB_STATUS_SUCCESS )
         {
-            printu ( "Error on full device descriptor reading" );
+            printuln ( "Error on full device descriptor reading" );
             return -1;
         }
     }
 
     // Read the first configuration descriptor
+    printuln ( "Read of the first configuration descriptor" );
     status = usb_read_conf_desc ( dev, 0 );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when reading configuration descriptor" );
+        printuln ( "Error when reading configuration descriptor" );
         return -1;
     }
 
     // Activate the first configuration
+    printuln ( "Activate the first configuration" );
     status = usb_set_configuration ( dev,
             dev -> conf_desc -> bConfigurationValue );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when activating the first configuration" );
+        printuln ( "Error when activating the first configuration" );
         return -1;
     }
 
     // Try to find a driver for our new attached device!
+    printuln ( "Looking up driver for the new device" );
     status = usb_find_driver_for_dev ( dev );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "No driver found for newly attached device." );
+        printuln ( "No driver found for newly attached device." );
         // This is not an error as drivers can be registered at any time
     }
 
@@ -492,32 +498,32 @@ void usb_init ( )
     // Register the hub driver
     if ( usb_register_driver ( & usb_hub_driver ) != 0 )
     {
-        printu ( "Unable to register vital USB Hub Driver" );
+        printuln ( "Unable to register vital USB Hub Driver" );
         return;
     }
 
     // Request our Host Controller to start up
     if ( hcd_start ( ) != 0 )
     {
-        printu ( "USB Core failed to start the HCD" );
+        printuln ( "USB Core failed to start the HCD" );
         goto err_usb_unregister_hub_driver;
     }
 
     // Create the root hub
     if ( ! ( usb_root = usb_alloc_device ( 0 ) ) )
     {
-        printu ( "USB Core failed to allocate the root hub" );
+        printuln ( "USB Core failed to allocate the root hub" );
         goto err_hcd_stop;
     }
 
     // Attach the root hub
     if ( usb_attach_device ( usb_root ) != 0 )
     {
-        printu ( "USB Core failed to attach the root hub" );
+        printuln ( "USB Core failed to attach the root hub" );
         goto err_free_root_hub;
     }
 
-    printu ( "USB Core Initialization complete" );
+    printuln ( "USB Core Initialization complete" );
     return;
 
 err_free_root_hub:

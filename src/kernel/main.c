@@ -21,13 +21,13 @@ void kernel_main ( uint32_t z, uint32_t mach, uint32_t atags )
 
     hardware_init ( );
 
-    printu ( "Bootup sequence complete! Yielding CPU to userspace..." );
+    printuln ( "Bootup sequence complete! Yielding CPU to userspace..." );
     pcb_create ( init, 0 );
     scheduler_reschedule ( 0 );
 }
 
 void crash ( )
 {
-    printu ( "CRASH" );
+    printuln ( "CRASH" );
     for ( ; ; );
 }

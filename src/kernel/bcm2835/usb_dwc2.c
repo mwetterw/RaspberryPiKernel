@@ -48,7 +48,6 @@ static struct hwcfg
 
 void dwc2_interrupt ( )
 {
-    printu ( "USB IRQ" );
     union gint gint = regs -> core.gintsts;
 
     // Handle host port interrupt
@@ -84,11 +83,12 @@ static void dwc2_real_request ( struct usb_request * req )
 {
     uint32_t chan;
 
-    printu ( "Processing real USB Request" );
 
     chan = dwc2_get_free_chan ( );
-    printu ( "Free chan is" );
+    printu ( "Processing real USB Request" );
+    printu ( " Free chan is " );
     printu_32h ( chan );
+    printuln ( 0 );
 
     req -> status = USB_STATUS_NOT_SUPPORTED;
     usb_request_done ( req );
@@ -159,7 +159,7 @@ static void dwc2_setup_fifos ( )
     if ( dfifodepth < ( uint32_t )
             ( hwcfg.grxf.siz + hwcfg.gnptxf.siz + hwcfg.hptxf.siz ) )
     {
-        printu ( "FIFOs don't fit into DFIFO. Resizing..." );
+        printuln ( "FIFOs don't fit into DFIFO. Resizing..." );
 
         /* These power-on values (in hwcfg struct) represent the maximum size
          * for each FIFO. They must never be exceeded (but we can set less). */
@@ -311,24 +311,24 @@ static int dwc2_probe ( )
 {
     if ( hwcfg.gsnpsid.product != DWC2_PRODUCT_ID )
     {
-        printu ( "This is not a Synopsys DWC2 USB 2.0 OTG Controller!" );
+        printuln ( "This is not a Synopsys DWC2 USB 2.0 OTG Controller!" );
         return 0;
     }
 
     if ( ! dwc2_is_host_capable ( ) )
     {
-        printu ( "This release of the DWC2 is not host-capable." );
+        printuln ( "This release of the DWC2 is not host-capable." );
         return 0;
     }
 
     if ( hwcfg.gsnpsid.version != VERSION_2_80A )
     {
-        printu ( "Warning: This release of the DWC2 is untested." );
+        printuln ( "Warning: This release of the DWC2 is untested." );
     }
 
     if ( hwcfg.guid != BCM2708_GUID )
     {
-        printu ( "Warning: This instance (non-BCM2708) of the DWC2 is untested." );
+        printuln ( "Warning: This instance (non-BCM2708) of the DWC2 is untested." );
     }
 
     return 1;
@@ -341,7 +341,6 @@ static void dwc2_usb_consumer_thread ( )
         struct usb_request * req =
             ( void * ) ( long ) mailbox_recv ( usb_requests_mbox );
 
-        printu ( "HCD recv!" );
         if ( usb_dev_is_root ( req -> dev ) )
         {
             dwc2_root_hub_request ( req );
@@ -375,7 +374,7 @@ static int dwc2_start_usb_consumer_thread ( )
 
 int hcd_start ( )
 {
-    printu ( "Starting up Synopsys DesignWare USB 2.0 OTG Controller" );
+    printuln ( "Starting up Synopsys DesignWare USB 2.0 OTG Controller" );
 
     // Ask the GPU to power the USB controller on
     power_device ( POWER_USB_HCD, POWER_ON );
@@ -408,7 +407,7 @@ int hcd_start ( )
 
 void hcd_stop ( )
 {
-    printu ( "HCD Stop" );
+    printuln ( "HCD Stop" );
 }
 
 void hcd_submit_request ( struct usb_request * req )

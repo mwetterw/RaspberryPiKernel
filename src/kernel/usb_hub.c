@@ -108,7 +108,7 @@ static int usb_hub_read_hub_desc ( struct usb_hub * hub )
     if ( hdr.bLength < USB_HUB_DESC_MIN_BLENGTH ||
             hdr.bLength > USB_HUB_DESC_MAX_BLENGTH )
     {
-        printu ( "The reported Hub desc bLength is out of allowed range" );
+        printuln ( "The reported Hub desc bLength is out of allowed range" );
         return -1;
     }
 
@@ -159,7 +159,7 @@ static int usb_hub_port_reset ( struct usb_hub * hub, uint16_t port )
     status = usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_RESET, 1 );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when sending the request to reset the port" );
+        printuln ( "Error when sending the request to reset the port" );
         return status;
     }
 
@@ -167,20 +167,20 @@ static int usb_hub_port_reset ( struct usb_hub * hub, uint16_t port )
     int delay = 0;
     for ( ; hub -> ports [ port ].status.reset ; delay += USB_HUB_RST_DELAY )
     {
-        printu ( "USB Hub Port Reset wait" );
+        printuln ( "USB Hub Port Reset wait" );
         cdelay ( USB_HUB_RST_DELAY * 1000 * 7 );
 
         // Refresh the port status
         status = usb_hub_read_port_status ( hub, port );
         if ( status != USB_STATUS_SUCCESS )
         {
-            printu ( "Error when retrieving USB Hub Port Status during reset" );
+            printuln ( "Error when retrieving USB Hub Port Status during reset" );
             return status;
         }
 
         if ( delay >= USB_HUB_RST_TIMEOUT )
         {
-            printu ( "Hub port reset timed out" );
+            printuln ( "Hub port reset timed out" );
             return USB_STATUS_TIMEOUT;
         }
     }
@@ -196,11 +196,11 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
     int status;
     struct usb_device * new_dev;
 
-    printu ( "New device plugged in. Resetting the port..." );
+    printuln ( "New device plugged in. Resetting the port..." );
     status = usb_hub_port_reset ( hub, port );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when trying to reset the hub port" );
+        printuln ( "Error when trying to reset the hub port" );
         return;
     }
 
@@ -208,28 +208,28 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
     status = usb_hub_read_port_status ( hub, port );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error upon post-reset USB Hub Port Status retrieval" );
+        printuln ( "Error upon post-reset USB Hub Port Status retrieval" );
         usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
         return;
     }
 
     if ( hub -> ports [ port ].status.ls_dev )
     {
-        printu ( "Newly attached device is Low-Speed" );
+        printuln ( "Newly attached device is Low-Speed" );
     }
     else if ( hub -> ports [ port ].status.hs_dev )
     {
-        printu ( "Newly attached device is High-Speed" );
+        printuln ( "Newly attached device is High-Speed" );
     }
     else
     {
-        printu ( "Newly attached device is Full-Speed" );
+        printuln ( "Newly attached device is Full-Speed" );
     }
 
     // Allocate new device
     if ( ! ( new_dev = usb_alloc_device ( hub -> dev ) ) )
     {
-        printu ( "Error when trying to allocate device for new dev" );
+        printuln ( "Error when trying to allocate device for new dev" );
         usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
         return;
     }
@@ -239,7 +239,7 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
     // Ask the USB Core to attach the device !
     if ( usb_attach_device ( new_dev ) != 0 )
     {
-        printu ( "Error during attachment of new device" );
+        printuln ( "Error during attachment of new device" );
         hub -> ports [ port ].child = 0;
         usb_free_device ( new_dev );
         usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
@@ -250,20 +250,21 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
 {
     int status;
 
-    printu ( "Processing Hub Port Change..." );
+    printu ( "Processing Hub Port Change #" );
     printu_32h ( port );
+    printuln ( 0 );
 
     status = usb_hub_read_port_status ( hub, port );
     if ( status != USB_STATUS_SUCCESS )
     {
-        printu ( "Error when retrieving USB Hub Port Status" );
+        printuln ( "Error when retrieving USB Hub Port Status" );
         return;
     }
 
     // Connection changed
     if ( hub -> ports [ port ].status.c_connection )
     {
-        printu ( "Port connection changed" );
+        printuln ( "Port connection changed" );
         // Acknowledge the event
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_CONNECTION, 0 );
 
@@ -277,7 +278,7 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     // Reset changed
     if ( hub -> ports [ port ].status.c_reset )
     {
-        printu ( "Port reset changed" );
+        printuln ( "Port reset changed" );
         // Acknowledge the event
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_RESET, 0 );
     }
@@ -285,7 +286,7 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     // Enable changed (spec says only when enable -> disable)
     if ( hub -> ports [ port ].status.c_enable )
     {
-        printu ( "Port enable changed" );
+        printuln ( "Port enable changed" );
         // Acknowledge the event
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_ENABLE, 0 );
     }
@@ -293,20 +294,20 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     // Over-current changed
     if ( hub -> ports [ port ].status.c_over_current )
     {
-        printu ( "Port overcurrent changed" );
+        printuln ( "Port overcurrent changed" );
     }
 
     // Suspend changed
     if ( hub -> ports [ port ].status.c_suspend )
     {
-        printu ( "Port suspend changed" );
+        printuln ( "Port suspend changed" );
     }
 }
 
 static void usb_hub_hub_changed ( struct usb_hub * hub )
 {
     ( void ) hub;
-    printu ( "Processing Hub Change..." );
+    printuln ( "Processing Hub Change..." );
 }
 
 static void usb_hub_status_changed_worker ( )
@@ -374,7 +375,7 @@ void usb_hub_status_changed_request_done ( struct usb_request * req )
 {
     if ( req -> status != USB_STATUS_SUCCESS )
     {
-        printu ( "USB Hub Status Changed request failed" );
+        printuln ( "USB Hub Status Changed request failed" );
         return;
     }
 
@@ -484,6 +485,7 @@ int usb_hub_probe ( struct usb_device * dev )
     }
 
     // Read Hub Descriptor
+    printuln ( "Reading Hub Descriptor" );
     if ( usb_hub_read_hub_desc ( dev -> hub ) != 0 )
     {
         goto err_free_hub;
@@ -492,7 +494,7 @@ int usb_hub_probe ( struct usb_device * dev )
     uint8_t nbports = dev -> hub -> hub_desc -> bNbrPorts;
     if ( nbports < 1 )
     {
-        printu ( "Hub reports having no downstream port" );
+        printuln ( "Hub reports having no downstream port" );
         goto err_free_hub;
     }
 
@@ -528,7 +530,7 @@ int usb_hub_probe ( struct usb_device * dev )
             usb_hub_port_feature ( dev -> hub, port, HUB_FEATURE_PORT_POWER, 1 );
         if ( status != USB_STATUS_SUCCESS )
         {
-            printu ( "Ignoring port power-on failure" );
+            printuln ( "Ignoring port power-on failure" );
         }
     }
 

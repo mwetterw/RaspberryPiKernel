@@ -107,6 +107,7 @@ static const struct usb_hub_desc dwc2_root_hub_hub_desc =
 
 void dwc2_root_hub_handle_port_interrupt ( )
 {
+    printuln ( "Interrupt (root port)" );
     union hprt hprt = regs -> host.hprt;
 
     // Update our port status for the USB Hub driver
@@ -347,7 +348,7 @@ void dwc2_root_hub_request ( struct usb_request * req )
     // Interrupt Request
     if ( req -> endp )
     {
-        printu ( "Processing Root Hub Interrupt Request" );
+        printuln ( "Processing Root Hub Interrupt Request" );
         dwc2_root_hub_pending_req = req;
         if ( dwc2_root_hub_port_status.wPortChange != 0 )
         {
@@ -357,7 +358,7 @@ void dwc2_root_hub_request ( struct usb_request * req )
     // Control Request
     else
     {
-        printu ( "Processing Root Hub Control Request" );
+        printuln ( "Processing Root Hub Control Request" );
         req -> status = dwc2_root_hub_ctrl_req ( req );
         usb_request_done ( req );
     }

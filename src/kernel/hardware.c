@@ -18,18 +18,18 @@ void hardware_init ( )
     pic_disable_all_interrupts ( );
 
     uart_init ( );
-    printu ( "Welcome!" );
+    printuln ( "Welcome!" );
 
-    printu ( "Initializing Timer" );
+    printuln ( "Initializing Timer" );
     systimer_init ( );
 
-    printu ( "Configuring OK_LED" );
+    printuln ( "Configuring OK_LED" );
     hardware_led_init ( );
 
-    printu ( "Launching USB Core Init process" );
+    printuln ( "Launching USB Core Init process" );
     pcb_create ( usb_init, 0 );
 
-    printu ( "Hardware initialization complete" );
+    printuln ( "Hardware initialization complete" );
 }
 
 void hardware_led_init ( )
