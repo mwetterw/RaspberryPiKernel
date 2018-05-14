@@ -72,6 +72,7 @@ struct usb_request
 
     // For the Host Controller
     enum usb_ctrl_stage ctrl_stage;
+    uint8_t next_data_toggle;
 };
 
 struct usb_driver

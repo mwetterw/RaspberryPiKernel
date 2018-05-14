@@ -21,6 +21,7 @@ extern void dwc2_root_hub_handle_port_interrupt ( );
 static void dwc2_channel_interrupt ( uint32_t chan );
 static void dwc2_prepare_channel ( uint32_t chan );
 static void dwc2_start_channel ( uint32_t chan );
+static void dwc2_defer_req ( struct usb_request * req );
 
 static mailbox_t usb_requests_mbox;
 
@@ -112,6 +113,7 @@ static void dwc2_channel_interrupt ( uint32_t chan )
 {
     union hcint hcint = regs -> host.hc [ chan ].hcint;
     union hcchar hcchar = regs -> host.hc [ chan ].hcchar;
+    union hctsiz hctsiz = regs -> host.hc [ chan ].hctsiz;
     struct usb_request * req = dwc2_chan_requests [ chan ];
 
     // Acknowledge interrupts for this channel
@@ -186,38 +188,49 @@ static void dwc2_channel_interrupt ( uint32_t chan )
         return;
     }
 
-    switch ( hcchar.eptype )
+    if ( hcchar.epdir == HCCHAR_EPDIR_IN )
     {
-        case HCCHAR_EPTYPE_CTRL:
-            if ( hcint.ack )
+        req -> xfer_size = req -> size - hctsiz.xfersize;
+    }
+
+    req -> next_data_toggle = hctsiz.pid;
+
+    if ( hcchar.eptype == HCCHAR_EPTYPE_CTRL )
+    {
+        if ( hcint.ack )
+        {
+            // Complete the request when status stage has completed
+            if ( req -> ctrl_stage == USB_CTRL_STAGE_STATUS )
             {
-                // Complete the request when status stage has completed
-                if ( req -> ctrl_stage == USB_CTRL_STAGE_STATUS )
-                {
-                    dwc2_complete_request ( chan, USB_STATUS_SUCCESS );
-                    return;
-                }
-
-                // Go on to the next stage
-                req -> ctrl_stage++;
-
-                // Skip DATA stage if there is no data to send/receive
-                if ( req -> setup_req.wLength == 0 )
-                {
-                    req -> ctrl_stage++;
-                }
-
-                // Start the new transaction
-                dwc2_prepare_channel ( chan );
+                dwc2_complete_request ( chan, USB_STATUS_SUCCESS );
                 return;
             }
-            break;
 
-        case HCCHAR_EPTYPE_ISOC:
-        case HCCHAR_EPTYPE_BLK:
-        case HCCHAR_EPTYPE_IRQ:
-            dwc2_complete_request ( chan, USB_STATUS_NOT_SUPPORTED );
-            break;
+            // Go on to the next stage
+            req -> ctrl_stage++;
+
+            // Skip DATA stage if there is no data to send/receive
+            if ( req -> setup_req.wLength == 0 )
+            {
+                req -> ctrl_stage++;
+            }
+
+            // Start the new transaction
+            dwc2_prepare_channel ( chan );
+            return;
+        }
+    }
+
+    if ( hcint.ack )
+    {
+        dwc2_complete_request ( chan, USB_STATUS_SUCCESS );
+        return;
+    }
+
+    if ( hcint.nak )
+    {
+        dwc2_release_chan ( chan );
+        dwc2_defer_req ( req );
     }
 }
 
@@ -252,64 +265,74 @@ static void dwc2_prepare_channel ( uint32_t chan )
         hcchar.mps = req -> dev -> dev_desc.bMaxPacketSize0;
     }
 
-    switch ( hcchar.eptype )
+    // Control transfer
+    if ( hcchar.eptype == HCCHAR_EPTYPE_CTRL )
     {
-        case HCCHAR_EPTYPE_CTRL:
-            switch ( req -> ctrl_stage )
-            {
-                /* USB 2.0 Section 8.5.3
-                 * During the Setup stage, a SETUP transaction is used to
-                 * transmit information to the control endpoint of a function.
-                 * SETUP transactions are similar in format to an OUT but use a
-                 * SETUP rather than an OUT PID. [...] A SETUP always uses a
-                 * DATA0 PID for the data field of the SETUP transaction. The
-                 * function receiving a SETUP must accept the SETUP data and
-                 * respond with ACK; if the data is corrupted, discard the data
-                 * and return no handshake. */
-                // [SETUP DATA0 ACK]
-                case USB_CTRL_STAGE_SETUP:
-                    hcchar.epdir = HCCHAR_EPDIR_OUT;
-                    hctsiz.pid = HCTSIZ_PID_MDATA_SETUP;
-                    hctsiz.xfersize = sizeof ( req -> setup_req );
-                    hcdma = &( req -> setup_req );
-                    break;
+        switch ( req -> ctrl_stage )
+        {
+            /* USB 2.0 Section 8.5.3
+             * During the Setup stage, a SETUP transaction is used to
+             * transmit information to the control endpoint of a function.
+             * SETUP transactions are similar in format to an OUT but use a
+             * SETUP rather than an OUT PID. [...] A SETUP always uses a
+             * DATA0 PID for the data field of the SETUP transaction. The
+             * function receiving a SETUP must accept the SETUP data and
+             * respond with ACK; if the data is corrupted, discard the data
+             * and return no handshake. */
+            // [SETUP DATA0 ACK]
+            case USB_CTRL_STAGE_SETUP:
+                hcchar.epdir = HCCHAR_EPDIR_OUT;
+                hctsiz.pid = HCTSIZ_PID_MDATA_SETUP;
+                hctsiz.xfersize = sizeof ( req -> setup_req );
+                hcdma = &( req -> setup_req );
+                break;
 
-                /* USB 2.0 Section 8.5.3
-                 * "The Data Stage, if present, of a control transfer
-                 * consists of one or more IN or OUT transactions and
-                 * follows the same protocol rules as bulk transfers. All
-                 * the transactions in the Data stage must be in the same
-                 * direction (i.e., all INs or OUTs). The amount of data to
-                 * be sent during the data stage and its direction are
-                 * specified during the Setup stage. If the amount of data
-                 * exceeds the prenegociated data packet size, the data is
-                 * sent in multiple transactions (INs or OUTs) that carry
-                 * the maximum packet size. Any remaining data is sent as
-                 * residual in the last transaction." */
-                // [IN DATA1 ACK] [IN DATA0 ACK]...
-                case USB_CTRL_STAGE_DATA:
-                    hcchar.epdir = req -> setup_req.bmRequestType.dir;
+            /* USB 2.0 Section 8.5.3
+             * "The Data Stage, if present, of a control transfer
+             * consists of one or more IN or OUT transactions and
+             * follows the same protocol rules as bulk transfers. All
+             * the transactions in the Data stage must be in the same
+             * direction (i.e., all INs or OUTs). The amount of data to
+             * be sent during the data stage and its direction are
+             * specified during the Setup stage. If the amount of data
+             * exceeds the prenegociated data packet size, the data is
+             * sent in multiple transactions (INs or OUTs) that carry
+             * the maximum packet size. Any remaining data is sent as
+             * residual in the last transaction." */
+            // [IN DATA1 ACK] [IN DATA0 ACK]...
+            case USB_CTRL_STAGE_DATA:
+                hcchar.epdir = req -> setup_req.bmRequestType.dir;
+                if ( req -> xfer_size == 0 )
+                {
                     hctsiz.pid = HCTSIZ_PID_DATA1;
-                    hctsiz.xfersize = req -> size;
-                    hcdma = req -> data;
-                    break;
+                }
+                else
+                {
+                    hctsiz.pid = req -> next_data_toggle;
+                }
+                hctsiz.xfersize = req -> size;
+                hcdma = req -> data;
+                break;
 
-                /* USB 2.0 Section 8.5.3
-                 * "A Status stage is delineated by a change in direction of data
-                 * flow from the previous stage and always uses a DATA1 PID." */
-                // [OUT DATA1(ZLP) ACK]
-                case USB_CTRL_STAGE_STATUS:
-                    hcchar.epdir = ! ( req -> setup_req.bmRequestType.dir );
-                    hctsiz.pid = HCTSIZ_PID_DATA1;
-                    hctsiz.xfersize = 0;
-                    hcdma = 0;
-                    break;
-            }
-            break;
-
-        default:
-            dwc2_complete_request ( chan, USB_STATUS_NOT_SUPPORTED );
-            return;
+            /* USB 2.0 Section 8.5.3
+             * "A Status stage is delineated by a change in direction of data
+             * flow from the previous stage and always uses a DATA1 PID." */
+            // [OUT DATA1(ZLP) ACK]
+            case USB_CTRL_STAGE_STATUS:
+                hcchar.epdir = ! ( req -> setup_req.bmRequestType.dir );
+                hctsiz.pid = HCTSIZ_PID_DATA1;
+                hctsiz.xfersize = 0;
+                hcdma = 0;
+                break;
+        }
+    }
+    // Non control transfer
+    else
+    {
+        hcchar.epdir = req -> endp -> bEndpointAddress.dir;
+        hctsiz.pid = req -> next_data_toggle;
+        hctsiz.xfersize = req -> size;
+        hcdma = req -> data;
     }
 
     // Set device address
@@ -377,6 +400,26 @@ static void dwc2_real_request ( struct usb_request * req )
 
     dwc2_chan_requests [ chan ] = req;
     dwc2_prepare_channel ( chan );
+}
+
+void dwc2_defer_req_thread ( struct usb_request * req )
+{
+    uint32_t usec;
+
+    // Determine number of usec of deferral
+    // TODO: This is valid only for HS IRQ and ISOC endpoints
+    usec = ( 1 << ( req -> endp -> bInterval - 1 ) ) * 125;
+
+    // Defer
+    api_process_sleep ( usec );
+
+    // Relaunch the request
+    dwc2_real_request ( req );
+}
+
+static void dwc2_defer_req ( struct usb_request * req )
+{
+    api_process_create ( dwc2_defer_req_thread, req );
 }
 
 #define NB_FIFOS 3
