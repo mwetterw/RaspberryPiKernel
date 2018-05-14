@@ -6,7 +6,7 @@
 #include "bcm2835/uart.h"
 #include "../libc/string.h"
 
-#define USB_MAX_DEV 32
+#define USB_MAX_DEV 127
 #define USB_MAX_DRIVERS 32
 static struct usb_device usb_devs [ USB_MAX_DEV ];
 static const struct usb_driver * usb_drivers [ USB_MAX_DRIVERS ];

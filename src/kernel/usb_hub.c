@@ -13,15 +13,15 @@
 
 #include "bcm2835/uart.h"
 
-static sem_t usb_hub_sem;
-
-extern struct usb_device * usb_root;
-
 #define USB_HUB_RST_TIMEOUT 800
 #define USB_HUB_RST_DELAY 10
 
+#define USB_MAX_HUB 32
+
 struct usb_hub
 {
+    int used;
+
     struct usb_device * dev;
     struct usb_hub_desc * hub_desc;
 
@@ -40,25 +40,48 @@ struct usb_hub_port
     struct usb_device * child;
 };
 
-static int usb_hub_allocate ( struct usb_device * dev )
+static sem_t usb_hub_sem;
+static struct usb_hub usb_hubs [ USB_MAX_HUB ];
+static uint32_t usb_hub_pending;
+
+extern struct usb_device * usb_root;
+
+
+static struct usb_hub * usb_hub_allocate ( struct usb_device * dev )
 {
-    struct usb_hub * hub;
-
-    hub = memory_allocate ( sizeof ( struct usb_hub ) );
-    if ( ! hub )
+    // Hub datastructure has already been allocated for this device
+    if ( dev -> hub )
     {
-        return -1;
+        return 0;
     }
-    memset ( hub, 0, sizeof ( struct usb_hub ) );
-    hub -> dev = dev;
 
-    dev -> hub = hub;
+    uint32_t irqmask = irq_disable ( );
+    for ( int i = 0 ; i < USB_MAX_HUB ; ++i )
+    {
+        if ( ! usb_hubs [ i ].used )
+        {
+            struct usb_hub * hub = & usb_hubs [ i ];
+            memset ( hub, 0, sizeof ( struct usb_hub ) );
+            hub -> used = 1;
+            hub -> dev = dev;
+            dev -> hub = hub;
 
+            irq_restore ( irqmask );
+            return hub;
+        }
+    }
+
+    irq_restore ( irqmask );
     return 0;
 }
 
 static void usb_hub_free ( struct usb_hub * hub )
 {
+    if ( ! hub -> used )
+    {
+        return;
+    }
+
     if ( hub -> ports )
     {
         memory_deallocate ( hub -> ports );
@@ -80,7 +103,7 @@ static void usb_hub_free ( struct usb_hub * hub )
     }
 
     hub -> dev -> hub = 0;
-    memory_deallocate ( hub );
+    hub -> used = 0;
 }
 
 static int usb_hub_get_hub_desc ( struct usb_hub * hub, void * buf, uint16_t size )
@@ -315,29 +338,36 @@ static void usb_hub_hub_changed ( struct usb_hub * hub )
 
 static void usb_hub_status_changed_worker ( )
 {
-    void f ( struct usb_device * dev )
+    uint32_t irqmask;
+    struct usb_hub * hub;
+    uint32_t hub_id;
+
+    uint8_t status_byte;
+    uint16_t port;
+    size_t s;
+
+    for ( ; ; )
     {
-        struct usb_hub * hub;
-        uint8_t status_byte;
-        uint16_t port;
-        size_t s;
+        // Wait for a Hub IRQ to occur
+        wait ( usb_hub_sem );
 
-        int hub_changed = 0;
-
-        // Skip non-hub device
-        if ( ! ( hub = dev -> hub ) )
+        // Determine which Hub has a pending IRQ
+        irqmask = irq_disable ( );
+        if ( ! usb_hub_pending )
         {
-            return;
+            irq_restore ( irqmask );
+            continue;
         }
+        hub_id = 31 - __builtin_clz ( usb_hub_pending );
+        usb_hub_pending ^= ( 1 << hub_id );
+        irq_restore ( irqmask );
+
+        hub = &usb_hubs [ hub_id ];
 
         // Process each status byte
         for ( s = 0 ; s < hub -> changed_size; ++s )
         {
             status_byte = ( hub -> changed ) [ s ];
-            if ( status_byte )
-            {
-                hub_changed = 1;
-            }
 
             // Process bits within the byte
             while ( status_byte )
@@ -361,30 +391,26 @@ static void usb_hub_status_changed_worker ( )
         }
 
         // Re-submit USB Hub IRQ request
-        if ( hub_changed )
-        {
-            usb_submit_request ( hub -> status_changed_req );
-        }
-    }
-
-    for ( ; ; )
-    {
-        wait ( usb_hub_sem );
-        usb_foreach ( usb_root, f );
+        usb_submit_request ( hub -> status_changed_req );
     }
 }
 
 void usb_hub_status_changed_request_done ( struct usb_request * req )
 {
+    uint32_t irqmask;
+    uint32_t hub_id;
+    struct usb_hub * hub;
+    size_t size;
+
     if ( req -> status != USB_STATUS_SUCCESS )
     {
         printuln ( "USB Hub Status Changed request failed" );
         return;
     }
 
-    struct usb_hub * hub = req -> dev -> hub;
+    hub = req -> dev -> hub;
 
-    size_t size = min ( req -> xfer_size, hub -> changed_size );
+    size = min ( req -> xfer_size, hub -> changed_size );
     memcpy ( hub -> changed, req -> data, size );
 
     if ( req -> xfer_size < hub -> changed_size )
@@ -393,6 +419,15 @@ void usb_hub_status_changed_request_done ( struct usb_request * req )
                     hub -> changed_size - req -> xfer_size );
     }
 
+    // Determine the Hub ID
+    hub_id = hub - usb_hubs;
+
+    // Mark the Hub has having a pending Hub IRQ
+    irqmask = irq_disable ( );
+    usb_hub_pending |= ( 1 << hub_id );
+    irq_restore ( irqmask );
+
+    // Tell the Hub IRQ processing thread!
     signal ( usb_hub_sem );
 }
 
@@ -482,8 +517,9 @@ int usb_hub_probe ( struct usb_device * dev )
     }
 
     // Allocate a hub
-    if ( usb_hub_allocate ( dev ) != 0 )
+    if ( ! usb_hub_allocate ( dev ) )
     {
+        printuln ( "Couldn't allocate Hub" );
         return -1;
     }
 
@@ -543,10 +579,7 @@ int usb_hub_probe ( struct usb_device * dev )
     req -> endp = dev -> endp_desc [ 0 ] [ 0 ];
     req -> callback = usb_hub_status_changed_request_done;
 
-    if ( usb_submit_request ( req ) != USB_STATUS_SUCCESS )
-    {
-        return USB_STATUS_ERROR;
-    }
+    usb_submit_request ( req );
 
     return USB_STATUS_SUCCESS;
 
