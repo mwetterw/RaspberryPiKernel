@@ -12,7 +12,7 @@ kernel_pcb_t * pcb_create ( void * f, void * args )
     kernel_pcb_t * pcb = memory_allocate ( sizeof ( kernel_pcb_t ) );
     pcb -> mpStack = memory_allocate ( KERNEL_STACK_SIZE );
     pcb -> mpSP = ( pcb -> mpStack ) + KERNEL_STACK_SIZE - 16;
-    pcb_inherit_cpsr ( pcb );
+    pcb -> mpSP [ cpsr ] = ( arm_get_cpsr ( ) & ~ARM_MODE_MASK ) | ARM_MODE_SVC;
     pcb_enable_irq ( pcb );
     pcb_set_register ( pcb, pc, pcb_bigbang );
     pcb_set_register ( pcb, r0, f );

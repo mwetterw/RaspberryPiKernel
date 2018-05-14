@@ -11,6 +11,8 @@
 #define ARM_MODE_UND 0x18
 #define ARM_MODE_SYS 0x1F
 
+#define ARM_MODE_MASK 0x1F
+
 #define ARM_CPSR_IRQ_MASK 0x80
 
 // Wait a number of cycles
