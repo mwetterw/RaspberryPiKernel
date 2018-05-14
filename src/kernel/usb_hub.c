@@ -259,8 +259,8 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
 
     hub -> ports [ port ].child = new_dev;
 
-    // Ask the USB Core to attach the device !
-    if ( usb_attach_device ( new_dev ) != 0 )
+    // Ask the USB Core to enumerate the device!
+    if ( usb_enumerate_device ( new_dev ) != 0 )
     {
         printuln ( "Error during attachment of new device" );
         hub -> ports [ port ].child = 0;

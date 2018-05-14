@@ -419,7 +419,7 @@ int usb_find_driver_for_dev ( struct usb_device * dev )
     return USB_STATUS_NOT_SUPPORTED;
 }
 
-int usb_attach_device ( struct usb_device * dev )
+int usb_enumerate_device ( struct usb_device * dev )
 {
     int status;
 
@@ -516,10 +516,10 @@ void usb_init ( )
         goto err_hcd_stop;
     }
 
-    // Attach the root hub
-    if ( usb_attach_device ( usb_root ) != 0 )
+    // Enumerate the root hub
+    if ( usb_enumerate_device ( usb_root ) != 0 )
     {
-        printuln ( "USB Core failed to attach the root hub" );
+        printuln ( "USB Core failed to enumerate the root hub" );
         goto err_free_root_hub;
     }
 
