@@ -39,11 +39,18 @@ void gpio_configure_pull_up_down ( unsigned char gpioPin, unsigned char state );
 
 /*
  * For a GPIO configured as an output,
- * sets or clears the pin.
+ * set or clear the pin.
  * ASSERT: The GPIO is configured as an output.
  */
 void gpio_output_set ( unsigned char gpioPin );
 void gpio_output_clear ( unsigned char gpioPin );
+
+/*
+ * For a GPIO configured as an input,
+ * fetch the current value
+ * ASSERT: The GPIO is configured as an input.
+ */
+int gpio_input_read ( unsigned char gpioPin );
 
 
 #define GPIO0 0

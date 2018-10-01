@@ -59,3 +59,8 @@ void gpio_output_clear ( unsigned char gpioPin )
 {
     gpio_w32i ( GPCLR0, gpioPin >> 5, ( 1 << ( gpioPin & 31 ) ) );
 }
+
+int gpio_input_read ( unsigned char gpioPin )
+{
+    return ( gpio_r32i ( GPLEV0, gpioPin >> 5 ) >> ( gpioPin & 31 ) ) & 1;
+}
