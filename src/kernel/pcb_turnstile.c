@@ -2,8 +2,8 @@
 
 void pcb_turnstile_init ( kernel_pcb_turnstile_t * turnstile )
 {
-	turnstile -> mpFirst = 0;
-	turnstile -> mpLast = 0;
+    turnstile -> mpFirst = 0;
+    turnstile -> mpLast = 0;
 }
 
 int pcb_turnstile_empty ( kernel_pcb_turnstile_t * turnstile )
@@ -13,74 +13,74 @@ int pcb_turnstile_empty ( kernel_pcb_turnstile_t * turnstile )
 
 void pcb_turnstile_pushback ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
-	pcb -> mpNext = 0;
+    pcb -> mpNext = 0;
 
-	if ( ! turnstile -> mpFirst )
-	{
-		turnstile -> mpFirst = pcb;
-		turnstile -> mpLast = pcb;
-		return;
-	}
+    if ( ! turnstile -> mpFirst )
+    {
+        turnstile -> mpFirst = pcb;
+        turnstile -> mpLast = pcb;
+        return;
+    }
 
-	turnstile -> mpLast -> mpNext = pcb;
-	turnstile -> mpLast = pcb;
+    turnstile -> mpLast -> mpNext = pcb;
+    turnstile -> mpLast = pcb;
 }
 
 void pcb_turnstile_sorted_insert ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
 {
-	// Empty turnstile
-	if ( ! turnstile -> mpFirst )
-	{
-		turnstile -> mpFirst = pcb;
-		turnstile -> mpLast = pcb;
+    // Empty turnstile
+    if ( ! turnstile -> mpFirst )
+    {
+        turnstile -> mpFirst = pcb;
+        turnstile -> mpLast = pcb;
         pcb -> mpNext = 0;
-		return;
-	}
+        return;
+    }
 
-	// Push front
-	if ( pcb -> mWakeUpDate <= turnstile -> mpFirst -> mWakeUpDate )
-	{
-		pcb -> mpNext = turnstile -> mpFirst;
-		turnstile -> mpFirst = pcb;
-		return;
-	}
+    // Push front
+    if ( pcb -> mWakeUpDate <= turnstile -> mpFirst -> mWakeUpDate )
+    {
+        pcb -> mpNext = turnstile -> mpFirst;
+        turnstile -> mpFirst = pcb;
+        return;
+    }
 
-	// Push back
-	if ( pcb -> mWakeUpDate >= turnstile -> mpLast -> mWakeUpDate )
-	{
-		turnstile -> mpLast -> mpNext = pcb;
-		turnstile -> mpLast = pcb;
-		pcb -> mpNext = 0;
-		return;
-	}
+    // Push back
+    if ( pcb -> mWakeUpDate >= turnstile -> mpLast -> mWakeUpDate )
+    {
+        turnstile -> mpLast -> mpNext = pcb;
+        turnstile -> mpLast = pcb;
+        pcb -> mpNext = 0;
+        return;
+    }
 
-	kernel_pcb_t * * it;
-	for
-	(
-			it = & ( turnstile -> mpFirst ) ;
-			pcb -> mWakeUpDate > ( * it ) -> mWakeUpDate ;
-			it = & ( ( * it ) -> mpNext )
-	);
-	pcb -> mpNext = * it;
-	* it = pcb;
+    kernel_pcb_t * * it;
+    for
+    (
+            it = & ( turnstile -> mpFirst ) ;
+            pcb -> mWakeUpDate > ( * it ) -> mWakeUpDate ;
+            it = & ( ( * it ) -> mpNext )
+    );
+    pcb -> mpNext = * it;
+    * it = pcb;
 }
 
 kernel_pcb_t *
 pcb_turnstile_popfront ( kernel_pcb_turnstile_t * turnstile )
 {
-	if ( ! turnstile -> mpFirst )
-	{
-		return 0;
-	}
+    if ( ! turnstile -> mpFirst )
+    {
+        return 0;
+    }
 
-	kernel_pcb_t * head = turnstile -> mpFirst;
-	turnstile -> mpFirst = head -> mpNext;
+    kernel_pcb_t * head = turnstile -> mpFirst;
+    turnstile -> mpFirst = head -> mpNext;
 
-	if ( turnstile -> mpLast == head )
-	{
-		turnstile -> mpLast = 0;
-	}
-	return head;
+    if ( turnstile -> mpLast == head )
+    {
+        turnstile -> mpLast = 0;
+    }
+    return head;
 }
 
 void pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnstile )
@@ -108,14 +108,14 @@ void pcb_turnstile_remove ( kernel_pcb_t * pcb, kernel_pcb_turnstile_t * turnsti
 
 void pcb_turnstile_rotate ( kernel_pcb_turnstile_t * turnstile )
 {
-	if ( ( ! turnstile -> mpFirst ) || turnstile -> mpFirst == turnstile -> mpLast )
-	{
-		return;
-	}
+    if ( ( ! turnstile -> mpFirst ) || turnstile -> mpFirst == turnstile -> mpLast )
+    {
+        return;
+    }
 
-	turnstile -> mpLast -> mpNext = turnstile -> mpFirst;
-	turnstile -> mpLast = turnstile -> mpFirst;
-	turnstile -> mpFirst = turnstile -> mpFirst -> mpNext;
-	turnstile -> mpLast -> mpNext = 0;
+    turnstile -> mpLast -> mpNext = turnstile -> mpFirst;
+    turnstile -> mpLast = turnstile -> mpFirst;
+    turnstile -> mpFirst = turnstile -> mpFirst -> mpNext;
+    turnstile -> mpLast -> mpNext = 0;
 }
 

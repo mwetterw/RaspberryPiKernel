@@ -5,8 +5,8 @@
 
 typedef struct kernel_pcb_turnstile_s
 {
-	kernel_pcb_t * mpFirst;
-	kernel_pcb_t * mpLast;
+    kernel_pcb_t * mpFirst;
+    kernel_pcb_t * mpLast;
 } kernel_pcb_turnstile_t;
 
 /*
