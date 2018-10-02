@@ -348,7 +348,6 @@ void dwc2_root_hub_request ( struct usb_request * req )
     // Interrupt Request
     if ( req -> endp )
     {
-        printuln ( "Processing Root Hub Interrupt Request" );
         dwc2_root_hub_pending_req = req;
         if ( dwc2_root_hub_port_status.wPortChange != 0 )
         {
@@ -358,7 +357,6 @@ void dwc2_root_hub_request ( struct usb_request * req )
     // Control Request
     else
     {
-        printuln ( "Processing Root Hub Control Request" );
         req -> status = dwc2_root_hub_ctrl_req ( req );
         usb_request_done ( req );
     }

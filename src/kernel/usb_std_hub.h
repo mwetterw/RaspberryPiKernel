@@ -212,7 +212,7 @@ struct usb_hub_port_status
         uint16_t wPortChange;
         struct
         {
-            uint16_t c_connection   :  1; // Attach or deattach event
+            uint16_t c_connection   :  1; // Attach or detach event
             uint16_t c_enable       :  1; // Set on port error condition
             uint16_t c_suspend      :  1; // Set when resume is complete
             uint16_t c_over_current :  1;

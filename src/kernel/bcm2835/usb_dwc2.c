@@ -391,12 +391,7 @@ static void dwc2_start_channel ( uint32_t chan )
 static void dwc2_real_request ( struct usb_request * req )
 {
     uint32_t chan;
-
     chan = dwc2_get_free_chan ( );
-    printu ( "Processing real USB Request" );
-    printu ( " Free chan is " );
-    printu_32h ( chan );
-    printuln ( 0 );
 
     dwc2_chan_requests [ chan ] = req;
     dwc2_prepare_channel ( chan );

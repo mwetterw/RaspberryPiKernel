@@ -214,12 +214,35 @@ static int usb_hub_port_reset ( struct usb_hub * hub, uint16_t port )
     return USB_STATUS_SUCCESS;
 }
 
+static void usb_hub_port_detach ( struct usb_hub * hub, uint16_t port )
+{
+    struct usb_device * dev = hub -> ports [ port ].child;
+
+    // This may happen if a device previously detached by the core is now
+    // physically unplugged from the port
+    if ( ! dev )
+    {
+        return;
+    }
+
+    printuln ( "Detaching USB device from hub's port..." );
+
+    // Disable the port
+    usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
+
+    // Reflect the change in this hub's datastructure
+    hub -> ports [ port ].child = 0;
+
+    // Inform the USB core of the detach event
+    usb_free_device ( dev );
+}
+
 static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
 {
     int status;
     struct usb_device * new_dev;
 
-    printuln ( "New device plugged in. Resetting the port..." );
+    printuln ( "Attaching USB device. Resetting the port..." );
     status = usb_hub_port_reset ( hub, port );
     if ( status != USB_STATUS_SUCCESS )
     {
@@ -263,9 +286,7 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
     if ( usb_enumerate_device ( new_dev ) != 0 )
     {
         printuln ( "Error during attachment of new device" );
-        hub -> ports [ port ].child = 0;
-        usb_free_device ( new_dev );
-        usb_hub_port_feature ( hub, port, HUB_FEATURE_PORT_ENABLE, 0 );
+        usb_hub_port_detach ( hub, port );
     }
 }
 
@@ -298,6 +319,11 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
         if ( hub -> ports [ port ].status.connection )
         {
             usb_hub_port_attach ( hub, port );
+        }
+        // Detach
+        else
+        {
+            usb_hub_port_detach ( hub, port );
         }
     }
 
