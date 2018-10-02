@@ -1,5 +1,6 @@
 #include "usb_hcdi.h"
 #include "usb_hub.h"
+#include "bcm2835/smsc9512.h"
 #include "memory.h"
 #include "semaphore.h"
 #include "arm.h"
@@ -500,6 +501,12 @@ void usb_init ( )
     {
         printuln ( "Unable to register vital USB Hub Driver" );
         return;
+    }
+
+    // Register SMSC LAN9512 driver
+    if ( usb_register_driver ( & smsc9512_driver ) != 0 )
+    {
+        printuln ( "Unable to register SMSC LAN9512 USB Driver" );
     }
 
     // Request our Host Controller to start up
