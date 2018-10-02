@@ -54,11 +54,11 @@ void scheduler_elect ( )
 	// We wake up sleeping processes
 	if ( turnstile_sleeping.mpFirst )
 	{
-		if
-		(
-			turnstile_sleeping.mpFirst -> mWakeUpDate <=
-		    systimer_get_clock ( )
-		)
+        /* A simple timestamp comparison here would cause problems since the
+         * clock overflows every 71min35sec. Only disadvantage is we can't
+         * sleep more than 35min47sec. */
+        if ( systimer_get_clock ( ) - turnstile_sleeping.mpFirst -> mWakeUpDate
+                < 0x80000000UL )
 		{
 			kernel_pcb_t * current;
 			current = pcb_turnstile_popfront ( &turnstile_sleeping );
