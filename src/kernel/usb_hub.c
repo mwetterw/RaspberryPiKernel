@@ -218,13 +218,6 @@ static void usb_hub_port_detach ( struct usb_hub * hub, uint16_t port )
 {
     struct usb_device * dev = hub -> ports [ port ].child;
 
-    // This may happen if a device previously detached by the core is now
-    // physically unplugged from the port
-    if ( ! dev )
-    {
-        return;
-    }
-
     printuln ( "Detaching USB device from hub's port..." );
 
     // Disable the port
@@ -293,6 +286,7 @@ static void usb_hub_port_attach ( struct usb_hub * hub, uint16_t port )
 static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
 {
     int status;
+    struct usb_hub_port * hub_port = & hub -> ports [ port ];
 
     printu ( "Processing Hub #");
     printu_32h ( hub -> dev -> addr );
@@ -309,26 +303,41 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     }
 
     // Connection changed
-    if ( hub -> ports [ port ].status.c_connection )
+    if ( hub_port -> status.c_connection )
     {
         printuln ( "Port connection changed" );
         // Acknowledge the event
         usb_hub_port_feature ( hub, port, HUB_FEATURE_C_PORT_CONNECTION, 0 );
 
         // A new USB device has been detected. Let's attach it!
-        if ( hub -> ports [ port ].status.connection )
+        if ( hub_port -> status.connection )
         {
+            // If a device was previously attached to this port, detach it
+            // first. This happens when a device disconnects then reconnects so
+            // fast that we'll miss the disconnection event and only see a new
+            // connection.
+            if ( hub_port -> child )
+            {
+                usb_hub_port_detach ( hub, port );
+            }
             usb_hub_port_attach ( hub, port );
         }
-        // Detach
+
+        // A USB device has been disconnected. Let's detach it!
         else
         {
-            usb_hub_port_detach ( hub, port );
+            // This "if" is necessary if a device previously detached by the
+            // core is now physically unplugged from the port, to avoid
+            // detaching it 2 times
+            if ( hub_port -> child )
+            {
+                usb_hub_port_detach ( hub, port );
+            }
         }
     }
 
     // Reset changed
-    if ( hub -> ports [ port ].status.c_reset )
+    if ( hub_port -> status.c_reset )
     {
         printuln ( "Port reset changed" );
         // Acknowledge the event
@@ -336,7 +345,7 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     }
 
     // Enable changed (spec says only when enable -> disable)
-    if ( hub -> ports [ port ].status.c_enable )
+    if ( hub_port -> status.c_enable )
     {
         printuln ( "Port enable changed" );
         // Acknowledge the event
@@ -344,13 +353,13 @@ static void usb_hub_port_changed ( struct usb_hub * hub, uint16_t port )
     }
 
     // Over-current changed
-    if ( hub -> ports [ port ].status.c_over_current )
+    if ( hub_port -> status.c_over_current )
     {
         printuln ( "Port overcurrent changed" );
     }
 
     // Suspend changed
-    if ( hub -> ports [ port ].status.c_suspend )
+    if ( hub_port -> status.c_suspend )
     {
         printuln ( "Port suspend changed" );
     }
