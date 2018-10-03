@@ -487,22 +487,19 @@ void usb_foreach ( struct usb_device * dev, usb_foreach_func_t f )
         return;
     }
 
-    f ( dev );
-
-    // Leaf. Don't stack up and stop there
-    if ( ! dev -> hub )
-    {
-        return;
-    }
-
     // This is a hub (root or middle node). Let's stack up!
-    for ( int i = 1 ; i <= dev -> hub -> hub_desc -> bNbrPorts ; ++i )
+    if ( dev -> hub )
     {
-        if ( dev -> hub -> ports [ i ].child )
+        for ( int i = 1 ; i <= dev -> hub -> hub_desc -> bNbrPorts ; ++i )
         {
-            usb_foreach ( dev -> hub -> ports [ i ].child, f );
+            if ( dev -> hub -> ports [ i ].child )
+            {
+                usb_foreach ( dev -> hub -> ports [ i ].child, f );
+            }
         }
     }
+
+    f ( dev );
 }
 
 int usb_hub_probe ( struct usb_device * dev )
@@ -625,7 +622,17 @@ err_free_hub:
 
 int usb_hub_remove ( struct usb_device * dev )
 {
-    ( void ) dev;
+    // For each child, free the sub USB tree
+    for ( int i = 1 ; i <= dev -> hub -> hub_desc -> bNbrPorts ; ++i )
+    {
+        if ( dev -> hub -> ports [ i ].child )
+        {
+            usb_foreach ( dev -> hub -> ports [ i ].child, usb_free_device );
+        }
+    }
+
+    usb_hub_free ( dev -> hub );
+
     return USB_STATUS_SUCCESS;
 }
 

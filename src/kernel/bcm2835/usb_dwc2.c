@@ -246,6 +246,7 @@ static void dwc2_prepare_channel ( uint32_t chan )
     hcchar.raw = 0;
     hcsplt = 0;
     hctsiz.raw = 0;
+    hcdma = 0;
 
     // Fetch the request associated to the channel
     req = dwc2_chan_requests [ chan ];
