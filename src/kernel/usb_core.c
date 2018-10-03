@@ -43,7 +43,6 @@ usb_bind_driver ( struct usb_device * dev, const struct usb_driver * driver )
     int status = driver -> probe ( dev );
     if ( status == USB_STATUS_SUCCESS )
     {
-        printuln ( "Binding driver to device" );
         dev -> driver = driver;
     }
     return status;
@@ -60,6 +59,8 @@ static void usb_unbind_driver ( struct usb_device * dev )
 
 void usb_free_device ( struct usb_device * dev )
 {
+    printuln ( "Free device" );
+
     // Unbind driver
     usb_unbind_driver ( dev );
 
@@ -424,6 +425,7 @@ int usb_enumerate_device ( struct usb_device * dev )
 {
     int status;
 
+    printuln ( "Starting device enumeration" );
     // USB 2.0 Section 5.5.3
     /* In order to determine the maximum packet size for the Default Control
      * Pipe, the USB System Software reads the device descriptor. The host will
@@ -433,7 +435,6 @@ int usb_enumerate_device ( struct usb_device * dev )
      * to have read this default pipe's wMaxPacketSize field (byte 7 of the
      * device descriptor). It will then allow the correct size for all
      * subsequent transactions. */
-    printuln ( "Initial read of the device descriptor" );
     dev -> dev_desc.bMaxPacketSize0 = USB_LS_CTRL_DATALEN;
     status = usb_read_device_desc ( dev, USB_LS_CTRL_DATALEN );
     if ( status != USB_STATUS_SUCCESS )
@@ -443,7 +444,6 @@ int usb_enumerate_device ( struct usb_device * dev )
     }
 
     // Set device address
-    printuln ( "Setting address" );
     status = usb_set_device_addr ( dev, usb_alloc_addr ( dev ) );
     if ( status != USB_STATUS_SUCCESS )
     {
@@ -452,7 +452,6 @@ int usb_enumerate_device ( struct usb_device * dev )
     }
 
     // Re-read the device descriptor only if bMaxPacketSize0 has increased
-    printuln ( "Re-read of device descriptor" );
     if ( dev -> dev_desc.bMaxPacketSize0 > USB_LS_CTRL_DATALEN )
     {
         status = usb_read_device_desc ( dev, sizeof ( struct usb_dev_desc ) );
@@ -464,7 +463,6 @@ int usb_enumerate_device ( struct usb_device * dev )
     }
 
     // Read the first configuration descriptor
-    printuln ( "Read of the first configuration descriptor" );
     status = usb_read_conf_desc ( dev, 0 );
     if ( status != USB_STATUS_SUCCESS )
     {
@@ -473,7 +471,6 @@ int usb_enumerate_device ( struct usb_device * dev )
     }
 
     // Activate the first configuration
-    printuln ( "Activate the first configuration" );
     status = usb_set_configuration ( dev,
             dev -> conf_desc -> bConfigurationValue );
     if ( status != USB_STATUS_SUCCESS )
@@ -483,7 +480,6 @@ int usb_enumerate_device ( struct usb_device * dev )
     }
 
     // Try to find a driver for our new attached device!
-    printuln ( "Looking up driver for the new device" );
     status = usb_find_driver_for_dev ( dev );
     if ( status != USB_STATUS_SUCCESS )
     {

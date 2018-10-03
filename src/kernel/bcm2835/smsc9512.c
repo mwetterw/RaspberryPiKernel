@@ -1,5 +1,6 @@
 #include "../usb_core.h"
 #include "../../api/process.h"
+#include "uart.h"
 
 static struct usb_device * usb_dev;
 
@@ -87,6 +88,7 @@ int smsc9512_probe ( struct usb_device * dev )
     usb_dev = dev;
 
     api_process_create ( smsc9512_led_process, 0 );
+    printuln ( "SMSC LAN9512 driver bound" );
 
     return USB_STATUS_SUCCESS;
 }

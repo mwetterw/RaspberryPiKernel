@@ -109,6 +109,22 @@ void dwc2_interrupt ( )
     }
 }
 
+static void dwc2_channel_interrupt_display ( union hcint hcint )
+{
+    if ( hcint.xfercompl )  { printu ( " xfercompl" ); }
+    if ( hcint.chhltd )     { printu ( " chhltd" ); }
+    if ( hcint.ahberr )     { printu ( " ahberr" ); }
+    if ( hcint.stall )      { printu ( " STALL" ); }
+    if ( hcint.nak )        { printu ( " NAK" ); }
+    if ( hcint.ack )        { printu ( " ACK" ); }
+    if ( hcint.nyet )       { printu ( " NYET" ); }
+    if ( hcint.xacterr )    { printu ( " xacterr" ); }
+    if ( hcint.bblerr )     { printu ( " bblerr" ); }
+    if ( hcint.frmovrun )   { printu ( " frmovrun" ); }
+    if ( hcint.datatglerr ) { printu ( " datatglerr" ); }
+    printuln ( 0 );
+}
+
 static void dwc2_channel_interrupt ( uint32_t chan )
 {
     union hcint hcint = regs -> host.hc [ chan ].hcint;
@@ -119,71 +135,12 @@ static void dwc2_channel_interrupt ( uint32_t chan )
     // Acknowledge interrupts for this channel
     regs -> host.hc [ chan ].hcint = hcint;
 
-    printu ( "Interrupt on channel: " );
-    printu_32h ( chan );
-
-    if ( hcint.xfercompl )
-    {
-        printu ( " xfercompl" );
-    }
-
-    if ( hcint.chhltd )
-    {
-        printu ( " chhltd" );
-    }
-
-    if ( hcint.ahberr )
-    {
-        printu ( " ahberr" );
-    }
-
-    if ( hcint.stall )
-    {
-        printu ( " STALL" );
-    }
-
-    if ( hcint.nak )
-    {
-        printu ( " NAK" );
-    }
-
-    if ( hcint.ack )
-    {
-        printu ( " ACK" );
-    }
-
-    if ( hcint.nyet )
-    {
-        printu ( " NYET" );
-    }
-
-    if ( hcint.xacterr )
-    {
-        printu ( " xacterr" );
-    }
-
-    if ( hcint.bblerr )
-    {
-        printu ( " bblerr" );
-    }
-
-    if ( hcint.frmovrun )
-    {
-        printu ( " frmovrun" );
-    }
-
-    if ( hcint.datatglerr )
-    {
-        printu ( " datatglerr" );
-    }
-
-    printuln ( 0 );
-
     // Error
     if ( hcint.ahberr || hcint.stall || hcint.xacterr || hcint.bblerr ||
             hcint.frmovrun || hcint.datatglerr )
     {
-        printuln ( "An error occurred" );
+        printu ( "A USB error occurred:" );
+        dwc2_channel_interrupt_display ( hcint );
         dwc2_complete_request ( chan, USB_STATUS_ERROR );
         return;
     }
