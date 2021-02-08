@@ -1,10 +1,12 @@
+#include "smsc9512_regs.h"
+
 #include "../../api/process.h"
 
 extern uint32_t smsc9512_write_reg ( uint16_t addr, uint32_t val );
 
 void smsc9512_led_write ( uint8_t val )
 {
-    smsc9512_write_reg ( 0x24, 0x770 | ( ~val & 7 ) );
+    smsc9512_write_reg ( LED_GPIO_CFG, 0x770 | ( ~val & 7 ) );
 }
 
 void smsc9512_led_chaser ( uint8_t max )
@@ -59,5 +61,3 @@ void smsc9512_led_process ( )
         smsc9512_led_binary_counter ( 16 );
     }
 }
-
-

@@ -2,6 +2,10 @@
 #include "../../api/process.h"
 #include "uart.h"
 
+#include "smsc9512_regs.h"
+
+#define SMSC9512_PID 0xEC00
+
 static struct usb_device * usb_dev;
 
 extern void smsc9512_led_process ( );
@@ -34,7 +38,7 @@ int smsc9512_probe ( struct usb_device * dev )
             dev_desc -> bDeviceSubClass != 0 ||
             dev_desc -> bDeviceProtocol != 1 ||
             dev_desc -> idVendor != 0x0424 ||
-            dev_desc -> idProduct != 0xEC00 )
+            dev_desc -> idProduct != SMSC9512_PID )
     {
         return USB_STATUS_NOT_SUPPORTED;
     }
@@ -87,8 +91,18 @@ int smsc9512_probe ( struct usb_device * dev )
 
     usb_dev = dev;
 
-    api_process_create ( smsc9512_led_process, 0 );
+    uint32_t id_rev = smsc9512_read_reg ( ID_REV );
+    if ( id_rev >> 16 != SMSC9512_PID )
+    {
+        usb_dev = 0;
+        return USB_STATUS_NOT_SUPPORTED;
+    }
+
     printuln ( "SMSC LAN9512 driver bound" );
+    printu ( "SMSC LAN9512 rev " ); printu_32h ( id_rev & 0xFFFF );
+    printuln ( "" );
+
+    api_process_create ( smsc9512_led_process, 0 );
 
     return USB_STATUS_SUCCESS;
 }
