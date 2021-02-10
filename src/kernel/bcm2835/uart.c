@@ -92,10 +92,12 @@ void printu_32h ( uint32_t val )
     uart_write_char ( '0' );
     uart_write_char ( 'x' );
 
+    uint8_t lz = __builtin_clz ( val );
+
     uint32_t cur;
-    for ( int byte = 7 ; byte >= 0 ; --byte, val <<= 4 )
+    for ( int nibble = 7 - ( lz >> 2 ) ; nibble >= 0 ; --nibble )
     {
-        cur = ( val & ( 0xf << 28 ) ) >> 28;
+        cur = ( val >> ( nibble << 2 ) ) & 0xf;
         if ( cur <= 0x9 )
         {
             uart_write_char ( '0' + cur );

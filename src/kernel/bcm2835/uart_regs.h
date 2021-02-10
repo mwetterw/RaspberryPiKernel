@@ -97,18 +97,18 @@ enum CR
 enum IFLS
 {
     IFLS_RXIFLSEL_SHIFT = 3,
-        IFLS_RXIFLSEL_1_8 = ( 0 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO becomes 1/8 full
-        IFLS_RXIFLSEL_1_4 = ( 1 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO becomes 1/4 full
-        IFLS_RXIFLSEL_1_2 = ( 2 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO becomes 1/2 full
-        IFLS_RXIFLSEL_3_4 = ( 3 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO becomes 3/4 full
-        IFLS_RXIFLSEL_7_8 = ( 4 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO becomes 7/8 full
+        IFLS_RXIFLSEL_1_8 = ( 0 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO >= 1/8 full
+        IFLS_RXIFLSEL_1_4 = ( 1 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO >= 1/4 full
+        IFLS_RXIFLSEL_1_2 = ( 2 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO >= 1/2 full
+        IFLS_RXIFLSEL_3_4 = ( 3 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO >= 3/4 full
+        IFLS_RXIFLSEL_7_8 = ( 4 << IFLS_RXIFLSEL_SHIFT ), // RX FIFO >= 7/8 full
 
     IFLS_TXIFLSEL_SHIFT = 0,
-        IFLS_TXIFLSEL_1_8 = ( 0 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO becomes 1/8 full
-        IFLS_TXIFLSEL_1_4 = ( 1 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO becomes 1/4 full
-        IFLS_TXIFLSEL_1_2 = ( 2 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO becomes 1/2 full
-        IFLS_TXIFLSEL_3_4 = ( 3 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO becomes 3/4 full
-        IFLS_TXIFLSEL_7_8 = ( 4 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO becomes 7/8 full
+        IFLS_TXIFLSEL_1_8 = ( 0 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO <= 1/8 full
+        IFLS_TXIFLSEL_1_4 = ( 1 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO <= 1/4 full
+        IFLS_TXIFLSEL_1_2 = ( 2 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO <= 1/2 full
+        IFLS_TXIFLSEL_3_4 = ( 3 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO <= 3/4 full
+        IFLS_TXIFLSEL_7_8 = ( 4 << IFLS_TXIFLSEL_SHIFT ), // TX FIFO <= 7/8 full
 };
 
 // Interrupts (valid for IMSC, RIS, MIS and ICR)
